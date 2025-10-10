@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Mail, Chrome } from 'lucide-react-native';
+import { Mail } from 'lucide-react-native';
 
 export default function PublishSignup() {
   const router = useRouter();
@@ -23,9 +23,9 @@ export default function PublishSignup() {
         </Text>
 
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.socialButton} onPress={handleGoogleSignIn}>
-            <Chrome size={24} color="#4285F4" />
-            <Text style={styles.socialButtonText}>Continue with Google</Text>
+          <TouchableOpacity style={styles.emailButton} onPress={handleEmailSignIn}>
+            <Mail size={24} color="#fff" />
+            <Text style={styles.emailButtonText}>Continue with Email</Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -34,23 +34,12 @@ export default function PublishSignup() {
             <View style={styles.dividerLine} />
           </View>
 
-          <View style={styles.emailContainer}>
-            <Text style={styles.fieldLabel}>Email</Text>
-            <View style={styles.inputContainer}>
-              <Mail size={20} color="#999" />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your email"
-                placeholderTextColor="#999"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
+            <View style={styles.googleIcon}>
+              <Text style={styles.googleIconText}>G</Text>
             </View>
-
-            <TouchableOpacity style={styles.emailButton} onPress={handleEmailSignIn}>
-              <Text style={styles.emailButtonText}>Continue with Email</Text>
-            </TouchableOpacity>
-          </View>
+            <Text style={styles.googleButtonText}>Continue with Google</Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.termsText}>
@@ -88,7 +77,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     gap: 16,
   },
-  socialButton: {
+  googleButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -99,7 +88,20 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     gap: 12,
   },
-  socialButtonText: {
+  googleIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#4285F4',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  googleIconText: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: '#fff',
+  },
+  googleButtonText: {
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#1a1a1a',
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24,
+    marginVertical: 16,
   },
   dividerLine: {
     flex: 1,
@@ -120,33 +122,14 @@ const styles = StyleSheet.create({
     color: '#999',
     marginHorizontal: 16,
   },
-  emailContainer: {
-    gap: 12,
-  },
-  fieldLabel: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
-  },
-  inputContainer: {
+  emailButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F8FF',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1a1a1a',
-  },
-  emailButton: {
+    justifyContent: 'center',
     backgroundColor: '#4A90E2',
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    gap: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,

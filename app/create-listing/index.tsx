@@ -8,7 +8,11 @@ export default function CreateListingIntro() {
   const router = useRouter();
   const { updateFormData, nextStep } = useListing();
 
-
+  const handleGetStarted = () => {
+    updateFormData({ listingCategory: 'property' });
+    nextStep();
+    router.push('/create-listing/steps' as any);
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -26,17 +30,6 @@ export default function CreateListingIntro() {
 
         <Text style={styles.title}>It&apos;s easy to get started on SpaceGig</Text>
         <Text style={styles.subtitle}>Create your property listing in just a few simple steps</Text>
-
-        <TouchableOpacity
-          style={styles.getStartedButton}
-          onPress={() => {
-            updateFormData({ listingCategory: 'property' });
-            nextStep();
-            router.push('/create-listing/steps' as any);
-          }}
-        >
-          <Text style={styles.getStartedButtonText}>Get Started</Text>
-        </TouchableOpacity>
 
         <View style={styles.stepsContainer}>
           <View style={styles.stepItem}>
@@ -69,6 +62,13 @@ export default function CreateListingIntro() {
             </View>
           </View>
         </View>
+
+        <TouchableOpacity
+          style={styles.getStartedButton}
+          onPress={handleGetStarted}
+        >
+          <Text style={styles.getStartedButtonText}>Get Started</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
-    marginTop: 20,
+    marginTop: 32,
   },
   getStartedButtonText: {
     fontSize: 18,

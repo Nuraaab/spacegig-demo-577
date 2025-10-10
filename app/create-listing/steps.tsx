@@ -286,7 +286,7 @@ export default function CreateListingSteps() {
                         updateFormData({ amenities: [...formData.amenities, amenity.name] });
                       }
                     }}
-                    activeOpacity={1}
+                    activeOpacity={0.7}
                   >
                     <Icon size={20} color={isSelected ? '#4A90E2' : '#999'} />
                     <Text style={[styles.amenityText, isSelected && styles.amenityTextSelected]}>{amenity.name}</Text>
@@ -682,16 +682,16 @@ const styles = StyleSheet.create({
   amenityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F8FF',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
     gap: 12,
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: '#e5e7eb',
   },
   amenityItemSelected: {
-    backgroundColor: '#E6F3FF',
-    borderColor: '#4A90E2',
+    backgroundColor: '#E0F2FE',
+    borderColor: '#0ea5e9',
   },
   checkbox: {
     width: 24,
