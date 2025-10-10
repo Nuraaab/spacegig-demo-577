@@ -35,9 +35,9 @@ export default function TabLayout() {
     });
 
     if (isJobsRoute) {
-      router.push('/create-job/index' as any);
+      router.push('/create-job');
     } else {
-      router.push('/create-listing/index' as any);
+      router.push('/create-listing');
     }
   };
 
