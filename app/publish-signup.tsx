@@ -1,16 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Mail, Chrome, Apple } from 'lucide-react-native';
+import { Mail, Chrome } from 'lucide-react-native';
 
 export default function PublishSignup() {
   const router = useRouter();
 
   const handleGoogleSignIn = () => {
-    router.push('/publish-success' as any);
-  };
-
-  const handleAppleSignIn = () => {
     router.push('/publish-success' as any);
   };
 
@@ -30,11 +26,6 @@ export default function PublishSignup() {
           <TouchableOpacity style={styles.socialButton} onPress={handleGoogleSignIn}>
             <Chrome size={24} color="#4285F4" />
             <Text style={styles.socialButtonText}>Continue with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.socialButton} onPress={handleAppleSignIn}>
-            <Apple size={24} color="#000" />
-            <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>

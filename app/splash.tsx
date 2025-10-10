@@ -12,25 +12,28 @@ export default function SplashScreen() {
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        tension: 20,
-        friction: 7,
-        useNativeDriver: true,
-      }),
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          tension: 30,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.delay(400),
     ]).start();
 
     const timer = setTimeout(() => {
       if (!isLoading) {
         router.replace('/welcome');
       }
-    }, 2500);
+    }, 2200);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated, isLoading, router, fadeAnim, scaleAnim]);
@@ -50,8 +53,8 @@ export default function SplashScreen() {
           <View style={styles.iconWrapper}>
             <Home size={80} color="#fff" strokeWidth={2} />
           </View>
-          <Text style={styles.title}>PostIt</Text>
-          <Text style={styles.subtitle}>Find Your Perfect Place</Text>
+          <Text style={styles.title}>SpaceGig</Text>
+          <Text style={styles.subtitle}>Find Your Perfect Space</Text>
         </Animated.View>
       </View>
     </SafeAreaView>

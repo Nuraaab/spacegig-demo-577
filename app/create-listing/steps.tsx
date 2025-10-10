@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Home, Building, Building2, MapPin, Bed, Bath, HomeIcon, Maximize, Sparkles, Wifi, Tv, UtensilsCrossed, WashingMachine, Car, Wind, Flame, Waves, Dumbbell, PawPrint, Trees } from 'lucide-react-native';
+import { ChevronLeft, Home, Building, Building2, MapPin, Bed, Bath, HomeIcon, Maximize, Sparkles, Image as ImageIcon, FileText, DollarSign, CheckCircle2 } from 'lucide-react-native';
 import { useListing } from '@/contexts/ListingContext';
 import { PROPERTY_TYPES, AMENITIES } from '@/mocks/properties';
 
@@ -286,9 +286,10 @@ export default function CreateListingSteps() {
                         updateFormData({ amenities: [...formData.amenities, amenity.name] });
                       }
                     }}
+                    activeOpacity={0.7}
                   >
-                    <Icon size={20} color="#4A90E2" />
-                    <Text style={styles.amenityText}>{amenity.name}</Text>
+                    <Icon size={20} color={isSelected ? '#4A90E2' : '#999'} />
+                    <Text style={[styles.amenityText, isSelected && styles.amenityTextSelected]}>{amenity.name}</Text>
                     <View style={styles.checkbox}>
                       {isSelected && <View style={styles.checkboxInner} />}
                     </View>
@@ -370,30 +371,45 @@ export default function CreateListingSteps() {
             <Text style={styles.stepSubtitle}>Review your listing before publishing</Text>
 
             <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Listing Type</Text>
-              <Text style={styles.reviewValue}>{formData.listingCategory}</Text>
+              <View style={styles.reviewIconContainer}>
+                <ImageIcon size={20} color="#4A90E2" />
+              </View>
+              <View style={styles.reviewContent}>
+                <Text style={styles.reviewLabel}>Photos</Text>
+                <Text style={styles.reviewValue}>Ready to upload</Text>
+              </View>
             </View>
 
             <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Property Type</Text>
-              <Text style={styles.reviewValue}>{formData.propertyType}</Text>
+              <View style={styles.reviewIconContainer}>
+                <FileText size={20} color="#4A90E2" />
+              </View>
+              <View style={styles.reviewContent}>
+                <Text style={styles.reviewLabel}>Details</Text>
+                <Text style={styles.reviewValue}>
+                  {formData.propertyType} • {formData.beds} beds • {formData.baths} baths
+                </Text>
+              </View>
             </View>
 
             <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Specifications</Text>
-              <Text style={styles.reviewValue}>
-                {formData.beds} beds • {formData.baths} baths • {formData.sqft} sqft
-              </Text>
+              <View style={styles.reviewIconContainer}>
+                <DollarSign size={20} color="#4A90E2" />
+              </View>
+              <View style={styles.reviewContent}>
+                <Text style={styles.reviewLabel}>Price</Text>
+                <Text style={styles.reviewValue}>${formData.price}/{formData.listingType === 'rent' ? 'month' : 'sale'}</Text>
+              </View>
             </View>
 
             <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Price</Text>
-              <Text style={styles.reviewValue}>${formData.price}/month</Text>
-            </View>
-
-            <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Amenities</Text>
-              <Text style={styles.reviewValue}>{formData.amenities.length} selected</Text>
+              <View style={styles.reviewIconContainer}>
+                <CheckCircle2 size={20} color="#4A90E2" />
+              </View>
+              <View style={styles.reviewContent}>
+                <Text style={styles.reviewLabel}>Amenities</Text>
+                <Text style={styles.reviewValue}>{formData.amenities.length} selected</Text>
+              </View>
             </View>
           </View>
         );
@@ -670,10 +686,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   amenityItemSelected: {
     backgroundColor: '#E6F3FF',
-    borderWidth: 2,
     borderColor: '#4A90E2',
   },
   checkbox: {
@@ -692,8 +709,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A90E2',
   },
   amenityText: {
+    flex: 1,
     fontSize: 16,
+    color: '#666',
+  },
+  amenityTextSelected: {
     color: '#1a1a1a',
+    fontWeight: '600' as const,
   },
   privacyNote: {
     fontSize: 14,
@@ -715,9 +737,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   reviewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#F0F8FF',
     padding: 16,
     borderRadius: 12,
+    gap: 12,
+  },
+  reviewIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  reviewContent: {
+    flex: 1,
   },
   reviewLabel: {
     fontSize: 14,
