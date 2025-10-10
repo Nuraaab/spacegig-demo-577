@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -11,21 +12,48 @@ import { Home, Briefcase, Search, PlusCircle } from 'lucide-react-native';
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const addPropertyScale = useRef(new Animated.Value(1)).current;
+  const addJobScale = useRef(new Animated.Value(1)).current;
+  const discoverPropertiesScale = useRef(new Animated.Value(1)).current;
+  const discoverJobsScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
 
   const handleAddProperty = () => {
-    router.push('/create-listing' as any);
+    animateButton(addPropertyScale, () => {
+      router.push('/create-listing' as any);
+    });
   };
 
   const handleAddJob = () => {
-    router.push('/create-job/index' as any);
+    animateButton(addJobScale, () => {
+      router.push('/create-job/index' as any);
+    });
   };
 
   const handleDiscoverProperties = () => {
-    router.replace('/(tabs)/(discover)/discover');
+    animateButton(discoverPropertiesScale, () => {
+      router.replace('/(tabs)/(discover)/discover');
+    });
   };
 
   const handleDiscoverJobs = () => {
-    router.replace('/(tabs)/(discover)/jobs');
+    animateButton(discoverJobsScale, () => {
+      router.replace('/(tabs)/(discover)/jobs');
+    });
   };
 
   return (
@@ -38,39 +66,43 @@ export default function OnboardingScreen() {
           <View style={styles.category}>
             <Text style={styles.categoryTitle}>Add Listings</Text>
             
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleAddProperty}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: '#E3F2FD' }]}>
-                <Home size={32} color="#4A90E2" strokeWidth={2} />
-              </View>
-              <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Add Property</Text>
-                <Text style={styles.optionDescription}>
-                  List your property for rent or sale
-                </Text>
-              </View>
-              <PlusCircle size={24} color="#4A90E2" />
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: addPropertyScale }] }}>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={handleAddProperty}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.iconContainer, { backgroundColor: '#E3F2FD' }]}>
+                  <Home size={32} color="#4A90E2" strokeWidth={2} />
+                </View>
+                <View style={styles.optionContent}>
+                  <Text style={styles.optionTitle}>Add Property</Text>
+                  <Text style={styles.optionDescription}>
+                    List your property for rent or sale
+                  </Text>
+                </View>
+                <PlusCircle size={24} color="#4A90E2" />
+              </TouchableOpacity>
+            </Animated.View>
 
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleAddJob}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: '#E8F5E9' }]}>
-                <Briefcase size={32} color="#10B981" strokeWidth={2} />
-              </View>
-              <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Add Job Opening</Text>
-                <Text style={styles.optionDescription}>
-                  Post a job opportunity for candidates
-                </Text>
-              </View>
-              <PlusCircle size={24} color="#10B981" />
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: addJobScale }] }}>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={handleAddJob}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.iconContainer, { backgroundColor: '#E8F5E9' }]}>
+                  <Briefcase size={32} color="#10B981" strokeWidth={2} />
+                </View>
+                <View style={styles.optionContent}>
+                  <Text style={styles.optionTitle}>Add Job Opening</Text>
+                  <Text style={styles.optionDescription}>
+                    Post a job opportunity for candidates
+                  </Text>
+                </View>
+                <PlusCircle size={24} color="#10B981" />
+              </TouchableOpacity>
+            </Animated.View>
           </View>
 
           <View style={styles.divider}>
@@ -82,43 +114,47 @@ export default function OnboardingScreen() {
           <View style={styles.category}>
             <Text style={styles.categoryTitle}>Discover</Text>
             
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleDiscoverProperties}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: '#FFF3E0' }]}>
-                <Search size={32} color="#FF9800" strokeWidth={2} />
-              </View>
-              <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Discover Properties</Text>
-                <Text style={styles.optionDescription}>
-                  Browse and find your perfect home
-                </Text>
-              </View>
-              <View style={styles.arrow}>
-                <Text style={styles.arrowText}>→</Text>
-              </View>
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: discoverPropertiesScale }] }}>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={handleDiscoverProperties}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.iconContainer, { backgroundColor: '#FFF3E0' }]}>
+                  <Search size={32} color="#FF9800" strokeWidth={2} />
+                </View>
+                <View style={styles.optionContent}>
+                  <Text style={styles.optionTitle}>Discover Properties</Text>
+                  <Text style={styles.optionDescription}>
+                    Browse and find your perfect home
+                  </Text>
+                </View>
+                <View style={styles.arrow}>
+                  <Text style={styles.arrowText}>→</Text>
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
 
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleDiscoverJobs}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: '#F3E5F5' }]}>
-                <Search size={32} color="#9C27B0" strokeWidth={2} />
-              </View>
-              <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Job Openings</Text>
-                <Text style={styles.optionDescription}>
-                  Explore career opportunities near you
-                </Text>
-              </View>
-              <View style={styles.arrow}>
-                <Text style={styles.arrowText}>→</Text>
-              </View>
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: discoverJobsScale }] }}>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={handleDiscoverJobs}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.iconContainer, { backgroundColor: '#F3E5F5' }]}>
+                  <Search size={32} color="#9C27B0" strokeWidth={2} />
+                </View>
+                <View style={styles.optionContent}>
+                  <Text style={styles.optionTitle}>Job Openings</Text>
+                  <Text style={styles.optionDescription}>
+                    Explore career opportunities near you
+                  </Text>
+                </View>
+                <View style={styles.arrow}>
+                  <Text style={styles.arrowText}>→</Text>
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
           </View>
         </View>
       </View>

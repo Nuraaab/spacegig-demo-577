@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Switch, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { 
@@ -22,7 +22,7 @@ import {
   Gift,
   TrendingUp
 } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { JobOpening, Seniority, EmploymentType, Modality, PayCadence, JOB_CATEGORIES, COMMON_BENEFITS } from '@/mocks/jobs';
 
 const SENIORITY_LEVELS: { value: Seniority; label: string }[] = [
@@ -59,6 +59,24 @@ const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 export default function CreateJobSteps() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const backButtonScale = useRef(new Animated.Value(1)).current;
+  const nextButtonScale = useRef(new Animated.Value(1)).current;
+  const backFooterScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
   const [formData, setFormData] = useState<JobOpening>({
     company: {
       name: '',
@@ -135,19 +153,33 @@ export default function CreateJobSteps() {
   };
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      router.push('/publish-signup' as any);
-    }
+    animateButton(nextButtonScale, () => {
+      if (currentStep < totalSteps) {
+        setCurrentStep((prev) => prev + 1);
+      } else {
+        router.push('/publish-signup' as any);
+      }
+    });
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-    } else {
-      router.back();
-    }
+    animateButton(backButtonScale, () => {
+      if (currentStep > 1) {
+        setCurrentStep((prev) => prev - 1);
+      } else {
+        router.back();
+      }
+    });
+  };
+
+  const handleBackFooter = () => {
+    animateButton(backFooterScale, () => {
+      if (currentStep > 1) {
+        setCurrentStep((prev) => prev - 1);
+      } else {
+        router.back();
+      }
+    });
   };
 
   const addMustHaveSkill = () => {
@@ -843,9 +875,11 @@ export default function CreateJobSteps() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <ChevronLeft size={24} color="#1a1a1a" />
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.8}>
+            <ChevronLeft size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </Animated.View>
         <View style={styles.progressBarContainer}>
           <View style={[styles.progressBar, { width: `${progress}%` }]} />
         </View>
@@ -856,14 +890,18 @@ export default function CreateJobSteps() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.backFooterButton} onPress={handleBack}>
-          <Text style={styles.backFooterButtonText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>
-            {currentStep === totalSteps ? 'Publish' : 'Next'}
-          </Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: backFooterScale }] }}>
+          <TouchableOpacity style={styles.backFooterButton} onPress={handleBackFooter} activeOpacity={0.8}>
+            <Text style={styles.backFooterButtonText}>Back</Text>
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.View style={{ flex: 1, transform: [{ scale: nextButtonScale }] }}>
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.8}>
+            <Text style={styles.nextButtonText}>
+              {currentStep === totalSteps ? 'Publish' : 'Next'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </SafeAreaView>
   );

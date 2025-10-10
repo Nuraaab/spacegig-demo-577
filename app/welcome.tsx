@@ -53,19 +53,26 @@ export default function WelcomeScreen() {
     setCurrentIndex(index);
   };
 
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const skipScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
+
   const handleGetStarted = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
+    animateButton(buttonScale, () => {
       router.replace('/onboarding');
     });
   };
@@ -82,15 +89,19 @@ export default function WelcomeScreen() {
   };
 
   const handleSkip = () => {
-    handleGetStarted();
+    animateButton(skipScale, () => {
+      router.replace('/onboarding');
+    });
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>Skip</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: skipScale }] }}>
+          <TouchableOpacity onPress={handleSkip} style={styles.skipButton} activeOpacity={0.8}>
+            <Text style={styles.skipText}>Skip</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
       <ScrollView
@@ -129,11 +140,13 @@ export default function WelcomeScreen() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleNext}>
-          <Text style={styles.buttonText}>
-            {currentIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'}
-          </Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+          <TouchableOpacity style={styles.button} onPress={handleNext} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>
+              {currentIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </SafeAreaView>
   );

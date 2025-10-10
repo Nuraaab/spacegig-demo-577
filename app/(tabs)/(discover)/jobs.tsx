@@ -85,18 +85,42 @@ export default function JobsDiscoverScreen() {
     })
   ).current;
 
+  const likeButtonScale = useRef(new Animated.Value(1)).current;
+  const passButtonScale = useRef(new Animated.Value(1)).current;
+  const homeButtonScale = useRef(new Animated.Value(1)).current;
+  const filterButtonScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.85,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
+
   const handleLike = () => {
-    Animated.spring(position, {
-      toValue: { x: SCREEN_WIDTH + 100, y: 0 },
-      useNativeDriver: false,
-    }).start(() => handleSwipeComplete('right'));
+    animateButton(likeButtonScale, () => {
+      Animated.spring(position, {
+        toValue: { x: SCREEN_WIDTH + 100, y: 0 },
+        useNativeDriver: false,
+      }).start(() => handleSwipeComplete('right'));
+    });
   };
 
   const handlePass = () => {
-    Animated.spring(position, {
-      toValue: { x: -SCREEN_WIDTH - 100, y: 0 },
-      useNativeDriver: false,
-    }).start(() => handleSwipeComplete('left'));
+    animateButton(passButtonScale, () => {
+      Animated.spring(position, {
+        toValue: { x: -SCREEN_WIDTH - 100, y: 0 },
+        useNativeDriver: false,
+      }).start(() => handleSwipeComplete('left'));
+    });
   };
 
   if (!job) {
@@ -129,12 +153,14 @@ export default function JobsDiscoverScreen() {
         options={{
           title: 'Discover Jobs',
           headerLeft: () => (
-            <TouchableOpacity
-              onPress={() => router.replace('/onboarding')}
-              style={{ marginLeft: 8 }}
-            >
-              <Home size={24} color="#1a1a1a" />
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: homeButtonScale }], marginLeft: 8 }}>
+              <TouchableOpacity
+                onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
+                activeOpacity={0.8}
+              >
+                <Home size={24} color="#1a1a1a" />
+              </TouchableOpacity>
+            </Animated.View>
           ),
         }}
       />
@@ -150,12 +176,15 @@ export default function JobsDiscoverScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
-        <TouchableOpacity
-          style={styles.filterButton}
-          onPress={() => setShowFilters(!showFilters)}
-        >
-          <SlidersHorizontal size={20} color="#10B981" />
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: filterButtonScale }] }}>
+          <TouchableOpacity
+            style={styles.filterButton}
+            onPress={() => animateButton(filterButtonScale, () => setShowFilters(!showFilters))}
+            activeOpacity={0.8}
+          >
+            <SlidersHorizontal size={20} color="#10B981" />
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
       <Animated.View
@@ -238,13 +267,17 @@ export default function JobsDiscoverScreen() {
       </Animated.View>
 
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={[styles.actionButton, styles.passButton]} onPress={handlePass}>
-          <X size={32} color="#FF6B6B" strokeWidth={3} />
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: passButtonScale }] }}>
+          <TouchableOpacity style={[styles.actionButton, styles.passButton]} onPress={handlePass} activeOpacity={0.8}>
+            <X size={32} color="#FF6B6B" strokeWidth={3} />
+          </TouchableOpacity>
+        </Animated.View>
 
-        <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike}>
-          <Heart size={32} color="#10B981" strokeWidth={3} />
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: likeButtonScale }] }}>
+          <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike} activeOpacity={0.8}>
+            <Heart size={32} color="#10B981" strokeWidth={3} />
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
       {showConfirmation && (

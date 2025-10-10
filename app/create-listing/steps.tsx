@@ -1,31 +1,64 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Switch, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Home, Building, Building2, MapPin, Bed, Bath, HomeIcon, Maximize, Sparkles, Image as ImageIcon, FileText, DollarSign, CheckCircle2 } from 'lucide-react-native';
+import { useRef } from 'react';
 import { useListing } from '@/contexts/ListingContext';
 import { PROPERTY_TYPES, AMENITIES } from '@/mocks/properties';
 
 export default function CreateListingSteps() {
   const router = useRouter();
   const { currentStep, formData, updateFormData, nextStep, previousStep, submitListing } = useListing();
+  const backButtonScale = useRef(new Animated.Value(1)).current;
+  const nextButtonScale = useRef(new Animated.Value(1)).current;
+  const backFooterScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
 
   const totalSteps = 8;
   const progress = (currentStep / totalSteps) * 100;
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
-      nextStep();
-    } else {
-      router.push('/publish-signup' as any);
-    }
+    animateButton(nextButtonScale, () => {
+      if (currentStep < totalSteps) {
+        nextStep();
+      } else {
+        router.push('/publish-signup' as any);
+      }
+    });
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
-      previousStep();
-    } else {
-      router.back();
-    }
+    animateButton(backButtonScale, () => {
+      if (currentStep > 1) {
+        previousStep();
+      } else {
+        router.back();
+      }
+    });
+  };
+
+  const handleBackFooter = () => {
+    animateButton(backFooterScale, () => {
+      if (currentStep > 1) {
+        previousStep();
+      } else {
+        router.back();
+      }
+    });
   };
 
   const renderStepContent = () => {
@@ -422,9 +455,11 @@ export default function CreateListingSteps() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <ChevronLeft size={24} color="#1a1a1a" />
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.8}>
+            <ChevronLeft size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </Animated.View>
         <View style={styles.progressBarContainer}>
           <View style={[styles.progressBar, { width: `${progress}%` }]} />
         </View>
@@ -435,14 +470,18 @@ export default function CreateListingSteps() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.backFooterButton} onPress={handleBack}>
-          <Text style={styles.backFooterButtonText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>
-            {currentStep === totalSteps ? 'Publish' : 'Next'}
-          </Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: backFooterScale }] }}>
+          <TouchableOpacity style={styles.backFooterButton} onPress={handleBackFooter} activeOpacity={0.8}>
+            <Text style={styles.backFooterButtonText}>Back</Text>
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.View style={{ flex: 1, transform: [{ scale: nextButtonScale }] }}>
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.8}>
+            <Text style={styles.nextButtonText}>
+              {currentStep === totalSteps ? 'Publish' : 'Next'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </SafeAreaView>
   );

@@ -1,17 +1,39 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Mail } from 'lucide-react-native';
+import { useRef } from 'react';
 
 export default function PublishSignup() {
   const router = useRouter();
+  const emailScale = useRef(new Animated.Value(1)).current;
+  const googleScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
 
   const handleGoogleSignIn = () => {
-    router.push('/publish-success' as any);
+    animateButton(googleScale, () => {
+      router.push('/publish-success' as any);
+    });
   };
 
   const handleEmailSignIn = () => {
-    router.push('/publish-success' as any);
+    animateButton(emailScale, () => {
+      router.push('/publish-success' as any);
+    });
   };
 
   return (
@@ -23,10 +45,12 @@ export default function PublishSignup() {
         </Text>
 
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.emailButton} onPress={handleEmailSignIn}>
-            <Mail size={24} color="#fff" />
-            <Text style={styles.emailButtonText}>Continue with Email</Text>
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: emailScale }] }}>
+            <TouchableOpacity style={styles.emailButton} onPress={handleEmailSignIn} activeOpacity={0.8}>
+              <Mail size={24} color="#fff" />
+              <Text style={styles.emailButtonText}>Continue with Email</Text>
+            </TouchableOpacity>
+          </Animated.View>
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
@@ -34,12 +58,14 @@ export default function PublishSignup() {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
-            <View style={styles.googleIcon}>
-              <Text style={styles.googleIconText}>G</Text>
-            </View>
-            <Text style={styles.googleButtonText}>Continue with Google</Text>
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: googleScale }] }}>
+            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn} activeOpacity={0.8}>
+              <View style={styles.googleIcon}>
+                <Text style={styles.googleIconText}>G</Text>
+              </View>
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
 
         <Text style={styles.termsText}>
