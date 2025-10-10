@@ -435,6 +435,9 @@ export default function CreateListingSteps() {
       </ScrollView>
 
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.backFooterButton} onPress={handleBack}>
+          <Text style={styles.backFooterButtonText}>Back</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>
             {currentStep === totalSteps ? 'Publish' : 'Next'}
@@ -766,20 +769,34 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   footer: {
+    flexDirection: 'row',
     padding: 20,
+    paddingBottom: 30,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
+    gap: 12,
+    alignItems: 'center',
+  },
+  backFooterButton: {
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  backFooterButtonText: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
   },
   nextButton: {
-    backgroundColor: '#4A90E2',
+    flex: 1,
+    backgroundColor: '#1a1a1a',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   nextButtonText: {
     fontSize: 18,
