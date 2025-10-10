@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { X } from 'lucide-react-native';
+import { X, Home } from 'lucide-react-native';
 
 export default function CreateJobIntro() {
   const router = useRouter();
@@ -9,6 +9,9 @@ export default function CreateJobIntro() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.homeButton} onPress={() => router.replace('/onboarding')}>
+          <Home size={24} color="#1a1a1a" />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
           <X size={24} color="#1a1a1a" />
         </TouchableOpacity>
@@ -76,6 +79,16 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 12,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  homeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   closeButton: {
     width: 40,

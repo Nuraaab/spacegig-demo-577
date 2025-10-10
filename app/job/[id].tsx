@@ -17,6 +17,7 @@ import {
   DollarSign,
   Briefcase,
   Building,
+  Home,
 } from 'lucide-react-native';
 import { mockJobs } from '@/mocks/jobs';
 
@@ -34,6 +35,9 @@ export default function JobDetailScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
+          <TouchableOpacity style={styles.homeButton} onPress={() => router.replace('/onboarding')}>
+            <Home size={24} color="#1a1a1a" />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
             <X size={24} color="#1a1a1a" />
           </TouchableOpacity>
@@ -81,9 +85,14 @@ export default function JobDetailScreen() {
           </View>
 
           <View style={styles.header}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
-              <X size={24} color="#1a1a1a" />
-            </TouchableOpacity>
+            <View style={styles.headerLeft}>
+              <TouchableOpacity style={styles.homeButton} onPress={() => router.replace('/onboarding')}>
+                <Home size={24} color="#1a1a1a" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
+                <X size={24} color="#1a1a1a" />
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity style={styles.favoriteButton} onPress={handleToggleFavorite}>
               <Heart
                 size={24}
@@ -203,6 +212,23 @@ const styles = StyleSheet.create({
     right: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  homeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   closeButton: {
     width: 40,

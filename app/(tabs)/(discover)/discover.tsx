@@ -12,7 +12,7 @@ import {
   TextInput,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, ArrowLeft } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -110,7 +110,7 @@ export default function DiscoverScreen() {
                 onPress={() => router.replace('/onboarding')}
                 style={{ marginLeft: 8 }}
               >
-                <ArrowLeft size={24} color="#1a1a1a" />
+                <Home size={24} color="#1a1a1a" />
               </TouchableOpacity>
             ),
           }}
@@ -133,7 +133,7 @@ export default function DiscoverScreen() {
               onPress={() => router.replace('/onboarding')}
               style={{ marginLeft: 8 }}
             >
-              <ArrowLeft size={24} color="#1a1a1a" />
+              <Home size={24} color="#1a1a1a" />
             </TouchableOpacity>
           ),
         }}
