@@ -13,7 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, Plus, LayoutGrid, Layers } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, LayoutGrid, Layers } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -27,7 +27,6 @@ export default function DiscoverScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('swipe');
-  const addButtonScale = useRef(new Animated.Value(1)).current;
   const viewModeButtonScale = useRef(new Animated.Value(1)).current;
 
   const position = useRef(new Animated.ValueXY()).current;
@@ -133,22 +132,7 @@ export default function DiscoverScreen() {
     });
   };
 
-  const handleAddHome = () => {
-    Animated.sequence([
-      Animated.timing(addButtonScale, {
-        toValue: 1.2,
-        duration: 120,
-        useNativeDriver: true,
-      }),
-      Animated.timing(addButtonScale, {
-        toValue: 1,
-        duration: 120,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      router.push('/welcome');
-    });
-  };
+
 
   if (!property) {
     return (
@@ -368,13 +352,6 @@ export default function DiscoverScreen() {
           <Text style={styles.confirmationText}>Added to favorites!</Text>
         </View>
       )}
-
-      <Animated.View style={[styles.addButtonContainer, { transform: [{ scale: addButtonScale }] }]}>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddHome} activeOpacity={0.8}>
-          <Plus size={24} color="#fff" strokeWidth={2.5} />
-          <Text style={styles.addButtonText}>Add Home</Text>
-        </TouchableOpacity>
-      </Animated.View>
     </View>
   );
 }
@@ -595,32 +572,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
   },
-  addButtonContainer: {
-    position: 'absolute',
-    bottom: 130,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  addButton: {
-    flexDirection: 'row',
-    backgroundColor: '#0ea5e9',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 30,
-    alignItems: 'center',
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: '600' as const,
-    fontSize: 15,
-  },
+
   stackContainer: {
     flex: 1,
     marginTop: 8,
