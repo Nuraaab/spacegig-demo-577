@@ -58,8 +58,7 @@ export default function CreateJobIntro() {
         <TouchableOpacity
           style={styles.getStartedButton}
           onPress={() => {
-            console.log('Navigate to job creation steps');
-            router.back();
+            router.push('/create-job/steps' as any);
           }}
         >
           <Text style={styles.getStartedButtonText}>Get Started</Text>

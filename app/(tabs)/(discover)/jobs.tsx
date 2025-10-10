@@ -167,6 +167,11 @@ export default function JobsDiscoverScreen() {
         ]}
         {...panResponder.panHandlers}
       >
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => router.push(`/job/${job.id}` as any)}
+          style={styles.cardTouchable}
+        >
         <ScrollView
           style={styles.cardScrollView}
           showsVerticalScrollIndicator={false}
@@ -229,6 +234,7 @@ export default function JobsDiscoverScreen() {
             </View>
           </View>
         </ScrollView>
+        </TouchableOpacity>
       </Animated.View>
 
       <View style={styles.buttonsContainer}>
@@ -304,6 +310,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   cardScrollView: {
+    flex: 1,
+  },
+  cardTouchable: {
     flex: 1,
   },
   image: {

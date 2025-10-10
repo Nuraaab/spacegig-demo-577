@@ -47,6 +47,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="favorites"
+        options={{
+          title: "Favorites",
+          tabBarIcon: ({ color }) => <Heart size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="add-listing"
         options={{
           title: "",
@@ -72,13 +79,6 @@ export default function TabLayout() {
             e.preventDefault();
             handleAddPress();
           },
-        }}
-      />
-      <Tabs.Screen
-        name="favorites"
-        options={{
-          title: "Favorites",
-          tabBarIcon: ({ color }) => <Heart size={24} color={color} />,
         }}
       />
       <Tabs.Screen

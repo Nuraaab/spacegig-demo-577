@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Home, Building, Building2, MapPin, Bed, Bath, HomeIcon, Maximize, Sparkles } from 'lucide-react-native';
+import { ChevronLeft, Home, Building, Building2, MapPin, Bed, Bath, HomeIcon, Maximize, Sparkles, Wifi, Tv, UtensilsCrossed, WashingMachine, Car, Wind, Flame, Waves, Dumbbell, PawPrint, Trees } from 'lucide-react-native';
 import { useListing } from '@/contexts/ListingContext';
 import { PROPERTY_TYPES, AMENITIES } from '@/mocks/properties';
 
@@ -16,8 +16,7 @@ export default function CreateListingSteps() {
     if (currentStep < totalSteps) {
       nextStep();
     } else {
-      submitListing();
-      router.back();
+      router.push('/publish-signup' as any);
     }
   };
 
@@ -85,7 +84,12 @@ export default function CreateListingSteps() {
 
             <Text style={styles.fieldLabel}>Property Type</Text>
             <View style={styles.propertyTypeGrid}>
-              {PROPERTY_TYPES.map((type) => (
+              {PROPERTY_TYPES.filter((type) => {
+                if (formData.listingType === 'sale') {
+                  return type.value !== 'basement' && type.value !== 'room';
+                }
+                return true;
+              }).map((type) => (
                 <TouchableOpacity
                   key={type.value}
                   style={[
@@ -99,6 +103,8 @@ export default function CreateListingSteps() {
                   {type.value === 'condo' && <Building2 size={32} color="#4A90E2" />}
                   {type.value === 'land' && <MapPin size={32} color="#4A90E2" />}
                   {type.value === 'commercial' && <Building size={32} color="#4A90E2" />}
+                  {type.value === 'basement' && <HomeIcon size={32} color="#4A90E2" />}
+                  {type.value === 'room' && <Bed size={32} color="#4A90E2" />}
                   <Text style={styles.propertyTypeText}>{type.label}</Text>
                 </TouchableOpacity>
               ))}
@@ -140,13 +146,13 @@ export default function CreateListingSteps() {
               <View style={styles.counterButtons}>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => updateFormData({ baths: Math.max(0, formData.baths - 1) })}
+                  onPress={() => updateFormData({ baths: Math.max(0, formData.baths - 0.5) })}
                 >
                   <Text style={styles.counterButtonText}>-</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => updateFormData({ baths: formData.baths + 1 })}
+                  onPress={() => updateFormData({ baths: formData.baths + 0.5 })}
                 >
                   <Text style={styles.counterButtonText}>+</Text>
                 </TouchableOpacity>
@@ -265,25 +271,27 @@ export default function CreateListingSteps() {
 
             <View style={styles.amenitiesList}>
               {AMENITIES.map((amenity) => {
-                const isSelected = formData.amenities.includes(amenity);
+                const isSelected = formData.amenities.includes(amenity.name);
+                const Icon = amenity.icon;
                 return (
                   <TouchableOpacity
-                    key={amenity}
+                    key={amenity.name}
                     style={[styles.amenityItem, isSelected && styles.amenityItemSelected]}
                     onPress={() => {
                       if (isSelected) {
                         updateFormData({
-                          amenities: formData.amenities.filter((a) => a !== amenity),
+                          amenities: formData.amenities.filter((a) => a !== amenity.name),
                         });
                       } else {
-                        updateFormData({ amenities: [...formData.amenities, amenity] });
+                        updateFormData({ amenities: [...formData.amenities, amenity.name] });
                       }
                     }}
                   >
+                    <Icon size={20} color="#4A90E2" />
+                    <Text style={styles.amenityText}>{amenity.name}</Text>
                     <View style={styles.checkbox}>
                       {isSelected && <View style={styles.checkboxInner} />}
                     </View>
-                    <Text style={styles.amenityText}>{amenity}</Text>
                   </TouchableOpacity>
                 );
               })}

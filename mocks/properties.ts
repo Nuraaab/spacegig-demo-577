@@ -1,4 +1,6 @@
-export type PropertyType = 'house' | 'apartment' | 'condo' | 'land' | 'commercial';
+import { Wifi, Tv, UtensilsCrossed, WashingMachine, Car, Wind, Flame, Waves, Dumbbell, PawPrint, Home as HomeIcon, Trees } from 'lucide-react-native';
+
+export type PropertyType = 'house' | 'apartment' | 'condo' | 'land' | 'commercial' | 'basement' | 'room';
 export type ListingType = 'rent' | 'sale';
 
 export interface Property {
@@ -27,18 +29,18 @@ export interface Property {
 }
 
 export const AMENITIES = [
-  'Wi-Fi',
-  'TV',
-  'Kitchen',
-  'Washer',
-  'Free parking',
-  'Air conditioning',
-  'Heating',
-  'Pool',
-  'Gym',
-  'Pet friendly',
-  'Balcony',
-  'Garden',
+  { name: 'Wi-Fi', icon: Wifi },
+  { name: 'TV', icon: Tv },
+  { name: 'Kitchen', icon: UtensilsCrossed },
+  { name: 'Washer', icon: WashingMachine },
+  { name: 'Free parking', icon: Car },
+  { name: 'Air conditioning', icon: Wind },
+  { name: 'Heating', icon: Flame },
+  { name: 'Pool', icon: Waves },
+  { name: 'Gym', icon: Dumbbell },
+  { name: 'Pet friendly', icon: PawPrint },
+  { name: 'Balcony', icon: HomeIcon },
+  { name: 'Garden', icon: Trees },
 ];
 
 export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
@@ -47,6 +49,8 @@ export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
   { value: 'condo', label: 'Condo' },
   { value: 'land', label: 'Land' },
   { value: 'commercial', label: 'Commercial' },
+  { value: 'basement', label: 'Basement' },
+  { value: 'room', label: 'Room' },
 ];
 
 export const mockProperties: Property[] = [
