@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +29,25 @@ export default function JobDetailScreen() {
   const { id } = useLocalSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const homeButtonScale = useRef(new Animated.Value(1)).current;
+  const closeButtonScale = useRef(new Animated.Value(1)).current;
+  const favoriteButtonScale = useRef(new Animated.Value(1)).current;
+  const applyButtonScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
 
   const job = mockJobs.find((j) => j.id === id);
 
@@ -86,20 +106,38 @@ export default function JobDetailScreen() {
 
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <TouchableOpacity style={styles.homeButton} onPress={() => router.replace('/onboarding')}>
-                <Home size={24} color="#1a1a1a" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
-                <X size={24} color="#1a1a1a" />
-              </TouchableOpacity>
+              <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
+                <TouchableOpacity 
+                  style={styles.homeButton} 
+                  onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
+                  activeOpacity={0.8}
+                >
+                  <Home size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+              </Animated.View>
+              <Animated.View style={{ transform: [{ scale: closeButtonScale }] }}>
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={() => animateButton(closeButtonScale, () => router.back())}
+                  activeOpacity={0.8}
+                >
+                  <X size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+              </Animated.View>
             </View>
-            <TouchableOpacity style={styles.favoriteButton} onPress={handleToggleFavorite}>
-              <Heart
-                size={24}
-                color={isFavorite ? '#FF6B6B' : '#1a1a1a'}
-                fill={isFavorite ? '#FF6B6B' : 'transparent'}
-              />
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: favoriteButtonScale }] }}>
+              <TouchableOpacity 
+                style={styles.favoriteButton} 
+                onPress={() => animateButton(favoriteButtonScale, handleToggleFavorite)}
+                activeOpacity={0.8}
+              >
+                <Heart
+                  size={24}
+                  color={isFavorite ? '#FF6B6B' : '#1a1a1a'}
+                  fill={isFavorite ? '#FF6B6B' : 'transparent'}
+                />
+              </TouchableOpacity>
+            </Animated.View>
           </View>
         </View>
 
@@ -164,9 +202,15 @@ export default function JobDetailScreen() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.applyButton}>
-            <Text style={styles.applyButtonText}>Apply Now</Text>
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: applyButtonScale }] }}>
+            <TouchableOpacity 
+              style={styles.applyButton}
+              onPress={() => animateButton(applyButtonScale, () => {})}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.applyButtonText}>Apply Now</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -1,20 +1,51 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X, Home } from 'lucide-react-native';
+import { useRef } from 'react';
 
 export default function CreateJobIntro() {
   const router = useRouter();
+  const homeButtonScale = useRef(new Animated.Value(1)).current;
+  const closeButtonScale = useRef(new Animated.Value(1)).current;
+  const startButtonScale = useRef(new Animated.Value(1)).current;
+
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.homeButton} onPress={() => router.replace('/onboarding')}>
-          <Home size={24} color="#1a1a1a" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
-          <X size={24} color="#1a1a1a" />
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
+          <TouchableOpacity 
+            style={styles.homeButton} 
+            onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
+            activeOpacity={0.8}
+          >
+            <Home size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.View style={{ transform: [{ scale: closeButtonScale }] }}>
+          <TouchableOpacity 
+            style={styles.closeButton} 
+            onPress={() => animateButton(closeButtonScale, () => router.back())}
+            activeOpacity={0.8}
+          >
+            <X size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
       <View style={styles.content}>
@@ -58,14 +89,15 @@ export default function CreateJobIntro() {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.getStartedButton}
-          onPress={() => {
-            router.push('/create-job/steps' as any);
-          }}
-        >
-          <Text style={styles.getStartedButtonText}>Get Started</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: startButtonScale }] }}>
+          <TouchableOpacity
+            style={styles.getStartedButton}
+            onPress={() => animateButton(startButtonScale, () => router.push('/create-job/steps' as any))}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.getStartedButtonText}>Get Started</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </SafeAreaView>
   );
