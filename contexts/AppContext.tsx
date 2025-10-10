@@ -29,11 +29,30 @@ export const [AppProvider, useApp] = createContextHook(() => {
       if (storedAuth === 'true') {
         setIsAuthenticated(true);
       }
+      
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (parseError) {
+          console.error('Error parsing user data:', parseError);
+          await AsyncStorage.removeItem('user');
+        }
       }
+      
       if (storedFavorites) {
-        setFavorites(JSON.parse(storedFavorites));
+        try {
+          const parsedFavorites = JSON.parse(storedFavorites);
+          if (Array.isArray(parsedFavorites)) {
+            setFavorites(parsedFavorites);
+          } else {
+            console.error('Favorites is not an array, resetting');
+            await AsyncStorage.removeItem('favorites');
+          }
+        } catch (parseError) {
+          console.error('Error parsing favorites data:', parseError);
+          await AsyncStorage.removeItem('favorites');
+        }
       }
     } catch (error) {
       console.error('Error loading stored data:', error);
