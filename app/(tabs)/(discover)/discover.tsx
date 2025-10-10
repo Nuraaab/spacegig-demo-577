@@ -10,9 +10,10 @@ import {
   Animated,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, Plus } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, Plus, LayoutGrid, Layers } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -21,11 +22,13 @@ const SWIPE_THRESHOLD = 120;
 export default function DiscoverScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { getCurrentProperty, nextProperty, addToFavorites } = useApp();
+  const { getCurrentProperty, nextProperty, addToFavorites, properties } = useApp();
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('swipe');
   const addButtonScale = useRef(new Animated.Value(1)).current;
+  const viewModeButtonScale = useRef(new Animated.Value(1)).current;
 
   const position = useRef(new Animated.ValueXY()).current;
   const rotate = position.x.interpolate({
@@ -90,6 +93,12 @@ export default function DiscoverScreen() {
   const passButtonScale = useRef(new Animated.Value(1)).current;
   const homeButtonScale = useRef(new Animated.Value(1)).current;
   const filterButtonScale = useRef(new Animated.Value(1)).current;
+
+  const handleToggleViewMode = () => {
+    animateButton(viewModeButtonScale, () => {
+      setViewMode(prev => prev === 'swipe' ? 'stack' : 'swipe');
+    });
+  };
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -194,6 +203,19 @@ export default function DiscoverScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
+        <Animated.View style={{ transform: [{ scale: viewModeButtonScale }] }}>
+          <TouchableOpacity
+            style={styles.filterButton}
+            onPress={handleToggleViewMode}
+            activeOpacity={0.8}
+          >
+            {viewMode === 'swipe' ? (
+              <LayoutGrid size={20} color="#4A90E2" />
+            ) : (
+              <Layers size={20} color="#4A90E2" />
+            )}
+          </TouchableOpacity>
+        </Animated.View>
         <Animated.View style={{ transform: [{ scale: filterButtonScale }] }}>
           <TouchableOpacity
             style={styles.filterButton}
@@ -205,77 +227,140 @@ export default function DiscoverScreen() {
         </Animated.View>
       </View>
 
-      <Animated.View
-        style={[
-          styles.card,
-          {
-            transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }],
-          },
-        ]}
-        {...panResponder.panHandlers}
-      >
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => router.push(`/property/${property.id}` as any)}
-          style={styles.cardTouchable}
-        >
-          <Image source={{ uri: property.images[0] }} style={styles.image} />
+      {viewMode === 'swipe' ? (
+        <>
+          <Animated.View
+            style={[
+              styles.card,
+              {
+                transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }],
+              },
+            ]}
+            {...panResponder.panHandlers}
+          >
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => router.push(`/property/${property.id}` as any)}
+              style={styles.cardTouchable}
+            >
+              <Image source={{ uri: property.images[0] }} style={styles.image} />
 
-          <Animated.View style={[styles.likeLabel, { opacity: likeOpacity }]}>
-            <Text style={styles.likeLabelText}>LIKE</Text>
+              <Animated.View style={[styles.likeLabel, { opacity: likeOpacity }]}>
+                <Text style={styles.likeLabelText}>LIKE</Text>
+              </Animated.View>
+
+              <Animated.View style={[styles.nopeLabel, { opacity: nopeOpacity }]}>
+                <Text style={styles.nopeLabelText}>PASS</Text>
+              </Animated.View>
+
+              <View style={styles.cardContent}>
+                <View style={styles.priceTag}>
+                  <Text style={styles.price}>
+                    ${property.price.toLocaleString()}/{property.listingType === 'rent' ? 'mo' : 'sale'}
+                  </Text>
+                </View>
+
+                <Text style={styles.title}>{property.title}</Text>
+
+                <View style={styles.locationRow}>
+                  <MapPin size={16} color="#666" />
+                  <Text style={styles.location}>
+                    {property.location.city}, {property.location.state}
+                  </Text>
+                </View>
+
+                <View style={styles.specs}>
+                  <View style={styles.specItem}>
+                    <Bed size={18} color="#4A90E2" />
+                    <Text style={styles.specText}>{property.specs.beds} beds</Text>
+                  </View>
+                  <View style={styles.specItem}>
+                    <Bath size={18} color="#4A90E2" />
+                    <Text style={styles.specText}>{property.specs.baths} baths</Text>
+                  </View>
+                  <View style={styles.specItem}>
+                    <Maximize size={18} color="#4A90E2" />
+                    <Text style={styles.specText}>{property.specs.sqft} sqft</Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
           </Animated.View>
 
-          <Animated.View style={[styles.nopeLabel, { opacity: nopeOpacity }]}>
-            <Text style={styles.nopeLabelText}>PASS</Text>
-          </Animated.View>
+          <View style={styles.buttonsContainer}>
+            <Animated.View style={{ transform: [{ scale: passButtonScale }] }}>
+              <TouchableOpacity style={[styles.actionButton, styles.passButton]} onPress={handlePass} activeOpacity={0.8}>
+                <X size={32} color="#FF6B6B" strokeWidth={3} />
+              </TouchableOpacity>
+            </Animated.View>
 
-          <View style={styles.cardContent}>
-            <View style={styles.priceTag}>
-              <Text style={styles.price}>
-                ${property.price.toLocaleString()}/{property.listingType === 'rent' ? 'mo' : 'sale'}
-              </Text>
-            </View>
-
-            <Text style={styles.title}>{property.title}</Text>
-
-            <View style={styles.locationRow}>
-              <MapPin size={16} color="#666" />
-              <Text style={styles.location}>
-                {property.location.city}, {property.location.state}
-              </Text>
-            </View>
-
-            <View style={styles.specs}>
-              <View style={styles.specItem}>
-                <Bed size={18} color="#4A90E2" />
-                <Text style={styles.specText}>{property.specs.beds} beds</Text>
-              </View>
-              <View style={styles.specItem}>
-                <Bath size={18} color="#4A90E2" />
-                <Text style={styles.specText}>{property.specs.baths} baths</Text>
-              </View>
-              <View style={styles.specItem}>
-                <Maximize size={18} color="#4A90E2" />
-                <Text style={styles.specText}>{property.specs.sqft} sqft</Text>
-              </View>
-            </View>
+            <Animated.View style={{ transform: [{ scale: likeButtonScale }] }}>
+              <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike} activeOpacity={0.8}>
+                <Heart size={32} color="#4A90E2" strokeWidth={3} />
+              </TouchableOpacity>
+            </Animated.View>
           </View>
-        </TouchableOpacity>
-      </Animated.View>
-
-      <View style={styles.buttonsContainer}>
-        <Animated.View style={{ transform: [{ scale: passButtonScale }] }}>
-          <TouchableOpacity style={[styles.actionButton, styles.passButton]} onPress={handlePass} activeOpacity={0.8}>
-            <X size={32} color="#FF6B6B" strokeWidth={3} />
-          </TouchableOpacity>
-        </Animated.View>
-
-        <Animated.View style={{ transform: [{ scale: likeButtonScale }] }}>
-          <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike} activeOpacity={0.8}>
-            <Heart size={32} color="#4A90E2" strokeWidth={3} />
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
+        </>
+      ) : (
+        <ScrollView
+          style={styles.stackContainer}
+          contentContainerStyle={styles.stackContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {properties.map((prop) => (
+            <TouchableOpacity
+              key={prop.id}
+              activeOpacity={0.95}
+              onPress={() => router.push(`/property/${prop.id}` as any)}
+              style={styles.stackCard}
+            >
+              <Image source={{ uri: prop.images[0] }} style={styles.stackImage} />
+              <View style={styles.stackCardContent}>
+                <View style={styles.stackHeader}>
+                  <View style={styles.stackPriceTag}>
+                    <Text style={styles.stackPrice}>
+                      ${prop.price.toLocaleString()}/{prop.listingType === 'rent' ? 'mo' : 'sale'}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      addToFavorites(prop.id);
+                      setShowConfirmation(true);
+                      setTimeout(() => setShowConfirmation(false), 2000);
+                    }}
+                    style={styles.stackLikeButton}
+                    activeOpacity={0.7}
+                  >
+                    <Heart size={20} color="#4A90E2" strokeWidth={2.5} />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.stackTitle}>{prop.title}</Text>
+                <View style={styles.locationRow}>
+                  <MapPin size={14} color="#666" />
+                  <Text style={styles.stackLocation}>
+                    {prop.location.city}, {prop.location.state}
+                  </Text>
+                </View>
+                <View style={styles.stackSpecs}>
+                  <View style={styles.stackSpecItem}>
+                    <Bed size={16} color="#4A90E2" />
+                    <Text style={styles.stackSpecText}>{prop.specs.beds}</Text>
+                  </View>
+                  <View style={styles.stackSpecItem}>
+                    <Bath size={16} color="#4A90E2" />
+                    <Text style={styles.stackSpecText}>{prop.specs.baths}</Text>
+                  </View>
+                  <View style={styles.stackSpecItem}>
+                    <Maximize size={16} color="#4A90E2" />
+                    <Text style={styles.stackSpecText}>{prop.specs.sqft} sqft</Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
 
       {showConfirmation && (
         <View style={styles.confirmation}>
@@ -535,5 +620,81 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600' as const,
     fontSize: 15,
+  },
+  stackContainer: {
+    flex: 1,
+    marginTop: 8,
+  },
+  stackContent: {
+    padding: 16,
+    paddingBottom: 100,
+  },
+  stackCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    overflow: 'hidden',
+  },
+  stackImage: {
+    width: '100%',
+    height: 220,
+  },
+  stackCardContent: {
+    padding: 16,
+  },
+  stackHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  stackPriceTag: {
+    backgroundColor: '#4A90E2',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  stackPrice: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: '#fff',
+  },
+  stackLikeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0F8FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stackTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginBottom: 6,
+  },
+  stackLocation: {
+    fontSize: 13,
+    color: '#666',
+  },
+  stackSpecs: {
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 12,
+  },
+  stackSpecItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  stackSpecText: {
+    fontSize: 13,
+    color: '#333',
+    fontWeight: '500' as const,
   },
 });
