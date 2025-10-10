@@ -24,8 +24,19 @@ export default function CreateListingIntro() {
           style={styles.heroImage}
         />
 
-        <Text style={styles.title}>It&apos;s easy to get started on PostIt</Text>
+        <Text style={styles.title}>It&apos;s easy to get started on SpaceGig</Text>
         <Text style={styles.subtitle}>Create your property listing in just a few simple steps</Text>
+
+        <TouchableOpacity
+          style={styles.getStartedButton}
+          onPress={() => {
+            updateFormData({ listingCategory: 'property' });
+            nextStep();
+            router.push('/create-listing/steps' as any);
+          }}
+        >
+          <Text style={styles.getStartedButtonText}>Get Started</Text>
+        </TouchableOpacity>
 
         <View style={styles.stepsContainer}>
           <View style={styles.stepItem}>
@@ -58,17 +69,6 @@ export default function CreateListingIntro() {
             </View>
           </View>
         </View>
-
-        <TouchableOpacity
-          style={styles.getStartedButton}
-          onPress={() => {
-            updateFormData({ listingCategory: 'property' });
-            nextStep();
-            router.push('/create-listing/steps' as any);
-          }}
-        >
-          <Text style={styles.getStartedButtonText}>Get Started</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

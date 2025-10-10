@@ -286,7 +286,7 @@ export default function CreateListingSteps() {
                         updateFormData({ amenities: [...formData.amenities, amenity.name] });
                       }
                     }}
-                    activeOpacity={0.7}
+                    activeOpacity={1}
                   >
                     <Icon size={20} color={isSelected ? '#4A90E2' : '#999'} />
                     <Text style={[styles.amenityText, isSelected && styles.amenityTextSelected]}>{amenity.name}</Text>

@@ -20,8 +20,17 @@ export default function CreateJobIntro() {
           style={styles.heroImage}
         />
 
-        <Text style={styles.title}>It&apos;s easy to get started on PostIt</Text>
+        <Text style={styles.title}>It&apos;s easy to get started on SpaceGig</Text>
         <Text style={styles.subtitle}>Create your job listing in just a few simple steps</Text>
+
+        <TouchableOpacity
+          style={styles.getStartedButton}
+          onPress={() => {
+            router.push('/create-job/steps' as any);
+          }}
+        >
+          <Text style={styles.getStartedButtonText}>Get Started</Text>
+        </TouchableOpacity>
 
         <View style={styles.stepsContainer}>
           <View style={styles.stepItem}>
@@ -54,15 +63,6 @@ export default function CreateJobIntro() {
             </View>
           </View>
         </View>
-
-        <TouchableOpacity
-          style={styles.getStartedButton}
-          onPress={() => {
-            router.push('/create-job/steps' as any);
-          }}
-        >
-          <Text style={styles.getStartedButtonText}>Get Started</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

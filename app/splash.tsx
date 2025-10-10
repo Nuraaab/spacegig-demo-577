@@ -16,24 +16,24 @@ export default function SplashScreen() {
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 800,
+          duration: 600,
           useNativeDriver: true,
         }),
         Animated.spring(scaleAnim, {
           toValue: 1,
-          tension: 30,
-          friction: 8,
+          tension: 40,
+          friction: 7,
           useNativeDriver: true,
         }),
       ]),
-      Animated.delay(400),
+      Animated.delay(300),
     ]).start();
 
     const timer = setTimeout(() => {
       if (!isLoading) {
         router.replace('/welcome');
       }
-    }, 2200);
+    }, 1800);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated, isLoading, router, fadeAnim, scaleAnim]);

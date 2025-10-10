@@ -1,25 +1,44 @@
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, useRouter, usePathname } from "expo-router";
 import { Home, Heart, User, Plus, Users } from "lucide-react-native";
 import React, { useRef } from "react";
 import { TouchableOpacity, Text, StyleSheet, Animated } from "react-native";
 
 export default function TabLayout() {
   const router = useRouter();
+  const pathname = usePathname();
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  const isJobsRoute = pathname?.includes('/jobs');
 
   const handleAddPress = () => {
-    Animated.sequence([
-      Animated.spring(scaleAnim, {
-        toValue: 0.85,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
+    Animated.parallel([
+      Animated.sequence([
+        Animated.spring(scaleAnim, {
+          toValue: 0.8,
+          friction: 3,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 2,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.timing(rotateAnim, {
         toValue: 1,
-        friction: 3,
+        duration: 400,
         useNativeDriver: true,
       }),
-    ]).start();
-    router.push('/create-listing/index' as any);
+    ]).start(() => {
+      rotateAnim.setValue(0);
+    });
+
+    if (isJobsRoute) {
+      router.push('/create-job/index' as any);
+    } else {
+      router.push('/create-listing/index' as any);
+    }
   };
 
   return (
@@ -57,20 +76,26 @@ export default function TabLayout() {
         name="add-listing"
         options={{
           title: "",
-          tabBarIcon: () => (
-            <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={handleAddPress}
-                activeOpacity={0.9}
-              >
-                <Plus size={28} color="#fff" strokeWidth={3} />
-              </TouchableOpacity>
-            </Animated.View>
-          ),
+          tabBarIcon: () => {
+            const rotate = rotateAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['0deg', '180deg'],
+            });
+            return (
+              <Animated.View style={{ transform: [{ scale: scaleAnim }, { rotate }] }}>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={handleAddPress}
+                  activeOpacity={0.9}
+                >
+                  <Plus size={28} color="#fff" strokeWidth={3} />
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          },
           tabBarLabel: ({ focused }) => (
             <Text style={[styles.addLabel, focused && styles.addLabelFocused]}>
-              Add Listing
+              {isJobsRoute ? 'Add Opening' : 'Add Listing'}
             </Text>
           ),
         }}
