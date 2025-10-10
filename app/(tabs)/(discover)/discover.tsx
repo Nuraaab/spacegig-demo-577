@@ -410,31 +410,133 @@ export default function DiscoverScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Filters</Text>
-              <TouchableOpacity onPress={() => setShowFilters(false)}>
-                <X size={24} color="#1a1a1a" />
+              <TouchableOpacity 
+                onPress={() => {
+                  setFilters({
+                    propertyTypes: [],
+                    listingType: 'all',
+                    priceRange: { min: 0, max: 10000 },
+                    beds: 0,
+                    baths: 0,
+                    amenities: [],
+                  });
+                }}
+              >
+                <Text style={styles.resetText}>Reset</Text>
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               <View style={styles.filterSection}>
                 <Text style={styles.filterLabel}>Listing Type</Text>
-                <View style={styles.chipContainer}>
+                <View style={styles.segmentedControl}>
                   {['all', 'rent', 'sale'].map((type) => (
                     <TouchableOpacity
                       key={type}
                       style={[
-                        styles.chip,
-                        filters.listingType === type && styles.chipActive,
+                        styles.segment,
+                        filters.listingType === type && styles.segmentActive,
                       ]}
                       onPress={() => setFilters({ ...filters, listingType: type as any })}
                     >
                       <Text
                         style={[
-                          styles.chipText,
-                          filters.listingType === type && styles.chipTextActive,
+                          styles.segmentText,
+                          filters.listingType === type && styles.segmentTextActive,
                         ]}
                       >
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                        {type === 'all' ? 'All' : type === 'rent' ? 'For Rent' : 'For Sale'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.filterSection}>
+                <Text style={styles.filterLabel}>Price Range</Text>
+                <View style={styles.priceInputContainer}>
+                  <View style={styles.priceInput}>
+                    <Text style={styles.pricePrefix}>$</Text>
+                    <TextInput
+                      style={styles.priceInputText}
+                      value={filters.priceRange.min === 0 ? '' : filters.priceRange.min.toString()}
+                      onChangeText={(text) => {
+                        const value = parseInt(text) || 0;
+                        setFilters({
+                          ...filters,
+                          priceRange: { ...filters.priceRange, min: value },
+                        });
+                      }}
+                      keyboardType="numeric"
+                      placeholder="Min"
+                      placeholderTextColor="#999"
+                    />
+                  </View>
+                  <Text style={styles.priceSeparator}>—</Text>
+                  <View style={styles.priceInput}>
+                    <Text style={styles.pricePrefix}>$</Text>
+                    <TextInput
+                      style={styles.priceInputText}
+                      value={filters.priceRange.max === 10000 ? '' : filters.priceRange.max.toString()}
+                      onChangeText={(text) => {
+                        const value = parseInt(text) || 10000;
+                        setFilters({
+                          ...filters,
+                          priceRange: { ...filters.priceRange, max: value },
+                        });
+                      }}
+                      keyboardType="numeric"
+                      placeholder="Max"
+                      placeholderTextColor="#999"
+                    />
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.filterSection}>
+                <Text style={styles.filterLabel}>Bedrooms</Text>
+                <View style={styles.numberGrid}>
+                  {[0, 1, 2, 3, 4, 5].map((num) => (
+                    <TouchableOpacity
+                      key={num}
+                      style={[
+                        styles.numberButton,
+                        filters.beds === num && styles.numberButtonActive,
+                      ]}
+                      onPress={() => setFilters({ ...filters, beds: num })}
+                    >
+                      <Text
+                        style={[
+                          styles.numberButtonText,
+                          filters.beds === num && styles.numberButtonTextActive,
+                        ]}
+                      >
+                        {num === 0 ? 'Any' : num === 5 ? '5+' : num}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.filterSection}>
+                <Text style={styles.filterLabel}>Bathrooms</Text>
+                <View style={styles.numberGrid}>
+                  {[0, 1, 2, 3, 4].map((num) => (
+                    <TouchableOpacity
+                      key={num}
+                      style={[
+                        styles.numberButton,
+                        filters.baths === num && styles.numberButtonActive,
+                      ]}
+                      onPress={() => setFilters({ ...filters, baths: num })}
+                    >
+                      <Text
+                        style={[
+                          styles.numberButtonText,
+                          filters.baths === num && styles.numberButtonTextActive,
+                        ]}
+                      >
+                        {num === 0 ? 'Any' : num === 4 ? '4+' : num}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -472,98 +574,9 @@ export default function DiscoverScreen() {
               </View>
 
               <View style={styles.filterSection}>
-                <Text style={styles.filterLabel}>Price Range</Text>
-                <View style={styles.priceInputContainer}>
-                  <View style={styles.priceInput}>
-                    <DollarSign size={16} color="#666" />
-                    <TextInput
-                      style={styles.priceInputText}
-                      value={filters.priceRange.min.toString()}
-                      onChangeText={(text) => {
-                        const value = parseInt(text) || 0;
-                        setFilters({
-                          ...filters,
-                          priceRange: { ...filters.priceRange, min: value },
-                        });
-                      }}
-                      keyboardType="numeric"
-                      placeholder="Min"
-                    />
-                  </View>
-                  <Text style={styles.priceSeparator}>-</Text>
-                  <View style={styles.priceInput}>
-                    <DollarSign size={16} color="#666" />
-                    <TextInput
-                      style={styles.priceInputText}
-                      value={filters.priceRange.max.toString()}
-                      onChangeText={(text) => {
-                        const value = parseInt(text) || 10000;
-                        setFilters({
-                          ...filters,
-                          priceRange: { ...filters.priceRange, max: value },
-                        });
-                      }}
-                      keyboardType="numeric"
-                      placeholder="Max"
-                    />
-                  </View>
-                </View>
-              </View>
-
-              <View style={styles.filterSection}>
-                <Text style={styles.filterLabel}>Bedrooms (min)</Text>
-                <View style={styles.chipContainer}>
-                  {[0, 1, 2, 3, 4].map((num) => (
-                    <TouchableOpacity
-                      key={num}
-                      style={[
-                        styles.chip,
-                        filters.beds === num && styles.chipActive,
-                      ]}
-                      onPress={() => setFilters({ ...filters, beds: num })}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.beds === num && styles.chipTextActive,
-                        ]}
-                      >
-                        {num === 0 ? 'Any' : `${num}+`}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.filterSection}>
-                <Text style={styles.filterLabel}>Bathrooms (min)</Text>
-                <View style={styles.chipContainer}>
-                  {[0, 1, 2, 3].map((num) => (
-                    <TouchableOpacity
-                      key={num}
-                      style={[
-                        styles.chip,
-                        filters.baths === num && styles.chipActive,
-                      ]}
-                      onPress={() => setFilters({ ...filters, baths: num })}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.baths === num && styles.chipTextActive,
-                        ]}
-                      >
-                        {num === 0 ? 'Any' : `${num}+`}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.filterSection}>
                 <Text style={styles.filterLabel}>Amenities</Text>
                 <View style={styles.chipContainer}>
-                  {AMENITIES.map((amenity) => (
+                  {AMENITIES.slice(0, 8).map((amenity) => (
                     <TouchableOpacity
                       key={amenity.name}
                       style={[
@@ -593,25 +606,10 @@ export default function DiscoverScreen() {
 
             <View style={styles.modalFooter}>
               <TouchableOpacity
-                style={styles.clearButton}
-                onPress={() => {
-                  setFilters({
-                    propertyTypes: [],
-                    listingType: 'all',
-                    priceRange: { min: 0, max: 10000 },
-                    beds: 0,
-                    baths: 0,
-                    amenities: [],
-                  });
-                }}
-              >
-                <Text style={styles.clearButtonText}>Clear All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={styles.applyButton}
                 onPress={() => setShowFilters(false)}
               >
-                <Text style={styles.applyButtonText}>Apply Filters</Text>
+                <Text style={styles.applyButtonText}>Show Results</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -917,41 +915,101 @@ const styles = StyleSheet.create({
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: '90%',
-    paddingBottom: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '85%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700' as const,
     color: '#1a1a1a',
   },
+  resetText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#4A90E2',
+  },
   modalBody: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   filterSection: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   filterLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600' as const,
     color: '#1a1a1a',
     marginBottom: 12,
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 4,
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  segmentActive: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  segmentText: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+    color: '#666',
+  },
+  segmentTextActive: {
+    color: '#1a1a1a',
+    fontWeight: '600' as const,
+  },
+  numberGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  numberButton: {
+    width: '15%',
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    backgroundColor: '#f5f5f5',
+    borderWidth: 1.5,
+    borderColor: '#f5f5f5',
+  },
+  numberButtonActive: {
+    backgroundColor: '#E8F4FF',
+    borderColor: '#4A90E2',
+  },
+  numberButtonText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  numberButtonTextActive: {
+    color: '#4A90E2',
   },
   chipContainer: {
     flexDirection: 'row',
@@ -959,15 +1017,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     borderRadius: 20,
     backgroundColor: '#f5f5f5',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderWidth: 1.5,
+    borderColor: '#f5f5f5',
   },
   chipActive: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#E8F4FF',
     borderColor: '#4A90E2',
   },
   chipText: {
@@ -976,7 +1034,8 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
   },
   chipTextActive: {
-    color: '#fff',
+    color: '#4A90E2',
+    fontWeight: '600' as const,
   },
   priceInputContainer: {
     flexDirection: 'row',
@@ -988,49 +1047,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
     borderRadius: 12,
-    gap: 8,
+    borderWidth: 1.5,
+    borderColor: '#f5f5f5',
+  },
+  pricePrefix: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#666',
+    marginRight: 4,
   },
   priceInputText: {
     flex: 1,
     fontSize: 16,
     color: '#1a1a1a',
+    fontWeight: '500' as const,
   },
   priceSeparator: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 18,
+    color: '#999',
+    fontWeight: '300' as const,
   },
   modalFooter: {
-    flexDirection: 'row',
     padding: 20,
-    gap: 12,
+    paddingBottom: 24,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
   },
-  clearButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
-    backgroundColor: '#f5f5f5',
-    alignItems: 'center',
-  },
-  clearButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#666',
-  },
   applyButton: {
-    flex: 1,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 14,
     backgroundColor: '#4A90E2',
     alignItems: 'center',
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   applyButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
+    fontSize: 17,
+    fontWeight: '700' as const,
     color: '#fff',
   },
 });
