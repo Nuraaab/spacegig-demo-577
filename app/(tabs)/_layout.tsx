@@ -76,6 +76,7 @@ export default function TabLayout() {
         name="add-listing"
         options={{
           title: "",
+          href: null,
           tabBarIcon: () => {
             const rotate = rotateAnim.interpolate({
               inputRange: [0, 1],
@@ -98,12 +99,13 @@ export default function TabLayout() {
               {isJobsRoute ? 'Add Opening' : 'Add Listing'}
             </Text>
           ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-            handleAddPress();
-          },
+          tabBarButton: (props) => (
+            <TouchableOpacity
+              {...props}
+              onPress={handleAddPress}
+              style={props.style}
+            />
+          ),
         }}
       />
       <Tabs.Screen
