@@ -1,4 +1,61 @@
 export type JobType = 'full-time' | 'part-time' | 'contract' | 'internship';
+export type PayCadence = 'hour' | 'week' | 'month' | 'year';
+export type EmploymentType = 'full_time' | 'part_time' | 'contract' | 'temporary' | 'internship';
+export type Modality = 'onsite' | 'remote' | 'hybrid';
+export type Seniority = 'intern' | 'junior' | 'mid' | 'senior' | 'lead';
+
+export interface JobOpening {
+  id?: string;
+  company: {
+    name: string;
+    logoUrl?: string;
+    contactName: string;
+    contactEmail: string;
+    contactPhone?: string;
+    website?: string;
+  };
+  role: {
+    title: string;
+    category: string;
+    seniority: Seniority;
+    type: EmploymentType;
+    description: string;
+  };
+  location: {
+    modality: Modality;
+    primary?: string;
+    regions?: string[];
+    schedule?: { days: string[]; start?: string; end?: string; weekends?: boolean };
+  };
+  compensation: {
+    currency: string;
+    payType: 'hourly' | 'salary';
+    min: number;
+    max: number;
+    cadence: PayCadence;
+    benefits?: string[];
+    equity?: string;
+  };
+  requirements: {
+    years?: string;
+    mustHave: string[];
+    niceToHave?: string[];
+    certifications?: string[];
+    authRequired?: boolean;
+  };
+  screening: {
+    method: 'in_app' | 'external' | 'email';
+    externalUrl?: string;
+    email?: string;
+    questions?: { id: string; type: 'short' | 'mc' | 'yn'; prompt: string; options?: string[] }[];
+    resumeRequired?: boolean;
+    quickApply?: boolean;
+  };
+  timestamps?: { createdAt: string; updatedAt: string };
+  status?: 'draft' | 'published';
+  images?: string[];
+  featured?: boolean;
+}
 
 export interface Job {
   id: string;
@@ -198,4 +255,37 @@ export const mockJobs: Job[] = [
     ],
     featured: false,
   },
+];
+
+export const JOB_CATEGORIES = [
+  'Engineering',
+  'Design',
+  'Product',
+  'Marketing',
+  'Sales',
+  'Operations',
+  'Customer Success',
+  'Finance',
+  'Human Resources',
+  'Legal',
+  'Other',
+];
+
+export const COMMON_BENEFITS = [
+  'Health insurance',
+  'Dental insurance',
+  'Vision insurance',
+  '401(k) matching',
+  'Remote work',
+  'Flexible hours',
+  'Unlimited PTO',
+  'Paid time off',
+  'Professional development',
+  'Stock options',
+  'Gym membership',
+  'Commuter benefits',
+  'Equipment stipend',
+  'Home office budget',
+  'Parental leave',
+  'Mental health support',
 ];
