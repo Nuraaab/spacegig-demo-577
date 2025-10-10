@@ -10,18 +10,19 @@ import {
   Animated,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, ArrowLeft } from 'lucide-react-native';
-import { useApp } from '@/contexts/AppContext';
+import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, ArrowLeft } from 'lucide-react-native';
+import { mockJobs } from '@/mocks/jobs';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
 
-export default function DiscoverScreen() {
+export default function JobsDiscoverScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { getCurrentProperty, nextProperty, addToFavorites } = useApp();
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -45,15 +46,14 @@ export default function DiscoverScreen() {
     extrapolate: 'clamp',
   });
 
-  const property = getCurrentProperty();
+  const job = mockJobs[currentIndex];
 
   const handleSwipeComplete = (direction: 'left' | 'right') => {
-    if (direction === 'right' && property) {
-      addToFavorites(property.id);
+    if (direction === 'right' && job) {
       setShowConfirmation(true);
       setTimeout(() => setShowConfirmation(false), 2000);
     }
-    nextProperty();
+    setCurrentIndex((prev) => Math.min(prev + 1, mockJobs.length));
     position.setValue({ x: 0, y: 0 });
   };
 
@@ -99,12 +99,12 @@ export default function DiscoverScreen() {
     }).start(() => handleSwipeComplete('left'));
   };
 
-  if (!property) {
+  if (!job) {
     return (
       <View style={styles.container}>
         <Stack.Screen
           options={{
-            title: 'Discover Properties',
+            title: 'Discover Jobs',
             headerLeft: () => (
               <TouchableOpacity
                 onPress={() => router.replace('/onboarding')}
@@ -116,8 +116,8 @@ export default function DiscoverScreen() {
           }}
         />
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No more properties to show</Text>
-          <Text style={styles.emptySubtext}>Check back later for new listings</Text>
+          <Text style={styles.emptyText}>No more jobs to show</Text>
+          <Text style={styles.emptySubtext}>Check back later for new opportunities</Text>
         </View>
       </View>
     );
@@ -127,7 +127,7 @@ export default function DiscoverScreen() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: 'Discover Properties',
+          title: 'Discover Jobs',
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => router.replace('/onboarding')}
@@ -144,7 +144,7 @@ export default function DiscoverScreen() {
           <Search size={20} color="#999" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search properties..."
+            placeholder="Search jobs..."
             placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -154,7 +154,7 @@ export default function DiscoverScreen() {
           style={styles.filterButton}
           onPress={() => setShowFilters(!showFilters)}
         >
-          <SlidersHorizontal size={20} color="#4A90E2" />
+          <SlidersHorizontal size={20} color="#10B981" />
         </TouchableOpacity>
       </View>
 
@@ -167,15 +167,15 @@ export default function DiscoverScreen() {
         ]}
         {...panResponder.panHandlers}
       >
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => router.push(`/property/${property.id}` as any)}
-          style={styles.cardTouchable}
+        <ScrollView
+          style={styles.cardScrollView}
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
         >
-          <Image source={{ uri: property.images[0] }} style={styles.image} />
+          <Image source={{ uri: job.images[0] }} style={styles.image} />
 
           <Animated.View style={[styles.likeLabel, { opacity: likeOpacity }]}>
-            <Text style={styles.likeLabelText}>LIKE</Text>
+            <Text style={styles.likeLabelText}>INTERESTED</Text>
           </Animated.View>
 
           <Animated.View style={[styles.nopeLabel, { opacity: nopeOpacity }]}>
@@ -183,37 +183,52 @@ export default function DiscoverScreen() {
           </Animated.View>
 
           <View style={styles.cardContent}>
-            <View style={styles.priceTag}>
-              <Text style={styles.price}>
-                ${property.price.toLocaleString()}/{property.listingType === 'rent' ? 'mo' : 'sale'}
+            <View style={styles.salaryTag}>
+              <DollarSign size={16} color="#fff" />
+              <Text style={styles.salary}>
+                ${job.salary.min.toLocaleString()} - ${job.salary.max.toLocaleString()}
               </Text>
             </View>
 
-            <Text style={styles.title}>{property.title}</Text>
+            <Text style={styles.title}>{job.title}</Text>
+            <Text style={styles.company}>{job.company}</Text>
 
             <View style={styles.locationRow}>
               <MapPin size={16} color="#666" />
               <Text style={styles.location}>
-                {property.location.city}, {property.location.state}
+                {job.location.city}, {job.location.state}
+                {job.location.remote && ' • Remote'}
               </Text>
             </View>
 
-            <View style={styles.specs}>
-              <View style={styles.specItem}>
-                <Bed size={18} color="#4A90E2" />
-                <Text style={styles.specText}>{property.specs.beds} beds</Text>
-              </View>
-              <View style={styles.specItem}>
-                <Bath size={18} color="#4A90E2" />
-                <Text style={styles.specText}>{property.specs.baths} baths</Text>
-              </View>
-              <View style={styles.specItem}>
-                <Maximize size={18} color="#4A90E2" />
-                <Text style={styles.specText}>{property.specs.sqft} sqft</Text>
+            <View style={styles.jobTypeContainer}>
+              <View style={styles.jobTypeBadge}>
+                <Briefcase size={14} color="#10B981" />
+                <Text style={styles.jobTypeText}>{job.jobType}</Text>
               </View>
             </View>
+
+            <Text style={styles.sectionTitle}>Description</Text>
+            <Text style={styles.description}>{job.description}</Text>
+
+            <Text style={styles.sectionTitle}>Requirements</Text>
+            {job.requirements.map((req, index) => (
+              <View key={index} style={styles.listItem}>
+                <Text style={styles.bullet}>•</Text>
+                <Text style={styles.listText}>{req}</Text>
+              </View>
+            ))}
+
+            <Text style={styles.sectionTitle}>Benefits</Text>
+            <View style={styles.benefitsContainer}>
+              {job.benefits.map((benefit, index) => (
+                <View key={index} style={styles.benefitChip}>
+                  <Text style={styles.benefitText}>{benefit}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </TouchableOpacity>
+        </ScrollView>
       </Animated.View>
 
       <View style={styles.buttonsContainer}>
@@ -222,7 +237,7 @@ export default function DiscoverScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike}>
-          <Heart size={32} color="#4A90E2" strokeWidth={3} />
+          <Heart size={32} color="#10B981" strokeWidth={3} />
         </TouchableOpacity>
       </View>
 
@@ -268,7 +283,7 @@ const styles = StyleSheet.create({
   filterButton: {
     width: 48,
     height: 48,
-    backgroundColor: '#F0F8FF',
+    backgroundColor: '#E8F5E9',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -286,30 +301,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    overflow: 'hidden',
   },
-  cardTouchable: {
+  cardScrollView: {
     flex: 1,
   },
   image: {
     width: '100%',
-    height: '70%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    height: 200,
   },
   likeLabel: {
     position: 'absolute',
     top: 50,
     right: 40,
     borderWidth: 4,
-    borderColor: '#4A90E2',
+    borderColor: '#10B981',
     borderRadius: 8,
     padding: 8,
     transform: [{ rotate: '20deg' }],
+    backgroundColor: '#fff',
   },
   likeLabelText: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '700' as const,
-    color: '#4A90E2',
+    color: '#10B981',
   },
   nopeLabel: {
     position: 'absolute',
@@ -320,21 +335,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     transform: [{ rotate: '-20deg' }],
+    backgroundColor: '#fff',
   },
   nopeLabelText: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '700' as const,
     color: '#FF6B6B',
   },
   cardContent: {
-    flex: 1,
     padding: 20,
   },
-  priceTag: {
+  salaryTag: {
     position: 'absolute',
     top: -30,
     right: 20,
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#10B981',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -343,9 +358,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
-  price: {
-    fontSize: 18,
+  salary: {
+    fontSize: 16,
     fontWeight: '700' as const,
     color: '#fff',
   },
@@ -353,30 +371,86 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700' as const,
     color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  company: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: '#10B981',
     marginBottom: 8,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   location: {
     fontSize: 14,
     color: '#666',
   },
-  specs: {
-    flexDirection: 'row',
-    gap: 20,
+  jobTypeContainer: {
+    marginBottom: 16,
   },
-  specItem: {
+  jobTypeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    alignSelf: 'flex-start',
   },
-  specText: {
+  jobTypeText: {
     fontSize: 14,
-    color: '#333',
+    fontWeight: '600' as const,
+    color: '#10B981',
+    textTransform: 'capitalize' as const,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 22,
+  },
+  listItem: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    paddingRight: 20,
+  },
+  bullet: {
+    fontSize: 14,
+    color: '#10B981',
+    marginRight: 8,
+    fontWeight: '700' as const,
+  },
+  listText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 22,
+  },
+  benefitsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  benefitChip: {
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  benefitText: {
+    fontSize: 14,
+    color: '#10B981',
     fontWeight: '500' as const,
   },
   buttonsContainer: {
@@ -407,7 +481,7 @@ const styles = StyleSheet.create({
   },
   likeButton: {
     borderWidth: 2,
-    borderColor: '#4A90E2',
+    borderColor: '#10B981',
   },
   emptyContainer: {
     flex: 1,
@@ -433,7 +507,7 @@ const styles = StyleSheet.create({
     left: '50%',
     transform: [{ translateX: -100 }],
     width: 200,
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#10B981',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25,

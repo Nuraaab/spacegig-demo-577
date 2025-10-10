@@ -2,13 +2,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
-import { useListing } from '@/contexts/ListingContext';
 
-export default function CreateListingIntro() {
+export default function CreateJobIntro() {
   const router = useRouter();
-  const { updateFormData, nextStep } = useListing();
-
-
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -20,12 +16,12 @@ export default function CreateListingIntro() {
 
       <View style={styles.content}>
         <Image
-          source={{ uri: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400' }}
+          source={{ uri: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400' }}
           style={styles.heroImage}
         />
 
         <Text style={styles.title}>It&apos;s easy to get started on PostIt</Text>
-        <Text style={styles.subtitle}>Create your property listing in just a few simple steps</Text>
+        <Text style={styles.subtitle}>Create your job listing in just a few simple steps</Text>
 
         <View style={styles.stepsContainer}>
           <View style={styles.stepItem}>
@@ -33,8 +29,8 @@ export default function CreateListingIntro() {
               <Text style={styles.stepNumberText}>1</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Choose property type</Text>
-              <Text style={styles.stepDescription}>Select the type of property you&apos;re listing</Text>
+              <Text style={styles.stepTitle}>Job details</Text>
+              <Text style={styles.stepDescription}>Add job title, description, and requirements</Text>
             </View>
           </View>
 
@@ -43,8 +39,8 @@ export default function CreateListingIntro() {
               <Text style={styles.stepNumberText}>2</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Add details and photos</Text>
-              <Text style={styles.stepDescription}>Fill in the information and upload images</Text>
+              <Text style={styles.stepTitle}>Company information</Text>
+              <Text style={styles.stepDescription}>Tell candidates about your company</Text>
             </View>
           </View>
 
@@ -54,7 +50,7 @@ export default function CreateListingIntro() {
             </View>
             <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Review and publish</Text>
-              <Text style={styles.stepDescription}>Preview your listing and go live</Text>
+              <Text style={styles.stepDescription}>Preview your job listing and go live</Text>
             </View>
           </View>
         </View>
@@ -62,9 +58,8 @@ export default function CreateListingIntro() {
         <TouchableOpacity
           style={styles.getStartedButton}
           onPress={() => {
-            updateFormData({ listingCategory: 'property' });
-            nextStep();
-            router.push('/create-listing/steps' as any);
+            console.log('Navigate to job creation steps');
+            router.back();
           }}
         >
           <Text style={styles.getStartedButtonText}>Get Started</Text>
@@ -124,14 +119,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F0F8FF',
+    backgroundColor: '#E8F5E9',
     justifyContent: 'center',
     alignItems: 'center',
   },
   stepNumberText: {
     fontSize: 18,
     fontWeight: '700' as const,
-    color: '#4A90E2',
+    color: '#10B981',
   },
   stepContent: {
     flex: 1,
@@ -147,7 +142,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   getStartedButton: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#10B981',
     paddingVertical: 18,
     borderRadius: 12,
     alignItems: 'center',

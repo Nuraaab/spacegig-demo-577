@@ -17,7 +17,7 @@ export default function OnboardingScreen() {
   };
 
   const handleAddJob = () => {
-    console.log('Add job opening');
+    router.push('/create-job/index' as any);
   };
 
   const handleDiscoverProperties = () => {
@@ -25,7 +25,7 @@ export default function OnboardingScreen() {
   };
 
   const handleDiscoverJobs = () => {
-    console.log('Discover job openings');
+    router.replace('/(tabs)/(discover)/jobs');
   };
 
   return (

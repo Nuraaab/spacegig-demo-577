@@ -1,10 +1,26 @@
 import { Tabs, useRouter } from "expo-router";
-import { Home, Heart, User, Plus } from "lucide-react-native";
-import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { Home, Heart, User, Plus, Users } from "lucide-react-native";
+import React, { useRef } from "react";
+import { TouchableOpacity, Text, StyleSheet, Animated } from "react-native";
 
 export default function TabLayout() {
   const router = useRouter();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handleAddPress = () => {
+    Animated.sequence([
+      Animated.spring(scaleAnim, {
+        toValue: 0.85,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    router.push('/create-listing/index' as any);
+  };
 
   return (
     <Tabs
@@ -35,12 +51,15 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: () => (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => router.push('/create-listing/index' as any)}
-            >
-              <Plus size={28} color="#fff" strokeWidth={3} />
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={handleAddPress}
+                activeOpacity={0.9}
+              >
+                <Plus size={28} color="#fff" strokeWidth={3} />
+              </TouchableOpacity>
+            </Animated.View>
           ),
           tabBarLabel: ({ focused }) => (
             <Text style={[styles.addLabel, focused && styles.addLabelFocused]}>
@@ -51,7 +70,7 @@ export default function TabLayout() {
         listeners={{
           tabPress: (e) => {
             e.preventDefault();
-            router.push('/create-listing/index' as any);
+            handleAddPress();
           },
         }}
       />
@@ -60,6 +79,13 @@ export default function TabLayout() {
         options={{
           title: "Favorites",
           tabBarIcon: ({ color }) => <Heart size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="community"
+        options={{
+          title: "Community",
+          tabBarIcon: ({ color }) => <Users size={24} color={color} />,
         }}
       />
       <Tabs.Screen
