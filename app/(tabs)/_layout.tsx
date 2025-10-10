@@ -76,6 +76,7 @@ export default function TabLayout() {
         name="add-listing"
         options={{
           title: "",
+          href: null,
           tabBarIcon: () => {
             const rotate = rotateAnim.interpolate({
               inputRange: [0, 1],
