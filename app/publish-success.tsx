@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CheckCircle } from 'lucide-react-native';
@@ -23,13 +23,7 @@ export default function PublishSuccess() {
         useNativeDriver: true,
       }),
     ]).start();
-
-    const timeout = setTimeout(() => {
-      router.replace('/(tabs)/(discover)/discover');
-    }, 3000);
-
-    return () => clearTimeout(timeout);
-  }, [scaleAnim, fadeAnim, router]);
+  }, [scaleAnim, fadeAnim]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -46,27 +40,26 @@ export default function PublishSuccess() {
         </Animated.View>
 
         <Animated.View style={[styles.textContainer, { opacity: fadeAnim }]}>
-          <Text style={styles.title}>Property Successfully Published!</Text>
+          <Text style={styles.title}>Job Opening Successfully Published!</Text>
           <Text style={styles.subtitle}>
-            Your listing is now live and visible to potential renters and buyers
+            Your job opening is now live and visible to potential candidates
           </Text>
         </Animated.View>
 
-        <Animated.View style={[styles.loadingContainer, { opacity: fadeAnim }]}>
-          <View style={styles.loadingBar}>
-            <Animated.View
-              style={[
-                styles.loadingProgress,
-                {
-                  width: fadeAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0%', '100%'],
-                  }),
-                },
-              ]}
-            />
-          </View>
-          <Text style={styles.loadingText}>Redirecting to discover...</Text>
+        <Animated.View style={[styles.buttonsContainer, { opacity: fadeAnim }]}>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={() => router.replace('/create-job/steps')}
+          >
+            <Text style={styles.primaryButtonText}>Add Another Job Opening</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => router.replace('/(tabs)/(discover)/discover')}
+          >
+            <Text style={styles.secondaryButtonText}>Discover</Text>
+          </TouchableOpacity>
         </Animated.View>
       </View>
     </SafeAreaView>
@@ -89,7 +82,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 40,
   },
   title: {
     fontSize: 28,
@@ -104,25 +97,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  loadingContainer: {
+  buttonsContainer: {
     width: '100%',
+    gap: 16,
+  },
+  primaryButton: {
+    backgroundColor: '#10B981',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
     alignItems: 'center',
   },
-  loadingBar: {
-    width: '100%',
-    height: 4,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginBottom: 12,
+  primaryButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#fff',
   },
-  loadingProgress: {
-    height: '100%',
-    backgroundColor: '#10B981',
-    borderRadius: 2,
+  secondaryButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#10B981',
   },
-  loadingText: {
-    fontSize: 14,
-    color: '#999',
+  secondaryButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#10B981',
   },
 });
