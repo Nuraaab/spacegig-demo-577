@@ -124,5 +124,7 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: '#10B981',
     marginTop: -16,
+    textAlign: 'center',
+    width: 80,
   },
 });
