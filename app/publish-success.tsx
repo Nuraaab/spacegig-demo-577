@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { CheckCircle } from 'lucide-react-native';
+import { CheckCircle, Home } from 'lucide-react-native';
 
 export default function PublishSuccess() {
   const router = useRouter();
@@ -58,7 +58,7 @@ export default function PublishSuccess() {
             style={styles.secondaryButton}
             onPress={() => router.replace('/onboarding')}
           >
-            <Text style={styles.secondaryButtonText}>Discover</Text>
+            <Home size={24} color="#10B981" />
           </TouchableOpacity>
         </Animated.View>
       </View>
