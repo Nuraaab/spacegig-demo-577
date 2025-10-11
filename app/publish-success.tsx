@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { CheckCircle, Home } from 'lucide-react-native';
+import { CheckCircle, Home, Briefcase } from 'lucide-react-native';
 
 export default function PublishSuccess() {
   const router = useRouter();
@@ -56,9 +56,18 @@ export default function PublishSuccess() {
 
           <TouchableOpacity
             style={styles.secondaryButton}
+            onPress={() => router.push('/(tabs)/(discover)/jobs')}
+          >
+            <Briefcase size={24} color="#10B981" />
+            <Text style={styles.secondaryButtonText}>View Jobs</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
             onPress={() => router.replace('/onboarding')}
           >
             <Home size={24} color="#10B981" />
+            <Text style={styles.secondaryButtonText}>Home</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -119,6 +128,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 12,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
     borderWidth: 2,
     borderColor: '#10B981',
   },
