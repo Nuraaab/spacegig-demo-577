@@ -70,7 +70,7 @@ export default function TabLayout() {
                   <Plus size={28} color="#fff" strokeWidth={2.5} />
                 </TouchableOpacity>
               </Animated.View>
-              <Text style={styles.addJobLabel}>Add Job Opening</Text>
+              <Text style={styles.addJobLabel}>Add Opening</Text>
             </View>
           ),
           tabBarButton: (props) => (

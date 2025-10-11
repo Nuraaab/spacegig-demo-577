@@ -13,7 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, Home, Plus } from 'lucide-react-native';
+import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, Home } from 'lucide-react-native';
 import { mockJobs } from '@/mocks/jobs';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -89,7 +89,6 @@ export default function JobsDiscoverScreen() {
   const passButtonScale = useRef(new Animated.Value(1)).current;
   const homeButtonScale = useRef(new Animated.Value(1)).current;
   const filterButtonScale = useRef(new Animated.Value(1)).current;
-  const addButtonScale = useRef(new Animated.Value(1)).current;
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -280,32 +279,6 @@ export default function JobsDiscoverScreen() {
           </TouchableOpacity>
         </Animated.View>
       </View>
-
-      <Animated.View style={[styles.addButtonContainer, { transform: [{ scale: addButtonScale }] }]}>
-        <TouchableOpacity 
-          style={styles.addButton} 
-          onPress={() => {
-            Animated.sequence([
-              Animated.timing(addButtonScale, {
-                toValue: 1.2,
-                duration: 120,
-                useNativeDriver: true,
-              }),
-              Animated.timing(addButtonScale, {
-                toValue: 1,
-                duration: 120,
-                useNativeDriver: true,
-              }),
-            ]).start(() => {
-              router.push('/create-job/steps' as any);
-            });
-          }}
-          activeOpacity={0.8}
-        >
-          <Plus size={24} color="#fff" strokeWidth={2.5} />
-          <Text style={styles.addButtonText}>Add Opening</Text>
-        </TouchableOpacity>
-      </Animated.View>
 
       {showConfirmation && (
         <View style={styles.confirmation}>
@@ -595,30 +568,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
   },
-  addButtonContainer: {
-    position: 'absolute',
-    bottom: 130,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  addButton: {
-    flexDirection: 'row',
-    backgroundColor: '#10B981',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 30,
-    alignItems: 'center',
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: '600' as const,
-    fontSize: 15,
-  },
+
 });
