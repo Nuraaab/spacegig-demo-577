@@ -21,6 +21,7 @@ function RootLayoutNav() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="property/[id]" options={{ headerShown: false, presentation: "modal" }} />
       <Stack.Screen name="create-listing" options={{ headerShown: false, presentation: "modal" }} />
+      <Stack.Screen name="create-job" options={{ headerShown: false, presentation: "modal" }} />
     </Stack>
   );
 }
