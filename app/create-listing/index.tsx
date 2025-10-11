@@ -15,7 +15,7 @@ export default function CreateListingIntro() {
   };
 
   const handleJobListing = () => {
-    router.push('/create-job' as any);
+    router.push('/create-job/index' as any);
   };
 
   return (
