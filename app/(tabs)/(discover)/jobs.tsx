@@ -297,7 +297,7 @@ export default function JobsDiscoverScreen() {
                 useNativeDriver: true,
               }),
             ]).start(() => {
-              router.push('/create-job' as any);
+              router.push('/create-job/steps' as any);
             });
           }}
           activeOpacity={0.8}
