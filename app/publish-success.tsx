@@ -56,7 +56,7 @@ export default function PublishSuccess() {
 
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() => router.replace('/(tabs)/(discover)/discover')}
+            onPress={() => router.replace('/onboarding')}
           >
             <Text style={styles.secondaryButtonText}>Discover</Text>
           </TouchableOpacity>
