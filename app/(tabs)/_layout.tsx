@@ -1,6 +1,6 @@
 import { Tabs, useRouter } from "expo-router";
 import { Home, Heart, User, Users, Plus } from "lucide-react-native";
-import { TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { TouchableOpacity, StyleSheet, Animated, Text, View } from "react-native";
 import { useRef } from "react";
 
 export default function TabLayout() {
@@ -60,15 +60,18 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: () => (
-            <Animated.View style={{ transform: [{ scale: addButtonScale }] }}>
-              <TouchableOpacity
-                onPress={handleAddPress}
-                style={styles.addButton}
-                activeOpacity={0.8}
-              >
-                <Plus size={28} color="#fff" strokeWidth={2.5} />
-              </TouchableOpacity>
-            </Animated.View>
+            <View style={styles.addJobContainer}>
+              <Animated.View style={{ transform: [{ scale: addButtonScale }] }}>
+                <TouchableOpacity
+                  onPress={handleAddPress}
+                  style={styles.addButton}
+                  activeOpacity={0.8}
+                >
+                  <Plus size={28} color="#fff" strokeWidth={2.5} />
+                </TouchableOpacity>
+              </Animated.View>
+              <Text style={styles.addJobLabel}>Add Job Opening</Text>
+            </View>
           ),
           tabBarButton: (props) => (
             <TouchableOpacity
@@ -98,6 +101,10 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  addJobContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   addButton: {
     width: 56,
     height: 56,
@@ -111,5 +118,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
     marginBottom: 20,
+  },
+  addJobLabel: {
+    fontSize: 10,
+    fontWeight: '600' as const,
+    color: '#10B981',
+    marginTop: -16,
   },
 });
