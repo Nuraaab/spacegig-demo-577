@@ -59,7 +59,7 @@ export default function PublishSuccess() {
             onPress={() => router.push('/(tabs)/(discover)/jobs')}
           >
             <Briefcase size={24} color="#10B981" />
-            <Text style={styles.secondaryButtonText}>View Jobs</Text>
+            <Text style={styles.secondaryButtonText}>Discover Job Openings</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
