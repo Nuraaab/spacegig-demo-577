@@ -1,7 +1,28 @@
-import { Tabs } from "expo-router";
-import { Home, Heart, User, Users } from "lucide-react-native";
+import { Tabs, useRouter } from "expo-router";
+import { Home, Heart, User, Users, Plus } from "lucide-react-native";
+import { TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { useRef } from "react";
 
 export default function TabLayout() {
+  const router = useRouter();
+  const addButtonScale = useRef(new Animated.Value(1)).current;
+
+  const handleAddPress = () => {
+    Animated.sequence([
+      Animated.timing(addButtonScale, {
+        toValue: 0.85,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(addButtonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      router.push('/create-job/steps' as any);
+    });
+  };
 
   return (
     <Tabs
@@ -35,6 +56,30 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="add-job"
+        options={{
+          title: "",
+          tabBarIcon: () => (
+            <Animated.View style={{ transform: [{ scale: addButtonScale }] }}>
+              <TouchableOpacity
+                onPress={handleAddPress}
+                style={styles.addButton}
+                activeOpacity={0.8}
+              >
+                <Plus size={28} color="#fff" strokeWidth={2.5} />
+              </TouchableOpacity>
+            </Animated.View>
+          ),
+          tabBarButton: (props) => (
+            <TouchableOpacity
+              {...props}
+              onPress={handleAddPress}
+              style={[props.style, { flex: 1 }]}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="community"
         options={{
           title: "Community",
@@ -51,3 +96,20 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  addButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    marginBottom: 20,
+  },
+});
