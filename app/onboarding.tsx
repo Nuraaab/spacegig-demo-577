@@ -168,6 +168,7 @@ export default function OnboardingScreen() {
 
   const handleAddProperty2 = () => {
     animateButton(addProperty2Scale, () => {
+      router.push('/add-property-v2/get-started' as any);
     });
   };
 
