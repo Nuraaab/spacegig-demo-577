@@ -13,7 +13,6 @@ export default function PropertyTypeScreen() {
   const [selectedType, setSelectedType] = useState<PropertyType | null>(null);
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
-  const toggleAnimation = useRef(new Animated.Value(0)).current;
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -77,12 +76,6 @@ export default function PropertyTypeScreen() {
     if (type === 'sale' && (selectedType === 'basement' || selectedType === 'room')) {
       setSelectedType(null);
     }
-    
-    Animated.timing(toggleAnimation, {
-      toValue: type === 'sale' ? 1 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
   };
 
   const handleNext = () => {
@@ -124,22 +117,12 @@ export default function PropertyTypeScreen() {
         </Text>
 
         <View style={styles.toggleSection}>
-          <View style={styles.toggleTrack}>
-            <Animated.View
-              style={[
-                styles.toggleSlider,
-                {
-                  transform: [{
-                    translateX: toggleAnimation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, 160],
-                    }),
-                  }],
-                },
-              ]}
-            />
+          <View style={styles.toggleContainer}>
             <TouchableOpacity
-              style={styles.toggleLabel}
+              style={[
+                styles.toggleButton,
+                listingType === 'rent' && styles.toggleButtonActive,
+              ]}
               onPress={() => handleToggle('rent')}
               activeOpacity={0.7}
             >
@@ -153,7 +136,10 @@ export default function PropertyTypeScreen() {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.toggleLabel}
+              style={[
+                styles.toggleButton,
+                listingType === 'sale' && styles.toggleButtonActive,
+              ]}
               onPress={() => handleToggle('sale')}
               activeOpacity={0.7}
             >
@@ -356,41 +342,34 @@ const styles = StyleSheet.create({
   toggleSection: {
     marginBottom: 32,
   },
-  toggleTrack: {
+  toggleContainer: {
     flexDirection: 'row',
-    backgroundColor: '#F0F0F0',
-    borderRadius: 30,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
     padding: 4,
-    position: 'relative',
-    height: 56,
+    gap: 4,
   },
-  toggleSlider: {
-    position: 'absolute',
-    left: 4,
-    top: 4,
-    width: 160,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#4A90E2',
-    shadowColor: '#4A90E2',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  toggleLabel: {
+  toggleButton: {
     flex: 1,
-    height: 48,
-    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
-    zIndex: 1,
+    backgroundColor: 'transparent',
+  },
+  toggleButtonActive: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   toggleText: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#999',
+    color: '#666',
   },
   toggleTextActive: {
-    color: '#fff',
+    color: '#1a1a1a',
   },
 });
