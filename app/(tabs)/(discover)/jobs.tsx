@@ -140,7 +140,7 @@ export default function JobsDiscoverScreen() {
                   <Home size={24} color="#1a1a1a" />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => router.back()}
+                  onPress={() => router.push('/discover')}
                 >
                   <ArrowLeft size={24} color="#1a1a1a" />
                 </TouchableOpacity>
@@ -174,7 +174,7 @@ export default function JobsDiscoverScreen() {
               </Animated.View>
               <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
                 <TouchableOpacity
-                  onPress={() => animateButton(backButtonScale, () => router.back())}
+                  onPress={() => animateButton(backButtonScale, () => router.push('/discover'))}
                   activeOpacity={0.8}
                 >
                   <ArrowLeft size={24} color="#1a1a1a" />
@@ -200,7 +200,7 @@ export default function JobsDiscoverScreen() {
           <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
             <TouchableOpacity
               style={styles.headerButton}
-              onPress={() => animateButton(backButtonScale, () => router.back())}
+              onPress={() => animateButton(backButtonScale, () => router.push('/discover'))}
               activeOpacity={0.8}
             >
               <ArrowLeft size={20} color="#1a1a1a" />
