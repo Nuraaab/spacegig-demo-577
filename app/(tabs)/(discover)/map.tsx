@@ -42,17 +42,6 @@ type Region = {
 
 type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'newest' | 'sqft_asc' | 'sqft_desc';
 
-let MapView: any = null;
-let Marker: any = null;
-let PROVIDER_DEFAULT: any = null;
-
-if (Platform.OS !== 'web') {
-  const maps = require('react-native-maps');
-  MapView = maps.default;
-  Marker = maps.Marker;
-  PROVIDER_DEFAULT = maps.PROVIDER_DEFAULT;
-}
-
 function MapViewComponent({
   mapRef,
   region,
@@ -68,50 +57,7 @@ function MapViewComponent({
   handleMarkerPress: (property: Property) => void;
   handleRegionChangeComplete: (region: Region) => void;
 }) {
-  if (Platform.OS === 'web' || !MapView) return null;
-
-  return (
-    <MapView
-      ref={mapRef}
-      style={styles.map}
-      provider={PROVIDER_DEFAULT}
-      initialRegion={region}
-      onRegionChangeComplete={handleRegionChangeComplete}
-      showsUserLocation={false}
-      showsMyLocationButton={false}
-    >
-      {filteredProperties.map((property) => (
-        <Marker
-          key={property.id}
-          coordinate={{
-            latitude: property.location.lat,
-            longitude: property.location.lng,
-          }}
-          onPress={() => handleMarkerPress(property)}
-        >
-          <View
-            style={[
-              styles.markerChip,
-              selectedProperty?.id === property.id && styles.markerChipSelected,
-              property.is_deal && styles.markerChipDeal,
-            ]}
-          >
-            <Text style={styles.markerText}>{property.price_display}</Text>
-            {property.is_deal && (
-              <View style={styles.dealBadge}>
-                <Text style={styles.dealBadgeText}>Deal</Text>
-              </View>
-            )}
-            {property.is_new && (
-              <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>New</Text>
-              </View>
-            )}
-          </View>
-        </Marker>
-      ))}
-    </MapView>
-  );
+  return null;
 }
 
 export default function MapScreen() {
@@ -335,27 +281,16 @@ export default function MapScreen() {
         </TouchableOpacity>
       </View>
 
-      {Platform.OS === 'web' ? (
-        <View style={styles.webFallback}>
-          <MapPin size={64} color="#4A90E2" />
-          <Text style={styles.webFallbackTitle}>Map View</Text>
-          <Text style={styles.webFallbackText}>
-            Interactive map is only available on mobile devices.
-          </Text>
-          <Text style={styles.webFallbackText}>
-            Scan the QR code to view the map on your phone.
-          </Text>
-        </View>
-      ) : (
-        <MapViewComponent
-          mapRef={mapRef}
-          region={region}
-          filteredProperties={filteredProperties}
-          selectedProperty={selectedProperty}
-          handleMarkerPress={handleMarkerPress}
-          handleRegionChangeComplete={handleRegionChangeComplete}
-        />
-      )}
+      <View style={styles.webFallback}>
+        <MapPin size={64} color="#4A90E2" />
+        <Text style={styles.webFallbackTitle}>Map View</Text>
+        <Text style={styles.webFallbackText}>
+          Interactive map is only available on mobile devices.
+        </Text>
+        <Text style={styles.webFallbackText}>
+          Scan the QR code to view the map on your phone.
+        </Text>
+      </View>
 
       {showSearchThisArea && (
         <View style={styles.searchAreaButtonContainer}>
