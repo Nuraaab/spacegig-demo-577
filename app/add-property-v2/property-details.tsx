@@ -10,6 +10,8 @@ export default function PropertyDetailsScreen() {
   const [baths, setBaths] = useState<number>(1);
   const [bathrooms, setBathrooms] = useState<number>(1);
   
+  const bathroomOptions = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8];
+  
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -127,14 +129,24 @@ export default function PropertyDetailsScreen() {
           <View style={styles.counterRow}>
             <TouchableOpacity
               style={styles.roundButton}
-              onPress={() => setBathrooms(Math.max(0, bathrooms - 1))}
+              onPress={() => {
+                const currentIndex = bathroomOptions.indexOf(bathrooms);
+                if (currentIndex > 0) {
+                  setBathrooms(bathroomOptions[currentIndex - 1]);
+                }
+              }}
             >
               <Text style={styles.buttonText}>−</Text>
             </TouchableOpacity>
             <Text style={styles.value}>{bathrooms}</Text>
             <TouchableOpacity
               style={styles.roundButton}
-              onPress={() => setBathrooms(bathrooms + 1)}
+              onPress={() => {
+                const currentIndex = bathroomOptions.indexOf(bathrooms);
+                if (currentIndex < bathroomOptions.length - 1) {
+                  setBathrooms(bathroomOptions[currentIndex + 1]);
+                }
+              }}
             >
               <Text style={styles.buttonText}>+</Text>
             </TouchableOpacity>
