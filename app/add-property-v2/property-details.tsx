@@ -1,21 +1,17 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { ChevronLeft } from 'lucide-react-native';
 
 export default function PropertyDetailsScreen() {
   const router = useRouter();
-  const { type, listingType } = useLocalSearchParams();
   const [beds, setBeds] = useState<number>(1);
   const [baths, setBaths] = useState<number>(1);
-  const [den, setDen] = useState<number>(0);
-  const [furnished, setFurnished] = useState<'furnished' | 'unfurnished'>('unfurnished');
-  const [sqft, setSqft] = useState<string>('');
+  const [bathrooms, setBathrooms] = useState<number>(1);
   
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
-  const toggleAnimation = useRef(new Animated.Value(0)).current;
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -69,129 +65,64 @@ export default function PropertyDetailsScreen() {
           Tell us about the size and features
         </Text>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Beds</Text>
-          <View style={styles.counterContainer}>
-            <Bed size={20} color="#666" />
-            <Text style={styles.counterValue}>{beds}</Text>
-            <View style={styles.counterControls}>
-              <TouchableOpacity
-                style={styles.counterButton}
-                onPress={() => setBeds(Math.max(0, beds - 1))}
-              >
-                <Text style={styles.counterButtonText}>−</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.counterButton}
-                onPress={() => setBeds(beds + 1)}
-              >
-                <Text style={styles.counterButtonText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Baths</Text>
-          <View style={styles.counterContainer}>
-            <Bath size={20} color="#666" />
-            <Text style={styles.counterValue}>{baths}</Text>
-            <View style={styles.counterControls}>
-              <TouchableOpacity
-                style={styles.counterButton}
-                onPress={() => setBaths(Math.max(0, baths - 1))}
-              >
-                <Text style={styles.counterButtonText}>−</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.counterButton}
-                onPress={() => setBaths(baths + 1)}
-              >
-                <Text style={styles.counterButtonText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Den</Text>
-          <View style={styles.counterContainer}>
-            <HomeIcon size={20} color="#666" />
-            <Text style={styles.counterValue}>{den}</Text>
-            <View style={styles.counterControls}>
-              <TouchableOpacity
-                style={styles.counterButton}
-                onPress={() => setDen(Math.max(0, den - 1))}
-              >
-                <Text style={styles.counterButtonText}>−</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.counterButton}
-                onPress={() => setDen(den + 1)}
-              >
-                <Text style={styles.counterButtonText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.furnishingRow}>
-            <Text style={styles.sectionTitle}>Furnishing</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Bedrooms</Text>
+          <View style={styles.counterRow}>
             <TouchableOpacity
-              style={styles.modernToggle}
-              onPress={() => {
-                const newValue = furnished === 'furnished' ? 'unfurnished' : 'furnished';
-                setFurnished(newValue);
-                Animated.spring(toggleAnimation, {
-                  toValue: newValue === 'furnished' ? 1 : 0,
-                  useNativeDriver: true,
-                  friction: 6,
-                  tension: 80,
-                }).start();
-              }}
-              activeOpacity={1}
+              style={styles.roundButton}
+              onPress={() => setBeds(Math.max(0, beds - 1))}
             >
-              <Animated.View style={[
-                styles.toggleTrack,
-                {
-                  backgroundColor: toggleAnimation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['#E5E7EB', '#4A90E2'],
-                  }),
-                },
-              ]}>
-                <Animated.View style={[
-                  styles.toggleThumb,
-                  {
-                    transform: [{
-                      translateX: toggleAnimation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [2, 28],
-                      }),
-                    }],
-                  },
-                ]} />
-              </Animated.View>
+              <Text style={styles.buttonText}>−</Text>
+            </TouchableOpacity>
+            <Text style={styles.value}>{beds}</Text>
+            <TouchableOpacity
+              style={styles.roundButton}
+              onPress={() => setBeds(beds + 1)}
+            >
+              <Text style={styles.buttonText}>+</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.furnishingLabel}>
-            {furnished === 'furnished' ? 'Furnished' : 'Unfurnished'}
-          </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Size (sq ft)</Text>
-          <View style={styles.inputContainer}>
-            <Maximize2 size={20} color="#666" />
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. 1500"
-              placeholderTextColor="#999"
-              value={sqft}
-              onChangeText={setSqft}
-              keyboardType="numeric"
-            />
+        <View style={styles.divider} />
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Beds</Text>
+          <View style={styles.counterRow}>
+            <TouchableOpacity
+              style={styles.roundButton}
+              onPress={() => setBaths(Math.max(0, baths - 1))}
+            >
+              <Text style={styles.buttonText}>−</Text>
+            </TouchableOpacity>
+            <Text style={styles.value}>{baths}</Text>
+            <TouchableOpacity
+              style={styles.roundButton}
+              onPress={() => setBaths(baths + 1)}
+            >
+              <Text style={styles.buttonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Bathrooms</Text>
+          <View style={styles.counterRow}>
+            <TouchableOpacity
+              style={styles.roundButton}
+              onPress={() => setBathrooms(Math.max(0, bathrooms - 1))}
+            >
+              <Text style={styles.buttonText}>−</Text>
+            </TouchableOpacity>
+            <Text style={styles.value}>{bathrooms}</Text>
+            <TouchableOpacity
+              style={styles.roundButton}
+              onPress={() => setBathrooms(bathrooms + 1)}
+            >
+              <Text style={styles.buttonText}>+</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -280,58 +211,47 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
-  sectionTitle: {
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 20,
+  },
+  label: {
     fontSize: 18,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
-    marginBottom: 12,
-  },
-  counterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F8FA',
-    padding: 20,
-    borderRadius: 14,
-    gap: 16,
-  },
-  counterValue: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: '#1a1a1a',
-    flex: 1,
-  },
-  counterControls: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  counterButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  counterButtonText: {
-    fontSize: 24,
     fontWeight: '400' as const,
     color: '#1a1a1a',
   },
-  inputContainer: {
+  counterRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F8FA',
-    padding: 20,
-    borderRadius: 14,
     gap: 16,
   },
-  input: {
-    flex: 1,
-    fontSize: 16,
+  roundButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: '400' as const,
     color: '#1a1a1a',
-    fontWeight: '500' as const,
+  },
+  value: {
+    fontSize: 18,
+    fontWeight: '400' as const,
+    color: '#1a1a1a',
+    minWidth: 30,
+    textAlign: 'center',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#F3F4F6',
   },
   footer: {
     flexDirection: 'row',
@@ -356,36 +276,5 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     color: '#fff',
   },
-  furnishingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  furnishingLabel: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '500' as const,
-  },
-  modernToggle: {
-    width: 60,
-    height: 32,
-  },
-  toggleTrack: {
-    width: 60,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-  },
-  toggleThumb: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+
 });
