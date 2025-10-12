@@ -1,73 +1,104 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { X, Building2, Briefcase } from 'lucide-react-native';
-import { useListing } from '@/contexts/ListingContext';
+import { X, Home } from 'lucide-react-native';
+import { useRef } from 'react';
 
 export default function CreateListingIntro() {
   const router = useRouter();
-  const { updateFormData, nextStep } = useListing();
+  const homeButtonScale = useRef(new Animated.Value(1)).current;
+  const closeButtonScale = useRef(new Animated.Value(1)).current;
+  const startButtonScale = useRef(new Animated.Value(1)).current;
 
-  const handlePropertyListing = () => {
-    updateFormData({ listingCategory: 'property' });
-    nextStep();
-    router.push('/create-listing/steps' as any);
-  };
-
-  const handleJobListing = () => {
-    router.push('/create-job/index' as any);
+  const animateButton = (scale: Animated.Value, callback: () => void) => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(callback);
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
-          <X size={24} color="#1a1a1a" />
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
+          <TouchableOpacity 
+            style={styles.homeButton} 
+            onPress={() => animateButton(homeButtonScale, () => router.replace('/(tabs)/(discover)/discover' as any))}
+            activeOpacity={0.8}
+          >
+            <Home size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.View style={{ transform: [{ scale: closeButtonScale }] }}>
+          <TouchableOpacity 
+            style={styles.closeButton} 
+            onPress={() => animateButton(closeButtonScale, () => router.back())}
+            activeOpacity={0.8}
+          >
+            <X size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.title}>What would you like to add?</Text>
-          <Text style={styles.subtitle}>Choose the type of listing you want to create</Text>
+      <View style={styles.content}>
+        <Image
+          source={{ uri: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400' }}
+          style={styles.heroImage}
+        />
 
-          <View style={styles.optionsContainer}>
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handlePropertyListing}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: '#E8F4FD' }]}>
-                <Building2 size={32} color="#4A90E2" />
-              </View>
-              <Text style={styles.optionTitle}>Property Listing</Text>
-              <Text style={styles.optionDescription}>
-                List your property for rent or sale. Add photos, details, and pricing.
-              </Text>
-              <View style={styles.optionButton}>
-                <Text style={styles.optionButtonText}>Create Property</Text>
-              </View>
-            </TouchableOpacity>
+        <Text style={styles.title}>It&apos;s easy to get started on SpaceGig</Text>
+        <Text style={styles.subtitle}>Create your property listing in just a few simple steps</Text>
 
-            <TouchableOpacity
-              style={styles.optionCard}
-              onPress={handleJobListing}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: '#FFF4E6' }]}>
-                <Briefcase size={32} color="#FF9500" />
-              </View>
-              <Text style={styles.optionTitle}>Job Listing</Text>
-              <Text style={styles.optionDescription}>
-                Post a job opportunity. Find the right candidates for your team.
-              </Text>
-              <View style={[styles.optionButton, { backgroundColor: '#FF9500' }]}>
-                <Text style={styles.optionButtonText}>Create Job</Text>
-              </View>
-            </TouchableOpacity>
+        <View style={styles.stepsContainer}>
+          <View style={styles.stepItem}>
+            <View style={styles.stepNumber}>
+              <Text style={styles.stepNumberText}>1</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Property details</Text>
+              <Text style={styles.stepDescription}>Add property type, size, and specifications</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepItem}>
+            <View style={styles.stepNumber}>
+              <Text style={styles.stepNumberText}>2</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Location & pricing</Text>
+              <Text style={styles.stepDescription}>Set your location and rental price</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepItem}>
+            <View style={styles.stepNumber}>
+              <Text style={styles.stepNumberText}>3</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Review and publish</Text>
+              <Text style={styles.stepDescription}>Preview your listing and go live</Text>
+            </View>
           </View>
         </View>
-      </ScrollView>
+
+        <Animated.View style={{ transform: [{ scale: startButtonScale }] }}>
+          <TouchableOpacity
+            style={styles.getStartedButton}
+            onPress={() => animateButton(startButtonScale, () => router.push('/create-listing/steps' as any))}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.getStartedButtonText}>Get Started</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -81,7 +112,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  homeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   closeButton: {
     width: 40,
@@ -91,73 +130,75 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
+  },
+  heroImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700' as const,
     color: '#1a1a1a',
     marginBottom: 8,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 40,
-    textAlign: 'center',
+    marginBottom: 32,
   },
-  optionsContainer: {
+  stepsContainer: {
     gap: 20,
+    marginBottom: 40,
   },
-  optionCard: {
-    backgroundColor: '#fff',
+  stepItem: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  stepNumber: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    padding: 24,
-    borderWidth: 2,
-    borderColor: '#f0f0f0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    backgroundColor: '#E3F2FD',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
   },
-  optionTitle: {
-    fontSize: 24,
+  stepNumberText: {
+    fontSize: 18,
     fontWeight: '700' as const,
+    color: '#4A90E2',
+  },
+  stepContent: {
+    flex: 1,
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
     color: '#1a1a1a',
-    marginBottom: 8,
+    marginBottom: 4,
   },
-  optionDescription: {
-    fontSize: 15,
+  stepDescription: {
+    fontSize: 14,
     color: '#666',
-    lineHeight: 22,
-    marginBottom: 20,
   },
-  optionButton: {
+  getStartedButton: {
     backgroundColor: '#4A90E2',
-    paddingVertical: 14,
+    paddingVertical: 18,
     borderRadius: 12,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+    marginTop: 32,
   },
-  optionButtonText: {
-    fontSize: 16,
+  getStartedButtonText: {
+    fontSize: 18,
     fontWeight: '600' as const,
     color: '#fff',
   },

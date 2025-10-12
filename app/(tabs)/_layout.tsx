@@ -20,7 +20,7 @@ export default function TabLayout() {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      router.push('/create-job');
+      router.push('/+not-found');
     });
   };
 

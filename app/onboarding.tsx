@@ -34,13 +34,13 @@ export default function OnboardingScreen() {
 
   const handleAddProperty = () => {
     animateButton(addPropertyScale, () => {
-      router.push('/create-listing' as any);
+      router.push('/create-listing/index' as any);
     });
   };
 
   const handleAddJob = () => {
     animateButton(addJobScale, () => {
-      router.push('/create-job/index' as any);
+      router.push('/+not-found' as any);
     });
   };
 
