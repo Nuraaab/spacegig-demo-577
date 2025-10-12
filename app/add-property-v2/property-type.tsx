@@ -13,6 +13,7 @@ export default function PropertyTypeScreen() {
   const [selectedType, setSelectedType] = useState<PropertyType | null>(null);
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
+  const toggleScale = useRef(new Animated.Value(1)).current;
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -72,6 +73,19 @@ export default function PropertyTypeScreen() {
   const handleToggle = (type: ListingType) => {
     if (listingType === type) return;
     
+    Animated.sequence([
+      Animated.timing(toggleScale, {
+        toValue: 0.96,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(toggleScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    
     setListingType(type);
     if (type === 'sale' && (selectedType === 'basement' || selectedType === 'room')) {
       setSelectedType(null);
@@ -117,7 +131,7 @@ export default function PropertyTypeScreen() {
         </Text>
 
         <View style={styles.toggleSection}>
-          <View style={styles.toggleContainer}>
+          <Animated.View style={[styles.toggleContainer, { transform: [{ scale: toggleScale }] }]}>
             <TouchableOpacity
               style={[
                 styles.toggleButton,
@@ -152,7 +166,7 @@ export default function PropertyTypeScreen() {
                 Sale
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
 
         <View style={styles.section}>
@@ -357,10 +371,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   toggleButtonActive: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
+    backgroundColor: '#4A90E2',
+    shadowColor: '#4A90E2',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -370,6 +384,6 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   toggleTextActive: {
-    color: '#1a1a1a',
+    color: '#fff',
   },
 });
