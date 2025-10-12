@@ -14,7 +14,7 @@ import {
   Modal,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, LayoutGrid, Layers, DollarSign } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, LayoutGrid, Layers, Map } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -256,6 +256,13 @@ export default function DiscoverScreen() {
             )}
           </TouchableOpacity>
         </Animated.View>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => router.push('/(tabs)/(discover)/map' as any)}
+          activeOpacity={0.8}
+        >
+          <Map size={20} color="#4A90E2" />
+        </TouchableOpacity>
         <Animated.View style={{ transform: [{ scale: filterButtonScale }] }}>
           <TouchableOpacity
             style={styles.filterButton}

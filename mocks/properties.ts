@@ -8,6 +8,7 @@ export interface Property {
   title: string;
   description: string;
   price: number;
+  price_display: string;
   listingType: ListingType;
   propertyType: PropertyType;
   location: {
@@ -16,6 +17,8 @@ export interface Property {
     state: string;
     country: string;
     zipCode: string;
+    lat: number;
+    lng: number;
   };
   specs: {
     beds: number;
@@ -26,6 +29,9 @@ export interface Property {
   amenities: string[];
   images: string[];
   featured: boolean;
+  is_deal: boolean;
+  is_new: boolean;
+  listed_at: string;
 }
 
 export const AMENITIES = [
@@ -59,6 +65,7 @@ export const mockProperties: Property[] = [
     title: 'Modern Downtown Loft',
     description: 'Stunning loft in the heart of downtown with floor-to-ceiling windows, exposed brick, and modern finishes. Walking distance to restaurants, shops, and entertainment. Perfect for urban professionals.',
     price: 2500,
+    price_display: '$2,500+',
     listingType: 'rent',
     propertyType: 'apartment',
     location: {
@@ -67,6 +74,8 @@ export const mockProperties: Property[] = [
       state: 'CA',
       country: 'United States',
       zipCode: '94102',
+      lat: 37.7749,
+      lng: -122.4194,
     },
     specs: {
       beds: 2,
@@ -82,12 +91,16 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800',
     ],
     featured: true,
+    is_deal: false,
+    is_new: true,
+    listed_at: '2025-10-10T10:00:00Z',
   },
   {
     id: '2',
     title: 'Luxury Beachfront Villa',
     description: 'Breathtaking oceanfront property with private beach access, infinity pool, and panoramic views. This architectural masterpiece features high-end finishes throughout and smart home technology.',
     price: 8500,
+    price_display: '$8,500+',
     listingType: 'rent',
     propertyType: 'house',
     location: {
@@ -96,6 +109,8 @@ export const mockProperties: Property[] = [
       state: 'CA',
       country: 'United States',
       zipCode: '90265',
+      lat: 34.0259,
+      lng: -118.7798,
     },
     specs: {
       beds: 4,
@@ -111,12 +126,16 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800',
     ],
     featured: true,
+    is_deal: true,
+    is_new: false,
+    listed_at: '2025-09-15T14:30:00Z',
   },
   {
     id: '3',
     title: 'Cozy Studio in Arts District',
     description: 'Charming studio apartment in the vibrant Arts District. Features exposed brick, hardwood floors, and large windows. Close to galleries, cafes, and public transit.',
     price: 1800,
+    price_display: '$1,800+',
     listingType: 'rent',
     propertyType: 'apartment',
     location: {
@@ -125,6 +144,8 @@ export const mockProperties: Property[] = [
       state: 'CA',
       country: 'United States',
       zipCode: '90013',
+      lat: 34.0407,
+      lng: -118.2468,
     },
     specs: {
       beds: 1,
@@ -139,12 +160,16 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800',
     ],
     featured: false,
+    is_deal: false,
+    is_new: false,
+    listed_at: '2025-08-20T09:15:00Z',
   },
   {
     id: '4',
     title: 'Spacious Family Home',
     description: 'Beautiful family home in quiet suburban neighborhood. Large backyard, updated kitchen, and plenty of space for everyone. Top-rated schools nearby.',
     price: 3200,
+    price_display: '$3,200+',
     listingType: 'rent',
     propertyType: 'house',
     location: {
@@ -153,6 +178,8 @@ export const mockProperties: Property[] = [
       state: 'CA',
       country: 'United States',
       zipCode: '91101',
+      lat: 34.1478,
+      lng: -118.1445,
     },
     specs: {
       beds: 3,
@@ -167,12 +194,16 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
     ],
     featured: true,
+    is_deal: false,
+    is_new: true,
+    listed_at: '2025-10-08T16:45:00Z',
   },
   {
     id: '5',
     title: 'Penthouse with City Views',
     description: 'Exclusive penthouse offering 360-degree city views. Features include a private rooftop terrace, chef\'s kitchen, and luxury finishes throughout. Building amenities include concierge and valet.',
     price: 6500,
+    price_display: '$6,500+',
     listingType: 'rent',
     propertyType: 'condo',
     location: {
@@ -181,6 +212,8 @@ export const mockProperties: Property[] = [
       state: 'CA',
       country: 'United States',
       zipCode: '92101',
+      lat: 32.7157,
+      lng: -117.1611,
     },
     specs: {
       beds: 3,
@@ -195,5 +228,8 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800',
     ],
     featured: true,
+    is_deal: true,
+    is_new: false,
+    listed_at: '2025-09-25T11:20:00Z',
   },
 ];
