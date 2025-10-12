@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, Home, Bed, Bath } from 'lucide-react-native';
 
 export default function PropertyDetailsScreen() {
   const router = useRouter();
@@ -66,7 +66,12 @@ export default function PropertyDetailsScreen() {
         </Text>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Bedrooms</Text>
+          <View style={styles.labelContainer}>
+            <View style={styles.iconContainer}>
+              <Home size={20} color="#4A90E2" />
+            </View>
+            <Text style={styles.label}>Bedrooms</Text>
+          </View>
           <View style={styles.counterRow}>
             <TouchableOpacity
               style={styles.roundButton}
@@ -87,7 +92,12 @@ export default function PropertyDetailsScreen() {
         <View style={styles.divider} />
 
         <View style={styles.row}>
-          <Text style={styles.label}>Beds</Text>
+          <View style={styles.labelContainer}>
+            <View style={styles.iconContainer}>
+              <Bed size={20} color="#4A90E2" />
+            </View>
+            <Text style={styles.label}>Beds</Text>
+          </View>
           <View style={styles.counterRow}>
             <TouchableOpacity
               style={styles.roundButton}
@@ -108,7 +118,12 @@ export default function PropertyDetailsScreen() {
         <View style={styles.divider} />
 
         <View style={styles.row}>
-          <Text style={styles.label}>Bathrooms</Text>
+          <View style={styles.labelContainer}>
+            <View style={styles.iconContainer}>
+              <Bath size={20} color="#4A90E2" />
+            </View>
+            <Text style={styles.label}>Bathrooms</Text>
+          </View>
           <View style={styles.counterRow}>
             <TouchableOpacity
               style={styles.roundButton}
@@ -216,6 +231,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 20,
+  },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#E8F4FF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   label: {
     fontSize: 18,
