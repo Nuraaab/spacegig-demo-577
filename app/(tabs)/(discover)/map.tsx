@@ -11,7 +11,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import type { Region } from 'react-native-maps';
+
 import { Stack, useRouter } from 'expo-router';
 import {
   Search,
@@ -32,6 +32,13 @@ import { PROPERTY_TYPES, PropertyType, Property } from '@/mocks/properties';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+type Region = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
 
 type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'newest' | 'sqft_asc' | 'sqft_desc';
 
