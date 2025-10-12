@@ -2,9 +2,9 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Home, Building, Building2, MapPin } from 'lucide-react-native';
+import { ChevronLeft, Home, Building, Building2, MapPin, Warehouse, DoorOpen } from 'lucide-react-native';
 
-type PropertyType = 'house' | 'apartment' | 'condo' | 'land';
+type PropertyType = 'house' | 'apartment' | 'condo' | 'land' | 'basement' | 'room';
 type ListingType = 'rent' | 'sale';
 
 export default function PropertyTypeScreen() {
@@ -29,7 +29,7 @@ export default function PropertyTypeScreen() {
     ]).start(callback);
   };
 
-  const propertyTypes = [
+  const basePropertyTypes = [
     {
       id: 'house' as PropertyType,
       title: 'House',
@@ -51,6 +51,23 @@ export default function PropertyTypeScreen() {
       icon: MapPin,
     },
   ];
+
+  const rentOnlyTypes = [
+    {
+      id: 'basement' as PropertyType,
+      title: 'Basement',
+      icon: Warehouse,
+    },
+    {
+      id: 'room' as PropertyType,
+      title: 'Room',
+      icon: DoorOpen,
+    },
+  ];
+
+  const propertyTypes = listingType === 'rent' 
+    ? [...basePropertyTypes, ...rentOnlyTypes]
+    : basePropertyTypes;
 
   const handleNext = () => {
     if (!selectedType) return;
