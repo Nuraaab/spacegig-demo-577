@@ -139,20 +139,7 @@ export default function JobsDiscoverScreen() {
                 <Home size={24} color="#1a1a1a" />
               </TouchableOpacity>
             ),
-            headerRight: () => (
-              <Animated.View style={{ transform: [{ scale: viewButtonScale }], marginRight: 8 }}>
-                <TouchableOpacity
-                  onPress={() => animateButton(viewButtonScale, () => setViewMode(viewMode === 'stack' ? 'grid' : 'stack'))}
-                  activeOpacity={0.8}
-                >
-                  {viewMode === 'stack' ? (
-                    <LayoutGrid size={24} color="#10B981" />
-                  ) : (
-                    <Layers size={24} color="#10B981" />
-                  )}
-                </TouchableOpacity>
-              </Animated.View>
-            ),
+
           }}
         />
         <View style={styles.emptyContainer}>
@@ -178,20 +165,7 @@ export default function JobsDiscoverScreen() {
               </TouchableOpacity>
             </Animated.View>
           ),
-          headerRight: () => (
-            <Animated.View style={{ transform: [{ scale: viewButtonScale }], marginRight: 8 }}>
-              <TouchableOpacity
-                onPress={() => animateButton(viewButtonScale, () => setViewMode(viewMode === 'stack' ? 'grid' : 'stack'))}
-                activeOpacity={0.8}
-              >
-                {viewMode === 'stack' ? (
-                  <LayoutGrid size={24} color="#10B981" />
-                ) : (
-                  <Layers size={24} color="#10B981" />
-                )}
-              </TouchableOpacity>
-            </Animated.View>
-          ),
+
         }}
       />
 
@@ -206,6 +180,19 @@ export default function JobsDiscoverScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
+        <Animated.View style={{ transform: [{ scale: viewButtonScale }] }}>
+          <TouchableOpacity
+            style={styles.filterButton}
+            onPress={() => animateButton(viewButtonScale, () => setViewMode(viewMode === 'stack' ? 'grid' : 'stack'))}
+            activeOpacity={0.8}
+          >
+            {viewMode === 'stack' ? (
+              <LayoutGrid size={20} color="#10B981" />
+            ) : (
+              <Layers size={20} color="#10B981" />
+            )}
+          </TouchableOpacity>
+        </Animated.View>
         <Animated.View style={{ transform: [{ scale: filterButtonScale }] }}>
           <TouchableOpacity
             style={styles.filterButton}
