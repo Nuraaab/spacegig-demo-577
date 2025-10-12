@@ -9,7 +9,7 @@ type ListingType = 'rent' | 'sale';
 
 export default function PropertyTypeScreen() {
   const router = useRouter();
-  const [listingType, setListingType] = useState<ListingType>('rent');
+  const [listingType] = useState<ListingType>('rent');
   const [selectedType, setSelectedType] = useState<PropertyType | null>(null);
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
@@ -106,32 +106,6 @@ export default function PropertyTypeScreen() {
         <Text style={styles.subtitle}>
           Choose the property type you&apos;re listing
         </Text>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Listing Type</Text>
-          <View style={styles.listingTypeCard}>
-            <View style={styles.listingTypeHeader}>
-              <View>
-                <Text style={styles.listingTypeTitle}>Rent or Sale</Text>
-                <Text style={styles.listingTypeSubtitle}>Choose whether you&apos;re renting or selling</Text>
-              </View>
-              <View style={styles.toggleWrapper}>
-                <Text style={[styles.toggleLabel, listingType === 'sale' && styles.toggleLabelActive]}>Sale</Text>
-                <TouchableOpacity
-                  style={styles.toggleTrack}
-                  onPress={() => setListingType(listingType === 'rent' ? 'sale' : 'rent')}
-                  activeOpacity={0.8}
-                >
-                  <Animated.View style={[
-                    styles.toggleThumb,
-                    listingType === 'rent' && styles.toggleThumbActive,
-                  ]} />
-                </TouchableOpacity>
-                <Text style={[styles.toggleLabel, listingType === 'rent' && styles.toggleLabelActive]}>Rent</Text>
-              </View>
-            </View>
-          </View>
-        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Property Type</Text>
@@ -253,64 +227,6 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: '#1a1a1a',
     marginBottom: 16,
-  },
-  listingTypeCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    padding: 20,
-  },
-  listingTypeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  listingTypeTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
-    marginBottom: 4,
-  },
-  listingTypeSubtitle: {
-    fontSize: 13,
-    color: '#666',
-  },
-  toggleWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  toggleLabel: {
-    fontSize: 14,
-    fontWeight: '500' as const,
-    color: '#999',
-  },
-  toggleLabelActive: {
-    color: '#1a1a1a',
-    fontWeight: '600' as const,
-  },
-  toggleTrack: {
-    width: 52,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#4DD0C0',
-    padding: 2,
-    justifyContent: 'center',
-  },
-  toggleThumb: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  toggleThumbActive: {
-    transform: [{ translateX: 20 }],
   },
   grid: {
     flexDirection: 'row',
