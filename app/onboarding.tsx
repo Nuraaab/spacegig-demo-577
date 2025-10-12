@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,9 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Home, Briefcase, Search, PlusCircle } from 'lucide-react-native';
+import { Home, Briefcase, Search, PlusCircle, ChevronRight, Sparkles } from 'lucide-react-native';
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -16,6 +17,116 @@ export default function OnboardingScreen() {
   const addJobScale = useRef(new Animated.Value(1)).current;
   const discoverPropertiesScale = useRef(new Animated.Value(1)).current;
   const discoverJobsScale = useRef(new Animated.Value(1)).current;
+
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const titleTranslateY = useRef(new Animated.Value(-20)).current;
+  const card1Opacity = useRef(new Animated.Value(0)).current;
+  const card1TranslateX = useRef(new Animated.Value(-50)).current;
+  const card2Opacity = useRef(new Animated.Value(0)).current;
+  const card2TranslateX = useRef(new Animated.Value(-50)).current;
+  const card3Opacity = useRef(new Animated.Value(0)).current;
+  const card3TranslateX = useRef(new Animated.Value(50)).current;
+  const card4Opacity = useRef(new Animated.Value(0)).current;
+  const card4TranslateX = useRef(new Animated.Value(50)).current;
+  const sparkleRotate = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(titleOpacity, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(titleTranslateY, {
+        toValue: 0,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    Animated.stagger(100, [
+      Animated.parallel([
+        Animated.timing(card1Opacity, {
+          toValue: 1,
+          duration: 500,
+          delay: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(card1TranslateX, {
+          toValue: 0,
+          tension: 50,
+          friction: 7,
+          delay: 200,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(card2Opacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(card2TranslateX, {
+          toValue: 0,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(card3Opacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(card3TranslateX, {
+          toValue: 0,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.timing(card4Opacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(card4TranslateX, {
+          toValue: 0,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+
+    Animated.loop(
+      Animated.timing(sparkleRotate, {
+        toValue: 1,
+        duration: 3000,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [
+    titleOpacity,
+    titleTranslateY,
+    card1Opacity,
+    card1TranslateX,
+    card2Opacity,
+    card2TranslateX,
+    card3Opacity,
+    card3TranslateX,
+    card4Opacity,
+    card4TranslateX,
+    sparkleRotate,
+  ]);
+
+  const sparkleRotation = sparkleRotate.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -57,208 +168,322 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.content}>
-        <Text style={styles.title}>What are you looking for?</Text>
-        <Text style={styles.subtitle}>Choose an option to get started</Text>
-
-        <View style={styles.categoriesContainer}>
-          <View style={styles.category}>
-            <Text style={styles.categoryTitle}>Add Listings</Text>
-            
-            <Animated.View style={{ transform: [{ scale: addPropertyScale }] }}>
-              <TouchableOpacity
-                style={styles.optionCard}
-                onPress={handleAddProperty}
-                activeOpacity={0.8}
-              >
-                <View style={[styles.iconContainer, { backgroundColor: '#E3F2FD' }]}>
-                  <Home size={32} color="#4A90E2" strokeWidth={2} />
-                </View>
-                <View style={styles.optionContent}>
-                  <Text style={styles.optionTitle}>Add Property</Text>
-                  <Text style={styles.optionDescription}>
-                    List your property for rent or sale
-                  </Text>
-                </View>
-                <PlusCircle size={24} color="#4A90E2" />
-              </TouchableOpacity>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#667eea', '#764ba2', '#f093fb']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <View style={styles.content}>
+          <Animated.View
+            style={[
+              styles.header,
+              {
+                opacity: titleOpacity,
+                transform: [{ translateY: titleTranslateY }],
+              },
+            ]}
+          >
+            <Animated.View
+              style={{
+                transform: [{ rotate: sparkleRotation }],
+                marginBottom: 12,
+              }}
+            >
+              <Sparkles size={40} color="#fff" fill="#fff" />
             </Animated.View>
+            <Text style={styles.title}>What are you looking for?</Text>
+            <Text style={styles.subtitle}>Choose an option to get started</Text>
+          </Animated.View>
 
-            <Animated.View style={{ transform: [{ scale: addJobScale }] }}>
-              <TouchableOpacity
-                style={styles.optionCard}
-                onPress={handleAddJob}
-                activeOpacity={0.8}
+          <View style={styles.cardsContainer}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Add Listings</Text>
+
+              <Animated.View
+                style={{
+                  opacity: card1Opacity,
+                  transform: [
+                    { translateX: card1TranslateX },
+                    { scale: addPropertyScale },
+                  ],
+                }}
               >
-                <View style={[styles.iconContainer, { backgroundColor: '#E8F5E9' }]}>
-                  <Briefcase size={32} color="#10B981" strokeWidth={2} />
-                </View>
-                <View style={styles.optionContent}>
-                  <Text style={styles.optionTitle}>Add Job Opening</Text>
-                  <Text style={styles.optionDescription}>
-                    Post a job opportunity for candidates
-                  </Text>
-                </View>
-                <PlusCircle size={24} color="#10B981" />
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
+                <TouchableOpacity
+                  style={styles.card}
+                  onPress={handleAddProperty}
+                  activeOpacity={0.9}
+                >
+                  <LinearGradient
+                    colors={['#667eea', '#764ba2']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.cardGradient}
+                  >
+                    <View style={styles.cardIconContainer}>
+                      <Home size={28} color="#fff" strokeWidth={2.5} />
+                    </View>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.cardTitle}>Add Property</Text>
+                      <Text style={styles.cardDescription}>
+                        List your property for rent or sale
+                      </Text>
+                    </View>
+                    <View style={styles.cardArrow}>
+                      <PlusCircle size={24} color="rgba(255,255,255,0.9)" strokeWidth={2} />
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Animated.View>
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <View style={styles.category}>
-            <Text style={styles.categoryTitle}>Discover</Text>
-            
-            <Animated.View style={{ transform: [{ scale: discoverPropertiesScale }] }}>
-              <TouchableOpacity
-                style={styles.optionCard}
-                onPress={handleDiscoverProperties}
-                activeOpacity={0.8}
+              <Animated.View
+                style={{
+                  opacity: card2Opacity,
+                  transform: [
+                    { translateX: card2TranslateX },
+                    { scale: addJobScale },
+                  ],
+                }}
               >
-                <View style={[styles.iconContainer, { backgroundColor: '#FFF3E0' }]}>
-                  <Search size={32} color="#FF9800" strokeWidth={2} />
-                </View>
-                <View style={styles.optionContent}>
-                  <Text style={styles.optionTitle}>Discover Properties</Text>
-                  <Text style={styles.optionDescription}>
-                    Browse and find your perfect home
-                  </Text>
-                </View>
-                <View style={styles.arrow}>
-                  <Text style={styles.arrowText}>→</Text>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
+                <TouchableOpacity
+                  style={styles.card}
+                  onPress={handleAddJob}
+                  activeOpacity={0.9}
+                >
+                  <LinearGradient
+                    colors={['#11998e', '#38ef7d']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.cardGradient}
+                  >
+                    <View style={styles.cardIconContainer}>
+                      <Briefcase size={28} color="#fff" strokeWidth={2.5} />
+                    </View>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.cardTitle}>Add Job Opening</Text>
+                      <Text style={styles.cardDescription}>
+                        Post a job opportunity for candidates
+                      </Text>
+                    </View>
+                    <View style={styles.cardArrow}>
+                      <PlusCircle size={24} color="rgba(255,255,255,0.9)" strokeWidth={2} />
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
 
-            <Animated.View style={{ transform: [{ scale: discoverJobsScale }] }}>
-              <TouchableOpacity
-                style={styles.optionCard}
-                onPress={handleDiscoverJobs}
-                activeOpacity={0.8}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <View style={styles.dividerCircle}>
+                <Text style={styles.dividerText}>OR</Text>
+              </View>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Discover</Text>
+
+              <Animated.View
+                style={{
+                  opacity: card3Opacity,
+                  transform: [
+                    { translateX: card3TranslateX },
+                    { scale: discoverPropertiesScale },
+                  ],
+                }}
               >
-                <View style={[styles.iconContainer, { backgroundColor: '#F3E5F5' }]}>
-                  <Search size={32} color="#9C27B0" strokeWidth={2} />
-                </View>
-                <View style={styles.optionContent}>
-                  <Text style={styles.optionTitle}>Job Openings</Text>
-                  <Text style={styles.optionDescription}>
-                    Explore career opportunities near you
-                  </Text>
-                </View>
-                <View style={styles.arrow}>
-                  <Text style={styles.arrowText}>→</Text>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
+                <TouchableOpacity
+                  style={styles.card}
+                  onPress={handleDiscoverProperties}
+                  activeOpacity={0.9}
+                >
+                  <LinearGradient
+                    colors={['#f093fb', '#f5576c']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.cardGradient}
+                  >
+                    <View style={styles.cardIconContainer}>
+                      <Search size={28} color="#fff" strokeWidth={2.5} />
+                    </View>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.cardTitle}>Discover Properties</Text>
+                      <Text style={styles.cardDescription}>
+                        Browse and find your perfect home
+                      </Text>
+                    </View>
+                    <View style={styles.cardArrow}>
+                      <ChevronRight size={28} color="rgba(255,255,255,0.9)" strokeWidth={2.5} />
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Animated.View>
+
+              <Animated.View
+                style={{
+                  opacity: card4Opacity,
+                  transform: [
+                    { translateX: card4TranslateX },
+                    { scale: discoverJobsScale },
+                  ],
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.card}
+                  onPress={handleDiscoverJobs}
+                  activeOpacity={0.9}
+                >
+                  <LinearGradient
+                    colors={['#4facfe', '#00f2fe']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.cardGradient}
+                  >
+                    <View style={styles.cardIconContainer}>
+                      <Briefcase size={28} color="#fff" strokeWidth={2.5} />
+                    </View>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.cardTitle}>Job Openings</Text>
+                      <Text style={styles.cardDescription}>
+                        Explore career opportunities near you
+                      </Text>
+                    </View>
+                    <View style={styles.cardArrow}>
+                      <ChevronRight size={28} color="rgba(255,255,255,0.9)" strokeWidth={2.5} />
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
           </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  safeArea: {
+    flex: 1,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingHorizontal: 20,
+  },
+  header: {
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 32,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700' as const,
-    color: '#1a1a1a',
+    fontSize: 34,
+    fontWeight: '800' as const,
+    color: '#fff',
     textAlign: 'center',
     marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
-    marginBottom: 40,
+    fontWeight: '500' as const,
   },
-  categoriesContainer: {
+  cardsContainer: {
     flex: 1,
   },
-  category: {
-    marginBottom: 24,
+  section: {
+    marginBottom: 16,
   },
-  categoryTitle: {
-    fontSize: 20,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#fff',
     marginBottom: 16,
     paddingLeft: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
-  optionCard: {
+  card: {
+    marginBottom: 14,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  cardGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
+    padding: 20,
+    minHeight: 100,
   },
-  iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
+  cardIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
-  optionContent: {
+  cardContent: {
     flex: 1,
   },
-  optionTitle: {
-    fontSize: 18,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
-    marginBottom: 4,
+  cardTitle: {
+    fontSize: 19,
+    fontWeight: '700' as const,
+    color: '#fff',
+    marginBottom: 6,
   },
-  optionDescription: {
+  cardDescription: {
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.85)',
     lineHeight: 20,
+    fontWeight: '500' as const,
   },
-  arrow: {
-    width: 32,
-    height: 32,
+  cardArrow: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  arrowText: {
-    fontSize: 24,
-    color: '#999',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 32,
+    marginVertical: 28,
+    paddingHorizontal: 20,
   },
   dividerLine: {
     flex: 1,
-    height: 1,
-    backgroundColor: '#e0e0e0',
+    height: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  dividerCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 16,
   },
   dividerText: {
     fontSize: 14,
-    fontWeight: '600' as const,
-    color: '#999',
-    marginHorizontal: 16,
+    fontWeight: '700' as const,
+    color: '#fff',
   },
 });
