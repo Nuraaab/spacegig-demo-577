@@ -170,7 +170,7 @@ export default function OnboardingScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#667eea', '#764ba2', '#f093fb']}
+        colors={['#1e3a8a', '#3b82f6', '#60a5fa']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFillObject}
@@ -217,7 +217,7 @@ export default function OnboardingScreen() {
                   activeOpacity={0.9}
                 >
                   <LinearGradient
-                    colors={['#667eea', '#764ba2']}
+                    colors={['#2563eb', '#1d4ed8']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.cardGradient}
@@ -253,7 +253,7 @@ export default function OnboardingScreen() {
                   activeOpacity={0.9}
                 >
                   <LinearGradient
-                    colors={['#11998e', '#38ef7d']}
+                    colors={['#10b981', '#059669']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.cardGradient}
@@ -301,7 +301,7 @@ export default function OnboardingScreen() {
                   activeOpacity={0.9}
                 >
                   <LinearGradient
-                    colors={['#f093fb', '#f5576c']}
+                    colors={['#3b82f6', '#2563eb']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.cardGradient}
@@ -337,7 +337,7 @@ export default function OnboardingScreen() {
                   activeOpacity={0.9}
                 >
                   <LinearGradient
-                    colors={['#4facfe', '#00f2fe']}
+                    colors={['#60a5fa', '#3b82f6']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.cardGradient}
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 28,
+    marginVertical: 16,
     paddingHorizontal: 20,
   },
   dividerLine: {
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 16,
+    marginHorizontal: 12,
   },
   dividerText: {
     fontSize: 14,
