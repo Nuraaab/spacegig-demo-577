@@ -14,7 +14,7 @@ import {
   Modal,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, LayoutGrid, Layers, Map } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, LayoutGrid, Layers, Map, Plus } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -30,6 +30,7 @@ export default function DiscoverScreen() {
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('swipe');
   const viewModeButtonScale = useRef(new Animated.Value(1)).current;
+  const addButtonScale = useRef(new Animated.Value(1)).current;
 
   const [filters, setFilters] = useState({
     propertyTypes: [] as PropertyType[],
@@ -417,6 +418,16 @@ export default function DiscoverScreen() {
           <Text style={styles.confirmationText}>Added to favorites!</Text>
         </View>
       )}
+
+      <Animated.View style={[styles.addListingButton, { transform: [{ scale: addButtonScale }] }]}>
+        <TouchableOpacity
+          style={styles.addListingButtonInner}
+          onPress={() => animateButton(addButtonScale, () => router.push('/add-property-v2/get-started' as any))}
+          activeOpacity={0.8}
+        >
+          <Plus size={28} color="#fff" strokeWidth={3} />
+        </TouchableOpacity>
+      </Animated.View>
 
       <Modal
         visible={showFilters}
@@ -1123,5 +1134,23 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700' as const,
     color: '#fff',
+  },
+  addListingButton: {
+    position: 'absolute',
+    bottom: 120,
+    right: 20,
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  addListingButtonInner: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#4A90E2',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
