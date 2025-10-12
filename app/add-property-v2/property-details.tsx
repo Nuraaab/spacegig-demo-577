@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2 } from 'lucide-react-native';
+import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2, Sofa } from 'lucide-react-native';
 
 export default function PropertyDetailsScreen() {
   const router = useRouter();
@@ -10,6 +10,7 @@ export default function PropertyDetailsScreen() {
   const [beds, setBeds] = useState<number>(1);
   const [baths, setBaths] = useState<number>(1);
   const [den, setDen] = useState<number>(0);
+  const [furnished, setFurnished] = useState<'furnished' | 'unfurnished'>('unfurnished');
   const [sqft, setSqft] = useState<string>('');
   
   const backButtonScale = useRef(new Animated.Value(1)).current;
@@ -130,6 +131,45 @@ export default function PropertyDetailsScreen() {
                 <Text style={styles.counterButtonText}>+</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Furnishing</Text>
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                styles.toggleOption,
+                styles.toggleOptionLeft,
+                furnished === 'furnished' && styles.toggleOptionActive,
+              ]}
+              onPress={() => setFurnished('furnished')}
+              activeOpacity={0.8}
+            >
+              <Sofa size={18} color={furnished === 'furnished' ? '#fff' : '#666'} />
+              <Text style={[
+                styles.toggleText,
+                furnished === 'furnished' && styles.toggleTextActive,
+              ]}>
+                Furnished
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.toggleOption,
+                styles.toggleOptionRight,
+                furnished === 'unfurnished' && styles.toggleOptionActive,
+              ]}
+              onPress={() => setFurnished('unfurnished')}
+              activeOpacity={0.8}
+            >
+              <Text style={[
+                styles.toggleText,
+                furnished === 'unfurnished' && styles.toggleTextActive,
+              ]}>
+                Unfurnished
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -307,6 +347,43 @@ const styles = StyleSheet.create({
   nextButtonText: {
     fontSize: 18,
     fontWeight: '700' as const,
+    color: '#fff',
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F8FA',
+    borderRadius: 12,
+    padding: 4,
+  },
+  toggleOption: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  toggleOptionLeft: {
+    marginRight: 2,
+  },
+  toggleOptionRight: {
+    marginLeft: 2,
+  },
+  toggleOptionActive: {
+    backgroundColor: '#4A90E2',
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  toggleText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  toggleTextActive: {
     color: '#fff',
   },
 });

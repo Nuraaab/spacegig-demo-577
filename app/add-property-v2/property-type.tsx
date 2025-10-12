@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Home, Building, Building2, MapPin, Warehouse, DoorOpen } from 'lucide-react-native';
@@ -109,20 +109,39 @@ export default function PropertyTypeScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Listing Type</Text>
-          <View style={styles.switchContainer}>
-            <Text style={[styles.switchLabel, listingType === 'sale' && styles.switchLabelInactive]}>
-              Sale
-            </Text>
-            <Switch
-              value={listingType === 'rent'}
-              onValueChange={(value) => setListingType(value ? 'rent' : 'sale')}
-              trackColor={{ false: '#4A90E2', true: '#4A90E2' }}
-              thumbColor="#fff"
-              ios_backgroundColor="#4A90E2"
-            />
-            <Text style={[styles.switchLabel, listingType === 'rent' && styles.switchLabelInactive]}>
-              Rent
-            </Text>
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                styles.toggleOption,
+                styles.toggleOptionLeft,
+                listingType === 'sale' && styles.toggleOptionActive,
+              ]}
+              onPress={() => setListingType('sale')}
+              activeOpacity={0.8}
+            >
+              <Text style={[
+                styles.toggleText,
+                listingType === 'sale' && styles.toggleTextActive,
+              ]}>
+                Sale
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.toggleOption,
+                styles.toggleOptionRight,
+                listingType === 'rent' && styles.toggleOptionActive,
+              ]}
+              onPress={() => setListingType('rent')}
+              activeOpacity={0.8}
+            >
+              <Text style={[
+                styles.toggleText,
+                listingType === 'rent' && styles.toggleTextActive,
+              ]}>
+                Rent
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -247,23 +266,40 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     marginBottom: 16,
   },
-  switchContainer: {
+  toggleContainer: {
     flexDirection: 'row',
+    backgroundColor: '#F5F8FA',
+    borderRadius: 12,
+    padding: 4,
+  },
+  toggleOption: {
+    flex: 1,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5F8FA',
-    padding: 16,
-    borderRadius: 14,
-    gap: 16,
+    borderRadius: 10,
   },
-  switchLabel: {
+  toggleOptionLeft: {
+    marginRight: 2,
+  },
+  toggleOptionRight: {
+    marginLeft: 2,
+  },
+  toggleOptionActive: {
+    backgroundColor: '#4A90E2',
+    shadowColor: '#4A90E2',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  toggleText: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#1a1a1a',
+    color: '#666',
   },
-  switchLabelInactive: {
-    color: '#999',
-    fontWeight: '500' as const,
+  toggleTextActive: {
+    color: '#fff',
   },
   grid: {
     flexDirection: 'row',
