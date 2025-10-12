@@ -12,7 +12,6 @@ import { Briefcase, Search, PlusCircle, ChevronRight, Sparkles } from 'lucide-re
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const addPropertyScale = useRef(new Animated.Value(1)).current;
   const addJobScale = useRef(new Animated.Value(1)).current;
   const discoverPropertiesScale = useRef(new Animated.Value(1)).current;
   const discoverJobsScale = useRef(new Animated.Value(1)).current;
@@ -22,11 +21,9 @@ export default function OnboardingScreen() {
   const card1Opacity = useRef(new Animated.Value(0)).current;
   const card1TranslateX = useRef(new Animated.Value(-50)).current;
   const card2Opacity = useRef(new Animated.Value(0)).current;
-  const card2TranslateX = useRef(new Animated.Value(-50)).current;
+  const card2TranslateX = useRef(new Animated.Value(50)).current;
   const card3Opacity = useRef(new Animated.Value(0)).current;
   const card3TranslateX = useRef(new Animated.Value(50)).current;
-  const card4Opacity = useRef(new Animated.Value(0)).current;
-  const card4TranslateX = useRef(new Animated.Value(50)).current;
   const sparkleRotate = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -86,19 +83,6 @@ export default function OnboardingScreen() {
           useNativeDriver: true,
         }),
       ]),
-      Animated.parallel([
-        Animated.timing(card4Opacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.spring(card4TranslateX, {
-          toValue: 0,
-          tension: 50,
-          friction: 7,
-          useNativeDriver: true,
-        }),
-      ]),
     ]).start();
 
     Animated.loop(
@@ -117,8 +101,6 @@ export default function OnboardingScreen() {
     card2TranslateX,
     card3Opacity,
     card3TranslateX,
-    card4Opacity,
-    card4TranslateX,
     sparkleRotate,
   ]);
 
@@ -140,12 +122,6 @@ export default function OnboardingScreen() {
         useNativeDriver: true,
       }),
     ]).start(callback);
-  };
-
-  const handleAddProperty = () => {
-    animateButton(addPropertyScale, () => {
-      router.push('/create-listing/index' as any);
-    });
   };
 
   const handleAddJob = () => {
@@ -200,37 +176,6 @@ export default function OnboardingScreen() {
                   opacity: card1Opacity,
                   transform: [
                     { translateX: card1TranslateX },
-                    { scale: addPropertyScale },
-                  ],
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.card}
-                  onPress={handleAddProperty}
-                  activeOpacity={0.9}
-                >
-                  <View style={styles.cardGradient}>
-                    <View style={styles.cardIconContainer}>
-                      <PlusCircle size={28} color="#fff" strokeWidth={2.5} />
-                    </View>
-                    <View style={styles.cardContent}>
-                      <Text style={styles.cardTitle}>Add Property</Text>
-                      <Text style={styles.cardDescription}>
-                        List your property for rent or sale
-                      </Text>
-                    </View>
-                    <View style={styles.cardArrow}>
-                      <PlusCircle size={24} color="#4A90E2" strokeWidth={2} />
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
-
-              <Animated.View
-                style={{
-                  opacity: card2Opacity,
-                  transform: [
-                    { translateX: card2TranslateX },
                     { scale: addJobScale },
                   ],
                 }}
@@ -271,9 +216,9 @@ export default function OnboardingScreen() {
 
               <Animated.View
                 style={{
-                  opacity: card3Opacity,
+                  opacity: card2Opacity,
                   transform: [
-                    { translateX: card3TranslateX },
+                    { translateX: card2TranslateX },
                     { scale: discoverPropertiesScale },
                   ],
                 }}
@@ -302,9 +247,9 @@ export default function OnboardingScreen() {
 
               <Animated.View
                 style={{
-                  opacity: card4Opacity,
+                  opacity: card3Opacity,
                   transform: [
-                    { translateX: card4TranslateX },
+                    { translateX: card3TranslateX },
                     { scale: discoverJobsScale },
                   ],
                 }}
