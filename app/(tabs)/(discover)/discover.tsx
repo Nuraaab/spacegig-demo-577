@@ -224,6 +224,15 @@ export default function DiscoverScreen() {
       />
 
       <View style={[styles.searchContainer, { paddingTop: insets.top + 12 }]}>
+        <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
+          <TouchableOpacity
+            style={styles.homeButton}
+            onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
+            activeOpacity={0.8}
+          >
+            <Home size={22} color="#4A90E2" />
+          </TouchableOpacity>
+        </Animated.View>
         <View style={styles.searchBar}>
           <Search size={20} color="#999" />
           <TextInput
@@ -632,6 +641,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+    alignItems: 'center',
+  },
+  homeButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#F0F8FF',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   searchBar: {
     flex: 1,
