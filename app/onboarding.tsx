@@ -7,7 +7,6 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Home, Briefcase, Search, PlusCircle, ChevronRight, Sparkles } from 'lucide-react-native';
 
@@ -169,12 +168,6 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#1e3a8a', '#3b82f6', '#60a5fa']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFillObject}
-      />
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         <View style={styles.content}>
           <Animated.View
@@ -192,7 +185,7 @@ export default function OnboardingScreen() {
                 marginBottom: 12,
               }}
             >
-              <Sparkles size={40} color="#fff" fill="#fff" />
+              <Sparkles size={40} color="#4A90E2" fill="#4A90E2" />
             </Animated.View>
             <Text style={styles.title}>What are you looking for?</Text>
             <Text style={styles.subtitle}>Choose an option to get started</Text>
@@ -216,12 +209,7 @@ export default function OnboardingScreen() {
                   onPress={handleAddProperty}
                   activeOpacity={0.9}
                 >
-                  <LinearGradient
-                    colors={['#2563eb', '#1d4ed8']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.cardGradient}
-                  >
+                  <View style={styles.cardGradient}>
                     <View style={styles.cardIconContainer}>
                       <Home size={28} color="#fff" strokeWidth={2.5} />
                     </View>
@@ -232,9 +220,9 @@ export default function OnboardingScreen() {
                       </Text>
                     </View>
                     <View style={styles.cardArrow}>
-                      <PlusCircle size={24} color="rgba(255,255,255,0.9)" strokeWidth={2} />
+                      <PlusCircle size={24} color="#4A90E2" strokeWidth={2} />
                     </View>
-                  </LinearGradient>
+                  </View>
                 </TouchableOpacity>
               </Animated.View>
 
@@ -252,12 +240,7 @@ export default function OnboardingScreen() {
                   onPress={handleAddJob}
                   activeOpacity={0.9}
                 >
-                  <LinearGradient
-                    colors={['#10b981', '#059669']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.cardGradient}
-                  >
+                  <View style={styles.cardGradient}>
                     <View style={styles.cardIconContainer}>
                       <Briefcase size={28} color="#fff" strokeWidth={2.5} />
                     </View>
@@ -268,9 +251,9 @@ export default function OnboardingScreen() {
                       </Text>
                     </View>
                     <View style={styles.cardArrow}>
-                      <PlusCircle size={24} color="rgba(255,255,255,0.9)" strokeWidth={2} />
+                      <PlusCircle size={24} color="#4A90E2" strokeWidth={2} />
                     </View>
-                  </LinearGradient>
+                  </View>
                 </TouchableOpacity>
               </Animated.View>
             </View>
@@ -300,12 +283,7 @@ export default function OnboardingScreen() {
                   onPress={handleDiscoverProperties}
                   activeOpacity={0.9}
                 >
-                  <LinearGradient
-                    colors={['#3b82f6', '#2563eb']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.cardGradient}
-                  >
+                  <View style={styles.cardGradient}>
                     <View style={styles.cardIconContainer}>
                       <Search size={28} color="#fff" strokeWidth={2.5} />
                     </View>
@@ -316,9 +294,9 @@ export default function OnboardingScreen() {
                       </Text>
                     </View>
                     <View style={styles.cardArrow}>
-                      <ChevronRight size={28} color="rgba(255,255,255,0.9)" strokeWidth={2.5} />
+                      <ChevronRight size={28} color="#4A90E2" strokeWidth={2.5} />
                     </View>
-                  </LinearGradient>
+                  </View>
                 </TouchableOpacity>
               </Animated.View>
 
@@ -336,25 +314,20 @@ export default function OnboardingScreen() {
                   onPress={handleDiscoverJobs}
                   activeOpacity={0.9}
                 >
-                  <LinearGradient
-                    colors={['#60a5fa', '#3b82f6']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.cardGradient}
-                  >
+                  <View style={styles.cardGradient}>
                     <View style={styles.cardIconContainer}>
                       <Briefcase size={28} color="#fff" strokeWidth={2.5} />
                     </View>
                     <View style={styles.cardContent}>
-                      <Text style={styles.cardTitle}>Job Openings</Text>
+                      <Text style={styles.cardTitle}>Discover Job Openings</Text>
                       <Text style={styles.cardDescription}>
                         Explore career opportunities near you
                       </Text>
                     </View>
                     <View style={styles.cardArrow}>
-                      <ChevronRight size={28} color="rgba(255,255,255,0.9)" strokeWidth={2.5} />
+                      <ChevronRight size={28} color="#4A90E2" strokeWidth={2.5} />
                     </View>
-                  </LinearGradient>
+                  </View>
                 </TouchableOpacity>
               </Animated.View>
             </View>
@@ -368,6 +341,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   safeArea: {
     flex: 1,
@@ -378,24 +352,21 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 40,
     paddingBottom: 32,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '800' as const,
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
     textAlign: 'center',
     marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: '#666',
     textAlign: 'center',
-    fontWeight: '500' as const,
+    fontWeight: '400' as const,
   },
   cardsContainer: {
     flex: 1,
@@ -405,35 +376,36 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#fff',
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
     marginBottom: 16,
     paddingLeft: 4,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   card: {
     marginBottom: 14,
-    borderRadius: 20,
+    borderRadius: 16,
     overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
   },
   cardGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
     minHeight: 100,
+    backgroundColor: '#fff',
   },
   cardIconContainer: {
     width: 56,
     height: 56,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    backgroundColor: '#4A90E2',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -442,48 +414,48 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    fontSize: 19,
-    fontWeight: '700' as const,
-    color: '#fff',
-    marginBottom: 6,
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 4,
   },
   cardDescription: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: '#666',
     lineHeight: 20,
-    fontWeight: '500' as const,
+    fontWeight: '400' as const,
   },
   cardArrow: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 16,
+    marginVertical: 12,
     paddingHorizontal: 20,
   },
   dividerLine: {
     flex: 1,
-    height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    height: 1,
+    backgroundColor: '#e5e5e5',
   },
   dividerCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 12,
   },
   dividerText: {
-    fontSize: 14,
-    fontWeight: '700' as const,
-    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#666',
   },
 });
