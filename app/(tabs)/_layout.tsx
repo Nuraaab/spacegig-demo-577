@@ -20,7 +20,7 @@ export default function TabLayout() {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      router.push('/create-job/index' as any);
+      router.push('/create-listing/index' as any);
     });
   };
 
@@ -70,7 +70,7 @@ export default function TabLayout() {
                   <Plus size={28} color="#fff" strokeWidth={2.5} />
                 </TouchableOpacity>
               </Animated.View>
-              <Text style={styles.addJobLabel}>Add Opening</Text>
+              <Text style={styles.addJobLabel}>Add Property</Text>
             </View>
           ),
           tabBarButton: (props) => (
