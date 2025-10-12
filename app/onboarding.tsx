@@ -8,22 +8,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Home, Briefcase, Search, PlusCircle, ChevronRight, Sparkles } from 'lucide-react-native';
+import { Briefcase, Search, PlusCircle, ChevronRight, Sparkles } from 'lucide-react-native';
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const addPropertyScale = useRef(new Animated.Value(1)).current;
-  const addProperty2Scale = useRef(new Animated.Value(1)).current;
   const addJobScale = useRef(new Animated.Value(1)).current;
   const discoverPropertiesScale = useRef(new Animated.Value(1)).current;
   const discoverJobsScale = useRef(new Animated.Value(1)).current;
 
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const titleTranslateY = useRef(new Animated.Value(-20)).current;
-  const card1Opacity = useRef(new Animated.Value(0)).current;
-  const card1TranslateX = useRef(new Animated.Value(-50)).current;
-  const card1_5Opacity = useRef(new Animated.Value(0)).current;
-  const card1_5TranslateX = useRef(new Animated.Value(-50)).current;
   const card2Opacity = useRef(new Animated.Value(0)).current;
   const card2TranslateX = useRef(new Animated.Value(-50)).current;
   const card3Opacity = useRef(new Animated.Value(0)).current;
@@ -49,43 +43,17 @@ export default function OnboardingScreen() {
 
     Animated.stagger(100, [
       Animated.parallel([
-        Animated.timing(card1Opacity, {
-          toValue: 1,
-          duration: 500,
-          delay: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(card1TranslateX, {
-          toValue: 0,
-          tension: 50,
-          friction: 7,
-          delay: 200,
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.parallel([
-        Animated.timing(card1_5Opacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.spring(card1_5TranslateX, {
-          toValue: 0,
-          tension: 50,
-          friction: 7,
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.parallel([
         Animated.timing(card2Opacity, {
           toValue: 1,
           duration: 500,
+          delay: 200,
           useNativeDriver: true,
         }),
         Animated.spring(card2TranslateX, {
           toValue: 0,
           tension: 50,
           friction: 7,
+          delay: 200,
           useNativeDriver: true,
         }),
       ]),
@@ -127,10 +95,6 @@ export default function OnboardingScreen() {
   }, [
     titleOpacity,
     titleTranslateY,
-    card1Opacity,
-    card1TranslateX,
-    card1_5Opacity,
-    card1_5TranslateX,
     card2Opacity,
     card2TranslateX,
     card3Opacity,
@@ -158,18 +122,6 @@ export default function OnboardingScreen() {
         useNativeDriver: true,
       }),
     ]).start(callback);
-  };
-
-  const handleAddProperty = () => {
-    animateButton(addPropertyScale, () => {
-      router.push('/create-listing/index' as any);
-    });
-  };
-
-  const handleAddProperty2 = () => {
-    animateButton(addProperty2Scale, () => {
-      router.push('/add-property-v2/property-type' as any);
-    });
   };
 
   const handleAddJob = () => {
@@ -218,68 +170,6 @@ export default function OnboardingScreen() {
           <View style={styles.cardsContainer}>
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Add Listings</Text>
-
-              <Animated.View
-                style={{
-                  opacity: card1Opacity,
-                  transform: [
-                    { translateX: card1TranslateX },
-                    { scale: addPropertyScale },
-                  ],
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.card}
-                  onPress={handleAddProperty}
-                  activeOpacity={0.9}
-                >
-                  <View style={styles.cardGradient}>
-                    <View style={styles.cardIconContainer}>
-                      <Home size={28} color="#fff" strokeWidth={2.5} />
-                    </View>
-                    <View style={styles.cardContent}>
-                      <Text style={styles.cardTitle}>Add Property</Text>
-                      <Text style={styles.cardDescription}>
-                        List your property for rent or sale
-                      </Text>
-                    </View>
-                    <View style={styles.cardArrow}>
-                      <PlusCircle size={24} color="#4A90E2" strokeWidth={2} />
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
-
-              <Animated.View
-                style={{
-                  opacity: card1_5Opacity,
-                  transform: [
-                    { translateX: card1_5TranslateX },
-                    { scale: addProperty2Scale },
-                  ],
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.card}
-                  onPress={handleAddProperty2}
-                  activeOpacity={0.9}
-                >
-                  <View style={styles.cardGradient}>
-                    <View style={styles.cardIconContainer}>
-                      <Home size={28} color="#fff" strokeWidth={2.5} />
-                    </View>
-                    <View style={styles.cardContent}>
-                      <Text style={styles.cardTitle}>Add Property 2</Text>
-                      <Text style={styles.cardDescription}>
-                        Alternative way to list your property
-                      </Text>
-                    </View>
-                    <View style={styles.cardArrow}>
-                      <PlusCircle size={24} color="#4A90E2" strokeWidth={2} />
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
 
               <Animated.View
                 style={{
