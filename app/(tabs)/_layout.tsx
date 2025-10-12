@@ -1,10 +1,9 @@
-import { Tabs, useRouter } from "expo-router";
+import { Tabs } from "expo-router";
 import { Home, Heart, User, Users, Plus } from "lucide-react-native";
 import { TouchableOpacity, StyleSheet, Animated, Text, View } from "react-native";
 import { useRef } from "react";
 
 export default function TabLayout() {
-  const router = useRouter();
   const addButtonScale = useRef(new Animated.Value(1)).current;
 
   const handleAddPress = () => {
@@ -19,9 +18,7 @@ export default function TabLayout() {
         duration: 100,
         useNativeDriver: true,
       }),
-    ]).start(() => {
-      router.push('/create-listing' as any);
-    });
+    ]).start();
   };
 
   return (
