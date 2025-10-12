@@ -223,17 +223,8 @@ export default function DiscoverScreen() {
         }}
       />
 
-      <View style={[styles.searchContainer, { paddingTop: insets.top + 12 }]}>
-        <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
-          <TouchableOpacity
-            style={styles.homeButton}
-            onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
-            activeOpacity={0.8}
-          >
-            <Home size={22} color="#4A90E2" />
-          </TouchableOpacity>
-        </Animated.View>
-        <View style={styles.searchBar}>
+      <View style={styles.topContainer}>
+        <View style={styles.searchBarFullWidth}>
           <Search size={20} color="#999" />
           <TextInput
             style={styles.searchInput}
@@ -243,35 +234,46 @@ export default function DiscoverScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
-        <Animated.View style={{ transform: [{ scale: viewModeButtonScale }] }}>
+        <View style={styles.filterRow}>
+          <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
+            <TouchableOpacity
+              style={styles.homeButton}
+              onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
+              activeOpacity={0.8}
+            >
+              <Home size={22} color="#4A90E2" />
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={{ transform: [{ scale: viewModeButtonScale }] }}>
+            <TouchableOpacity
+              style={styles.filterButton}
+              onPress={handleToggleViewMode}
+              activeOpacity={0.8}
+            >
+              {viewMode === 'swipe' ? (
+                <LayoutGrid size={20} color="#4A90E2" />
+              ) : (
+                <Layers size={20} color="#4A90E2" />
+              )}
+            </TouchableOpacity>
+          </Animated.View>
           <TouchableOpacity
             style={styles.filterButton}
-            onPress={handleToggleViewMode}
+            onPress={() => router.push('/(tabs)/(discover)/map' as any)}
             activeOpacity={0.8}
           >
-            {viewMode === 'swipe' ? (
-              <LayoutGrid size={20} color="#4A90E2" />
-            ) : (
-              <Layers size={20} color="#4A90E2" />
-            )}
+            <Map size={20} color="#4A90E2" />
           </TouchableOpacity>
-        </Animated.View>
-        <TouchableOpacity
-          style={styles.filterButton}
-          onPress={() => router.push('/(tabs)/(discover)/map' as any)}
-          activeOpacity={0.8}
-        >
-          <Map size={20} color="#4A90E2" />
-        </TouchableOpacity>
-        <Animated.View style={{ transform: [{ scale: filterButtonScale }] }}>
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={() => animateButton(filterButtonScale, () => setShowFilters(!showFilters))}
-            activeOpacity={0.8}
-          >
-            <SlidersHorizontal size={20} color="#4A90E2" />
-          </TouchableOpacity>
-        </Animated.View>
+          <Animated.View style={{ transform: [{ scale: filterButtonScale }] }}>
+            <TouchableOpacity
+              style={styles.filterButton}
+              onPress={() => animateButton(filterButtonScale, () => setShowFilters(!showFilters))}
+              activeOpacity={0.8}
+            >
+              <SlidersHorizontal size={20} color="#4A90E2" />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
       </View>
 
       {viewMode === 'swipe' ? (
@@ -640,14 +642,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-    gap: 12,
+  topContainer: {
     backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+    gap: 12,
+  },
+  searchBarFullWidth: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 12,
     alignItems: 'center',
   },
   homeButton: {
@@ -658,16 +673,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  searchBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    gap: 8,
-  },
+
   searchInput: {
     flex: 1,
     fontSize: 16,
