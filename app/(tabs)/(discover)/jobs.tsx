@@ -13,7 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, Home } from 'lucide-react-native';
+import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, Home, LayoutGrid, Layers } from 'lucide-react-native';
 import { mockJobs } from '@/mocks/jobs';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -26,6 +26,7 @@ export default function JobsDiscoverScreen() {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'stack' | 'grid'>('stack');
 
   const position = useRef(new Animated.ValueXY()).current;
   const rotate = position.x.interpolate({
@@ -89,6 +90,7 @@ export default function JobsDiscoverScreen() {
   const passButtonScale = useRef(new Animated.Value(1)).current;
   const homeButtonScale = useRef(new Animated.Value(1)).current;
   const filterButtonScale = useRef(new Animated.Value(1)).current;
+  const viewButtonScale = useRef(new Animated.Value(1)).current;
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -137,6 +139,20 @@ export default function JobsDiscoverScreen() {
                 <Home size={24} color="#1a1a1a" />
               </TouchableOpacity>
             ),
+            headerRight: () => (
+              <Animated.View style={{ transform: [{ scale: viewButtonScale }], marginRight: 8 }}>
+                <TouchableOpacity
+                  onPress={() => animateButton(viewButtonScale, () => setViewMode(viewMode === 'stack' ? 'grid' : 'stack'))}
+                  activeOpacity={0.8}
+                >
+                  {viewMode === 'stack' ? (
+                    <LayoutGrid size={24} color="#10B981" />
+                  ) : (
+                    <Layers size={24} color="#10B981" />
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
+            ),
           }}
         />
         <View style={styles.emptyContainer}>
@@ -159,6 +175,20 @@ export default function JobsDiscoverScreen() {
                 activeOpacity={0.8}
               >
                 <Home size={24} color="#1a1a1a" />
+              </TouchableOpacity>
+            </Animated.View>
+          ),
+          headerRight: () => (
+            <Animated.View style={{ transform: [{ scale: viewButtonScale }], marginRight: 8 }}>
+              <TouchableOpacity
+                onPress={() => animateButton(viewButtonScale, () => setViewMode(viewMode === 'stack' ? 'grid' : 'stack'))}
+                activeOpacity={0.8}
+              >
+                {viewMode === 'stack' ? (
+                  <LayoutGrid size={24} color="#10B981" />
+                ) : (
+                  <Layers size={24} color="#10B981" />
+                )}
               </TouchableOpacity>
             </Animated.View>
           ),
