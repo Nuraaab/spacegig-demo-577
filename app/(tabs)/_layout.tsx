@@ -101,9 +101,9 @@ const styles = StyleSheet.create({
   },
   addButton: {
     width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#10B981',
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#4A90E2',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   addJobLabel: {
     fontSize: 10,
     fontWeight: '600' as const,
-    color: '#10B981',
+    color: '#4A90E2',
     marginTop: -16,
     textAlign: 'center',
     width: 80,
