@@ -1,9 +1,10 @@
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { Home, Heart, User, Users, Plus } from "lucide-react-native";
 import { TouchableOpacity, StyleSheet, Animated, Text, View } from "react-native";
 import { useRef } from "react";
 
 export default function TabLayout() {
+  const router = useRouter();
   const addButtonScale = useRef(new Animated.Value(1)).current;
 
   const handleAddPress = () => {
@@ -18,7 +19,9 @@ export default function TabLayout() {
         duration: 100,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start(() => {
+      router.push('/create-listing' as any);
+    });
   };
 
   return (
@@ -57,26 +60,20 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: () => (
-            <View style={styles.addJobContainer}>
+            <TouchableOpacity
+              onPress={handleAddPress}
+              style={styles.addJobContainer}
+              activeOpacity={0.8}
+            >
               <Animated.View style={{ transform: [{ scale: addButtonScale }] }}>
-                <TouchableOpacity
-                  onPress={handleAddPress}
-                  style={styles.addButton}
-                  activeOpacity={0.8}
-                >
+                <View style={styles.addButton}>
                   <Plus size={28} color="#fff" strokeWidth={2.5} />
-                </TouchableOpacity>
+                </View>
               </Animated.View>
               <Text style={styles.addJobLabel}>Add Property</Text>
-            </View>
+            </TouchableOpacity>
           ),
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              {...props}
-              onPress={handleAddPress}
-              style={[props.style, { flex: 1 }]}
-            />
-          ),
+          tabBarButton: () => null,
         }}
       />
       <Tabs.Screen
