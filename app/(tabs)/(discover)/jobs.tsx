@@ -125,7 +125,7 @@ export default function JobsDiscoverScreen() {
     });
   };
 
-  if (!job) {
+  if (!job && viewMode === 'stack') {
     return (
       <View style={styles.container}>
         <Stack.Screen
@@ -204,98 +204,139 @@ export default function JobsDiscoverScreen() {
         </Animated.View>
       </View>
 
-      <Animated.View
-        style={[
-          styles.card,
-          {
-            transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }],
-          },
-        ]}
-        {...panResponder.panHandlers}
-      >
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => router.push(`/job/${job.id}` as any)}
-          style={styles.cardTouchable}
-        >
-        <ScrollView
-          style={styles.cardScrollView}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
-        >
-          <Image source={{ uri: job.images[0] }} style={styles.image} />
+      {viewMode === 'stack' ? (
+        <>
+          <Animated.View
+            style={[
+              styles.card,
+              {
+                transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }],
+              },
+            ]}
+            {...panResponder.panHandlers}
+          >
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => router.push(`/job/${job.id}` as any)}
+              style={styles.cardTouchable}
+            >
+            <ScrollView
+              style={styles.cardScrollView}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={false}
+            >
+              <Image source={{ uri: job.images[0] }} style={styles.image} />
 
-          <Animated.View style={[styles.likeLabel, { opacity: likeOpacity }]}>
-            <Text style={styles.likeLabelText}>INTERESTED</Text>
-          </Animated.View>
+              <Animated.View style={[styles.likeLabel, { opacity: likeOpacity }]}>
+                <Text style={styles.likeLabelText}>INTERESTED</Text>
+              </Animated.View>
 
-          <Animated.View style={[styles.nopeLabel, { opacity: nopeOpacity }]}>
-            <Text style={styles.nopeLabelText}>PASS</Text>
-          </Animated.View>
+              <Animated.View style={[styles.nopeLabel, { opacity: nopeOpacity }]}>
+                <Text style={styles.nopeLabelText}>PASS</Text>
+              </Animated.View>
 
-          <View style={styles.cardContent}>
-            <View style={styles.salaryTag}>
-              <DollarSign size={16} color="#fff" />
-              <Text style={styles.salary}>
-                ${job.salary.min.toLocaleString()} - ${job.salary.max.toLocaleString()}
-              </Text>
-            </View>
-
-            <Text style={styles.title}>{job.title}</Text>
-            <Text style={styles.company}>{job.company}</Text>
-
-            <View style={styles.locationRow}>
-              <MapPin size={16} color="#666" />
-              <Text style={styles.location}>
-                {job.location.city}, {job.location.state}
-                {job.location.remote && ' • Remote'}
-              </Text>
-            </View>
-
-            <View style={styles.jobTypeContainer}>
-              <View style={styles.jobTypeBadge}>
-                <Briefcase size={14} color="#10B981" />
-                <Text style={styles.jobTypeText}>{job.jobType}</Text>
-              </View>
-            </View>
-
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{job.description}</Text>
-
-            <Text style={styles.sectionTitle}>Requirements</Text>
-            {job.requirements.map((req, index) => (
-              <View key={index} style={styles.listItem}>
-                <Text style={styles.bullet}>•</Text>
-                <Text style={styles.listText}>{req}</Text>
-              </View>
-            ))}
-
-            <Text style={styles.sectionTitle}>Benefits</Text>
-            <View style={styles.benefitsContainer}>
-              {job.benefits.map((benefit, index) => (
-                <View key={index} style={styles.benefitChip}>
-                  <Text style={styles.benefitText}>{benefit}</Text>
+              <View style={styles.cardContent}>
+                <View style={styles.salaryTag}>
+                  <DollarSign size={16} color="#fff" />
+                  <Text style={styles.salary}>
+                    ${job.salary.min.toLocaleString()} - ${job.salary.max.toLocaleString()}
+                  </Text>
                 </View>
-              ))}
-            </View>
+
+                <Text style={styles.title}>{job.title}</Text>
+                <Text style={styles.company}>{job.company}</Text>
+
+                <View style={styles.locationRow}>
+                  <MapPin size={16} color="#666" />
+                  <Text style={styles.location}>
+                    {job.location.city}, {job.location.state}
+                    {job.location.remote && ' • Remote'}
+                  </Text>
+                </View>
+
+                <View style={styles.jobTypeContainer}>
+                  <View style={styles.jobTypeBadge}>
+                    <Briefcase size={14} color="#10B981" />
+                    <Text style={styles.jobTypeText}>{job.jobType}</Text>
+                  </View>
+                </View>
+
+                <Text style={styles.sectionTitle}>Description</Text>
+                <Text style={styles.description}>{job.description}</Text>
+
+                <Text style={styles.sectionTitle}>Requirements</Text>
+                {job.requirements.map((req, index) => (
+                  <View key={index} style={styles.listItem}>
+                    <Text style={styles.bullet}>•</Text>
+                    <Text style={styles.listText}>{req}</Text>
+                  </View>
+                ))}
+
+                <Text style={styles.sectionTitle}>Benefits</Text>
+                <View style={styles.benefitsContainer}>
+                  {job.benefits.map((benefit, index) => (
+                    <View key={index} style={styles.benefitChip}>
+                      <Text style={styles.benefitText}>{benefit}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </ScrollView>
+            </TouchableOpacity>
+          </Animated.View>
+
+          <View style={styles.buttonsContainer}>
+            <Animated.View style={{ transform: [{ scale: passButtonScale }] }}>
+              <TouchableOpacity style={[styles.actionButton, styles.passButton]} onPress={handlePass} activeOpacity={0.8}>
+                <X size={32} color="#FF6B6B" strokeWidth={3} />
+              </TouchableOpacity>
+            </Animated.View>
+
+            <Animated.View style={{ transform: [{ scale: likeButtonScale }] }}>
+              <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike} activeOpacity={0.8}>
+                <Heart size={32} color="#10B981" strokeWidth={3} />
+              </TouchableOpacity>
+            </Animated.View>
           </View>
+        </>
+      ) : (
+        <ScrollView
+          style={styles.gridContainer}
+          contentContainerStyle={styles.gridContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {mockJobs.map((jobItem) => (
+            <TouchableOpacity
+              key={jobItem.id}
+              style={styles.gridCard}
+              onPress={() => router.push(`/job/${jobItem.id}` as any)}
+              activeOpacity={0.8}
+            >
+              <Image source={{ uri: jobItem.images[0] }} style={styles.gridImage} />
+              <View style={styles.gridCardContent}>
+                <View style={styles.gridSalaryTag}>
+                  <DollarSign size={12} color="#fff" />
+                  <Text style={styles.gridSalary}>
+                    ${jobItem.salary.min.toLocaleString()}-${jobItem.salary.max.toLocaleString()}
+                  </Text>
+                </View>
+                <Text style={styles.gridTitle} numberOfLines={2}>{jobItem.title}</Text>
+                <Text style={styles.gridCompany} numberOfLines={1}>{jobItem.company}</Text>
+                <View style={styles.gridLocationRow}>
+                  <MapPin size={12} color="#666" />
+                  <Text style={styles.gridLocation} numberOfLines={1}>
+                    {jobItem.location.city}, {jobItem.location.state}
+                  </Text>
+                </View>
+                <View style={styles.gridJobTypeBadge}>
+                  <Briefcase size={10} color="#10B981" />
+                  <Text style={styles.gridJobTypeText}>{jobItem.jobType}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
-        </TouchableOpacity>
-      </Animated.View>
-
-      <View style={styles.buttonsContainer}>
-        <Animated.View style={{ transform: [{ scale: passButtonScale }] }}>
-          <TouchableOpacity style={[styles.actionButton, styles.passButton]} onPress={handlePass} activeOpacity={0.8}>
-            <X size={32} color="#FF6B6B" strokeWidth={3} />
-          </TouchableOpacity>
-        </Animated.View>
-
-        <Animated.View style={{ transform: [{ scale: likeButtonScale }] }}>
-          <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike} activeOpacity={0.8}>
-            <Heart size={32} color="#10B981" strokeWidth={3} />
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
+      )}
 
       {showConfirmation && (
         <View style={styles.confirmation}>
@@ -585,5 +626,93 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
   },
-
+  gridContainer: {
+    flex: 1,
+  },
+  gridContent: {
+    padding: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  gridCard: {
+    width: (SCREEN_WIDTH - 48) / 2,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  gridImage: {
+    width: '100%',
+    height: 120,
+  },
+  gridCardContent: {
+    padding: 12,
+  },
+  gridSalaryTag: {
+    position: 'absolute',
+    top: -16,
+    right: 8,
+    backgroundColor: '#10B981',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  gridSalary: {
+    fontSize: 11,
+    fontWeight: '700' as const,
+    color: '#fff',
+  },
+  gridTitle: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginBottom: 4,
+    marginTop: 4,
+  },
+  gridCompany: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: '#10B981',
+    marginBottom: 6,
+  },
+  gridLocationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 8,
+  },
+  gridLocation: {
+    fontSize: 11,
+    color: '#666',
+    flex: 1,
+  },
+  gridJobTypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  gridJobTypeText: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    color: '#10B981',
+    textTransform: 'capitalize' as const,
+  },
 });
