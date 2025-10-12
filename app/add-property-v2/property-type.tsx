@@ -124,12 +124,22 @@ export default function PropertyTypeScreen() {
         </Text>
 
         <View style={styles.toggleSection}>
-          <View style={styles.toggleContainer}>
-            <TouchableOpacity
+          <View style={styles.toggleTrack}>
+            <Animated.View
               style={[
-                styles.toggleOption,
-                listingType === 'rent' && styles.toggleOptionActive,
+                styles.toggleSlider,
+                {
+                  transform: [{
+                    translateX: toggleAnimation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, 160],
+                    }),
+                  }],
+                },
               ]}
+            />
+            <TouchableOpacity
+              style={styles.toggleLabel}
               onPress={() => handleToggle('rent')}
               activeOpacity={0.7}
             >
@@ -143,10 +153,7 @@ export default function PropertyTypeScreen() {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.toggleOption,
-                listingType === 'sale' && styles.toggleOptionActive,
-              ]}
+              style={styles.toggleLabel}
               onPress={() => handleToggle('sale')}
               activeOpacity={0.7}
             >
@@ -349,28 +356,33 @@ const styles = StyleSheet.create({
   toggleSection: {
     marginBottom: 32,
   },
-  toggleContainer: {
+  toggleTrack: {
     flexDirection: 'row',
     backgroundColor: '#F0F0F0',
-    borderRadius: 14,
-    padding: 3,
-    gap: 3,
+    borderRadius: 30,
+    padding: 4,
+    position: 'relative',
+    height: 56,
   },
-  toggleOption: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  toggleOptionActive: {
+  toggleSlider: {
+    position: 'absolute',
+    left: 4,
+    top: 4,
+    width: 160,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#4A90E2',
     shadowColor: '#4A90E2',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
+  },
+  toggleLabel: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
   toggleText: {
     fontSize: 16,
