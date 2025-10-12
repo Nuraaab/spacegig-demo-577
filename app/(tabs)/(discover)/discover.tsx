@@ -664,6 +664,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   homeButton: {
     width: 48,
