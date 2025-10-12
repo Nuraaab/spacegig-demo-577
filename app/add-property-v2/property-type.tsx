@@ -380,6 +380,7 @@ const styles = StyleSheet.create({
   },
   toggleLabel: {
     flex: 1,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
