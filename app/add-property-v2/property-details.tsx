@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2, Check } from 'lucide-react-native';
+import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2 } from 'lucide-react-native';
 
 export default function PropertyDetailsScreen() {
   const router = useRouter();
@@ -15,6 +15,7 @@ export default function PropertyDetailsScreen() {
   
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
+  const toggleAnimation = useRef(new Animated.Value(0)).current;
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -139,21 +140,38 @@ export default function PropertyDetailsScreen() {
             <Text style={styles.sectionTitle}>Furnishing</Text>
             <TouchableOpacity
               style={styles.modernToggle}
-              onPress={() => setFurnished(furnished === 'furnished' ? 'unfurnished' : 'furnished')}
-              activeOpacity={0.8}
+              onPress={() => {
+                const newValue = furnished === 'furnished' ? 'unfurnished' : 'furnished';
+                setFurnished(newValue);
+                Animated.spring(toggleAnimation, {
+                  toValue: newValue === 'furnished' ? 1 : 0,
+                  useNativeDriver: true,
+                  friction: 6,
+                  tension: 80,
+                }).start();
+              }}
+              activeOpacity={1}
             >
               <Animated.View style={[
                 styles.toggleTrack,
-                furnished === 'furnished' && styles.toggleTrackActive,
+                {
+                  backgroundColor: toggleAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['#E5E7EB', '#4A90E2'],
+                  }),
+                },
               ]}>
                 <Animated.View style={[
                   styles.toggleThumb,
-                  furnished === 'furnished' && styles.toggleThumbActive,
-                ]}>
-                  {furnished === 'furnished' && (
-                    <Check size={16} color="#00C853" strokeWidth={3} />
-                  )}
-                </Animated.View>
+                  {
+                    transform: [{
+                      translateX: toggleAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [2, 28],
+                      }),
+                    }],
+                  },
+                ]} />
               </Animated.View>
             </TouchableOpacity>
           </View>
@@ -351,33 +369,23 @@ const styles = StyleSheet.create({
   },
   modernToggle: {
     width: 60,
-    height: 34,
+    height: 32,
   },
   toggleTrack: {
     width: 60,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#E0E0E0',
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
-    padding: 2,
-  },
-  toggleTrackActive: {
-    backgroundColor: '#00C853',
   },
   toggleThumb: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
     elevation: 3,
-  },
-  toggleThumbActive: {
-    alignSelf: 'flex-end',
   },
 });
