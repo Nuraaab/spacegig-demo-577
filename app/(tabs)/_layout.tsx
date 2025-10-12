@@ -56,7 +56,6 @@ export default function TabLayout() {
         name="add-job"
         options={{
           title: "",
-          href: null,
           tabBarIcon: () => (
             <View style={styles.addJobContainer}>
               <Animated.View style={{ transform: [{ scale: addButtonScale }] }}>
