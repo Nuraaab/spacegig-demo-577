@@ -60,6 +60,10 @@ export const [ListingProvider, useListing] = createContextHook(() => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   }, []);
 
+  const setStep = useCallback((step: number) => {
+    setCurrentStep(step);
+  }, []);
+
   const resetForm = useCallback(() => {
     setFormData(initialFormData);
     setCurrentStep(1);
@@ -76,7 +80,8 @@ export const [ListingProvider, useListing] = createContextHook(() => {
     updateFormData,
     nextStep,
     previousStep,
+    setStep,
     resetForm,
     submitListing,
-  }), [currentStep, formData, updateFormData, nextStep, previousStep, resetForm, submitListing]);
+  }), [currentStep, formData, updateFormData, nextStep, previousStep, setStep, resetForm, submitListing]);
 });

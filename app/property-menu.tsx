@@ -39,7 +39,7 @@ export default function PropertyMenu() {
         listingCategory: 'property',
         propertyType: propertyType as any
       });
-      router.push('/create-listing/steps' as any);
+      router.push('/create-listing/index' as any);
     });
   };
 
