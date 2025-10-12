@@ -20,7 +20,7 @@ export default function TabLayout() {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      router.push('/create-listing/index' as any);
+      router.push('/create-listing' as any);
     });
   };
 
