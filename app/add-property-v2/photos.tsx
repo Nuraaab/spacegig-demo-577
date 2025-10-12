@@ -63,9 +63,9 @@ export default function PhotosScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '80%' }]} />
+            <View style={[styles.progressFill, { width: '100%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 4 of 5</Text>
+          <Text style={styles.progressText}>Step 8 of 8</Text>
         </View>
       </View>
 
@@ -74,6 +74,7 @@ export default function PhotosScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <Text style={styles.stepLabel}>STEP 8 OF 8</Text>
         <Text style={styles.title}>Add photos of your property</Text>
         <Text style={styles.subtitle}>
           High-quality photos help attract more interest. Add at least 5 photos.
@@ -221,6 +222,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
+  },
+  stepLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: '#999',
+    marginBottom: 8,
+    letterSpacing: 0.5,
   },
   title: {
     fontSize: 28,

@@ -1,25 +1,13 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { 
-  ChevronLeft, 
-  Wifi, 
-  Tv, 
-  UtensilsCrossed,
-  WashingMachine,
-  Car
-} from 'lucide-react-native';
+import { ChevronLeft, Sparkles } from 'lucide-react-native';
 
-type Amenity = {
-  id: string;
-  name: string;
-  icon: any;
-};
-
-export default function AmenitiesScreen() {
+export default function DescriptionScreen() {
   const router = useRouter();
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [description, setDescription] = useState<string>('');
+  
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -38,25 +26,9 @@ export default function AmenitiesScreen() {
     ]).start(callback);
   };
 
-  const amenities: Amenity[] = [
-    { id: 'wifi', name: 'Wi-Fi', icon: Wifi },
-    { id: 'tv', name: 'TV', icon: Tv },
-    { id: 'kitchen', name: 'Kitchen', icon: UtensilsCrossed },
-    { id: 'washer', name: 'Washer', icon: WashingMachine },
-    { id: 'parking', name: 'Free parking', icon: Car },
-  ];
-
-  const toggleAmenity = (id: string) => {
-    setSelectedAmenities(prev => 
-      prev.includes(id) 
-        ? prev.filter(a => a !== id)
-        : [...prev, id]
-    );
-  };
-
   const handleNext = () => {
     animateButton(nextButtonScale, () => {
-      router.push('/add-property-v2/address' as any);
+      router.push('/add-property-v2/amenities' as any);
     });
   };
 
@@ -74,9 +46,9 @@ export default function AmenitiesScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '75%' }]} />
+            <View style={[styles.progressFill, { width: '62.5%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 6 of 8</Text>
+          <Text style={styles.progressText}>Step 5 of 8</Text>
         </View>
       </View>
 
@@ -85,34 +57,39 @@ export default function AmenitiesScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.stepLabel}>STEP 6 OF 8</Text>
-        <Text style={styles.title}>What amenities do you offer?</Text>
+        <Text style={styles.stepLabel}>STEP 5 OF 8</Text>
+        <Text style={styles.title}>Describe your property</Text>
         <Text style={styles.subtitle}>
-          Select all the amenities available at your property
+          Write a detailed description that highlights the best features of your property
         </Text>
 
-        <View style={styles.amenitiesList}>
-          {amenities.map((amenity) => {
-            const Icon = amenity.icon;
-            const isSelected = selectedAmenities.includes(amenity.id);
-            
-            return (
-              <TouchableOpacity
-                key={amenity.id}
-                style={styles.amenityItem}
-                onPress={() => toggleAmenity(amenity.id)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.amenityLeft}>
-                  <Icon size={24} color="#666" strokeWidth={1.5} />
-                  <Text style={styles.amenityName}>{amenity.name}</Text>
-                </View>
-                <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                  {isSelected && <View style={styles.checkboxInner} />}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Description</Text>
+            <TouchableOpacity style={styles.aiButton}>
+              <Sparkles size={16} color="#4A90E2" />
+              <Text style={styles.aiButtonText}>Generate with AI</Text>
+            </TouchableOpacity>
+          </View>
+          <TextInput
+            style={styles.textArea}
+            placeholder="Describe your property... Include details about the neighborhood, nearby amenities, unique features, and what makes this property special."
+            placeholderTextColor="#999"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={8}
+            textAlignVertical="top"
+          />
+          <Text style={styles.charCount}>{description.length} characters</Text>
+        </View>
+
+        <View style={styles.tipsBox}>
+          <Text style={styles.tipsTitle}>Tips for a great description:</Text>
+          <Text style={styles.tipItem}>• Highlight unique features and amenities</Text>
+          <Text style={styles.tipItem}>• Mention nearby attractions and transportation</Text>
+          <Text style={styles.tipItem}>• Describe the neighborhood vibe</Text>
+          <Text style={styles.tipItem}>• Be honest and accurate</Text>
         </View>
       </ScrollView>
 
@@ -197,46 +174,68 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     lineHeight: 24,
   },
-  amenitiesList: {
-    gap: 12,
+  section: {
+    marginBottom: 24,
   },
-  amenityItem: {
+  sectionHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F5F8FA',
-    padding: 20,
-    borderRadius: 14,
-  },
-  amenityLeft: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    flex: 1,
+    marginBottom: 12,
   },
-  amenityName: {
-    fontSize: 16,
-    fontWeight: '500' as const,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600' as const,
     color: '#1a1a1a',
   },
-  checkbox: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    justifyContent: 'center',
+  aiButton: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F0F8FF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
-  checkboxSelected: {
-    borderColor: '#4A90E2',
-    backgroundColor: '#4A90E2',
+  aiButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#4A90E2',
   },
-  checkboxInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#fff',
+  textArea: {
+    backgroundColor: '#F5F8FA',
+    padding: 16,
+    borderRadius: 14,
+    fontSize: 16,
+    color: '#1a1a1a',
+    minHeight: 180,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  charCount: {
+    fontSize: 13,
+    color: '#999',
+    textAlign: 'right',
+    marginTop: 8,
+  },
+  tipsBox: {
+    backgroundColor: '#F0F8FF',
+    padding: 18,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#D6EBFF',
+  },
+  tipsTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  tipItem: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 22,
+    marginBottom: 4,
   },
   footer: {
     flexDirection: 'row',

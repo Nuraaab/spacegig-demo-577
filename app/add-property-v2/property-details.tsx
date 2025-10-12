@@ -1,19 +1,16 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Bed, Bath, Maximize, MapPin, DollarSign, Home as HomeIcon } from 'lucide-react-native';
+import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2 } from 'lucide-react-native';
 
 export default function PropertyDetailsScreen() {
   const router = useRouter();
-  const { type } = useLocalSearchParams();
-  const [listingType, setListingType] = useState<'rent' | 'sale'>('rent');
+  const { type, listingType } = useLocalSearchParams();
   const [beds, setBeds] = useState<number>(1);
   const [baths, setBaths] = useState<number>(1);
   const [den, setDen] = useState<number>(0);
   const [sqft, setSqft] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
-  const [price, setPrice] = useState<string>('');
   
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
@@ -35,7 +32,7 @@ export default function PropertyDetailsScreen() {
 
   const handleNext = () => {
     animateButton(nextButtonScale, () => {
-      router.push('/add-property-v2/amenities' as any);
+      router.push('/add-property-v2/location-price' as any);
     });
   };
 
@@ -53,9 +50,9 @@ export default function PropertyDetailsScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '40%' }]} />
+            <View style={[styles.progressFill, { width: '37.5%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 2 of 5</Text>
+          <Text style={styles.progressText}>Step 3 of 8</Text>
         </View>
       </View>
 
@@ -64,141 +61,90 @@ export default function PropertyDetailsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Tell us about your {type}</Text>
+        <Text style={styles.stepLabel}>STEP 3 OF 8</Text>
+        <Text style={styles.title}>Property specifications</Text>
         <Text style={styles.subtitle}>
-          Provide key details that will help potential tenants or buyers
+          Tell us about the size and features
         </Text>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Listing Type</Text>
-          <View style={styles.switchContainer}>
-            <Text style={[styles.switchLabel, listingType === 'sale' && styles.switchLabelActive]}>
-              For Sale
-            </Text>
-            <Switch
-              value={listingType === 'rent'}
-              onValueChange={(value) => setListingType(value ? 'rent' : 'sale')}
-              trackColor={{ false: '#4A90E2', true: '#4A90E2' }}
-              thumbColor="#fff"
-            />
-            <Text style={[styles.switchLabel, listingType === 'rent' && styles.switchLabelActive]}>
-              For Rent
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Property Specifications</Text>
-          
-          <View style={styles.counterRow}>
-            <View style={styles.counterItem}>
-              <Bed size={20} color="#4A90E2" />
-              <Text style={styles.counterLabel}>Bedrooms</Text>
-              <View style={styles.counterControls}>
-                <TouchableOpacity
-                  style={styles.counterButton}
-                  onPress={() => setBeds(Math.max(0, beds - 1))}
-                >
-                  <Text style={styles.counterButtonText}>−</Text>
-                </TouchableOpacity>
-                <Text style={styles.counterValue}>{beds}</Text>
-                <TouchableOpacity
-                  style={styles.counterButton}
-                  onPress={() => setBeds(beds + 1)}
-                >
-                  <Text style={styles.counterButtonText}>+</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.counterItem}>
-              <Bath size={20} color="#4A90E2" />
-              <Text style={styles.counterLabel}>Bathrooms</Text>
-              <View style={styles.counterControls}>
-                <TouchableOpacity
-                  style={styles.counterButton}
-                  onPress={() => setBaths(Math.max(0, baths - 0.5))}
-                >
-                  <Text style={styles.counterButtonText}>−</Text>
-                </TouchableOpacity>
-                <Text style={styles.counterValue}>{baths}</Text>
-                <TouchableOpacity
-                  style={styles.counterButton}
-                  onPress={() => setBaths(baths + 0.5)}
-                >
-                  <Text style={styles.counterButtonText}>+</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.counterRow}>
-            <View style={styles.counterItem}>
-              <HomeIcon size={20} color="#4A90E2" />
-              <Text style={styles.counterLabel}>Den</Text>
-              <View style={styles.counterControls}>
-                <TouchableOpacity
-                  style={styles.counterButton}
-                  onPress={() => setDen(Math.max(0, den - 1))}
-                >
-                  <Text style={styles.counterButtonText}>−</Text>
-                </TouchableOpacity>
-                <Text style={styles.counterValue}>{den}</Text>
-                <TouchableOpacity
-                  style={styles.counterButton}
-                  onPress={() => setDen(den + 1)}
-                >
-                  <Text style={styles.counterButtonText}>+</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.counterItem}>
-              <Maximize size={20} color="#4A90E2" />
-              <Text style={styles.counterLabel}>Square Feet</Text>
-              <TextInput
-                style={styles.sqftInput}
-                placeholder="e.g. 1200"
-                placeholderTextColor="#999"
-                value={sqft}
-                onChangeText={setSqft}
-                keyboardType="numeric"
-              />
+          <Text style={styles.sectionTitle}>Beds</Text>
+          <View style={styles.counterContainer}>
+            <Bed size={20} color="#666" />
+            <Text style={styles.counterValue}>{beds}</Text>
+            <View style={styles.counterControls}>
+              <TouchableOpacity
+                style={styles.counterButton}
+                onPress={() => setBeds(Math.max(0, beds - 1))}
+              >
+                <Text style={styles.counterButtonText}>−</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.counterButton}
+                onPress={() => setBeds(beds + 1)}
+              >
+                <Text style={styles.counterButtonText}>+</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
+          <Text style={styles.sectionTitle}>Baths</Text>
+          <View style={styles.counterContainer}>
+            <Bath size={20} color="#666" />
+            <Text style={styles.counterValue}>{baths}</Text>
+            <View style={styles.counterControls}>
+              <TouchableOpacity
+                style={styles.counterButton}
+                onPress={() => setBaths(Math.max(0, baths - 1))}
+              >
+                <Text style={styles.counterButtonText}>−</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.counterButton}
+                onPress={() => setBaths(baths + 1)}
+              >
+                <Text style={styles.counterButtonText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Den</Text>
+          <View style={styles.counterContainer}>
+            <HomeIcon size={20} color="#666" />
+            <Text style={styles.counterValue}>{den}</Text>
+            <View style={styles.counterControls}>
+              <TouchableOpacity
+                style={styles.counterButton}
+                onPress={() => setDen(Math.max(0, den - 1))}
+              >
+                <Text style={styles.counterButtonText}>−</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.counterButton}
+                onPress={() => setDen(den + 1)}
+              >
+                <Text style={styles.counterButtonText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Size (sq ft)</Text>
           <View style={styles.inputContainer}>
-            <MapPin size={20} color="#4A90E2" />
+            <Maximize2 size={20} color="#666" />
             <TextInput
               style={styles.input}
-              placeholder="Enter address or neighborhood"
+              placeholder="e.g. 1500"
               placeholderTextColor="#999"
-              value={location}
-              onChangeText={setLocation}
-            />
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {listingType === 'rent' ? 'Monthly Rent' : 'Sale Price'}
-          </Text>
-          <View style={styles.priceContainer}>
-            <DollarSign size={28} color="#4A90E2" />
-            <TextInput
-              style={styles.priceInput}
-              placeholder="0"
-              placeholderTextColor="#D1D5DB"
-              value={price}
-              onChangeText={setPrice}
+              value={sqft}
+              onChangeText={setSqft}
               keyboardType="numeric"
             />
-            {listingType === 'rent' && (
-              <Text style={styles.priceUnit}>/month</Text>
-            )}
           </View>
         </View>
       </ScrollView>
@@ -210,7 +156,7 @@ export default function PropertyDetailsScreen() {
             onPress={handleNext}
             activeOpacity={0.9}
           >
-            <Text style={styles.nextButtonText}>Continue</Text>
+            <Text style={styles.nextButtonText}>Next</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -264,12 +210,19 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
   },
+  stepLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: '#999',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700' as const,
     color: '#1a1a1a',
     marginBottom: 8,
-    lineHeight: 34,
+    lineHeight: 38,
   },
   subtitle: {
     fontSize: 16,
@@ -278,59 +231,36 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600' as const,
     color: '#1a1a1a',
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  switchContainer: {
+  counterContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#F5F8FA',
-    padding: 16,
+    padding: 20,
     borderRadius: 14,
     gap: 16,
   },
-  switchLabel: {
-    fontSize: 16,
-    fontWeight: '500' as const,
-    color: '#666',
-  },
-  switchLabelActive: {
-    fontWeight: '600' as const,
+  counterValue: {
+    fontSize: 24,
+    fontWeight: '700' as const,
     color: '#1a1a1a',
-  },
-  counterRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 12,
-  },
-  counterItem: {
     flex: 1,
-    backgroundColor: '#F5F8FA',
-    padding: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-    gap: 8,
-  },
-  counterLabel: {
-    fontSize: 13,
-    fontWeight: '600' as const,
-    color: '#666',
   },
   counterControls: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 12,
   },
   counterButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
@@ -338,63 +268,23 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   counterButtonText: {
-    fontSize: 18,
-    fontWeight: '600' as const,
+    fontSize: 24,
+    fontWeight: '400' as const,
     color: '#1a1a1a',
-  },
-  counterValue: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#1a1a1a',
-    minWidth: 32,
-    textAlign: 'center',
-  },
-  sqftInput: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
-    textAlign: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    minWidth: 80,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F5F8FA',
-    padding: 16,
+    padding: 20,
     borderRadius: 14,
-    gap: 12,
+    gap: 16,
   },
   input: {
     flex: 1,
     fontSize: 16,
     color: '#1a1a1a',
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F5F8FA',
-    padding: 24,
-    borderRadius: 14,
-    gap: 8,
-  },
-  priceInput: {
-    fontSize: 40,
-    fontWeight: '700' as const,
-    color: '#1a1a1a',
-    minWidth: 120,
-    textAlign: 'center',
-  },
-  priceUnit: {
-    fontSize: 20,
-    fontWeight: '600' as const,
-    color: '#666',
+    fontWeight: '500' as const,
   },
   footer: {
     flexDirection: 'row',

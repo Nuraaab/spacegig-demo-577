@@ -1,13 +1,15 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Home, Building, Building2, Bed } from 'lucide-react-native';
+import { ChevronLeft, Home, Building, Building2, MapPin } from 'lucide-react-native';
 
-type PropertyType = 'apartment' | 'condo' | 'room' | 'house';
+type PropertyType = 'house' | 'apartment' | 'condo' | 'land';
+type ListingType = 'rent' | 'sale';
 
 export default function PropertyTypeScreen() {
   const router = useRouter();
+  const [listingType, setListingType] = useState<ListingType>('rent');
   const [selectedType, setSelectedType] = useState<PropertyType | null>(null);
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
@@ -29,39 +31,31 @@ export default function PropertyTypeScreen() {
 
   const propertyTypes = [
     {
+      id: 'house' as PropertyType,
+      title: 'House',
+      icon: Home,
+    },
+    {
       id: 'apartment' as PropertyType,
       title: 'Apartment',
-      description: 'Multi-unit residential building',
       icon: Building,
-      color: '#4A90E2',
     },
     {
       id: 'condo' as PropertyType,
       title: 'Condo',
-      description: 'Individually owned unit in a complex',
       icon: Building2,
-      color: '#7B68EE',
     },
     {
-      id: 'room' as PropertyType,
-      title: 'Room',
-      description: 'Single room in a shared space',
-      icon: Bed,
-      color: '#FF6B9D',
-    },
-    {
-      id: 'house' as PropertyType,
-      title: 'House',
-      description: 'Standalone residential property',
-      icon: Home,
-      color: '#4CAF50',
+      id: 'land' as PropertyType,
+      title: 'Land',
+      icon: MapPin,
     },
   ];
 
   const handleNext = () => {
     if (!selectedType) return;
     animateButton(nextButtonScale, () => {
-      router.push(`/add-property-v2/property-details?type=${selectedType}` as any);
+      router.push(`/add-property-v2/property-details?type=${selectedType}&listingType=${listingType}` as any);
     });
   };
 
@@ -81,7 +75,7 @@ export default function PropertyTypeScreen() {
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '25%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 1 of 5</Text>
+          <Text style={styles.progressText}>Step 2 of 8</Text>
         </View>
       </View>
 
@@ -90,49 +84,56 @@ export default function PropertyTypeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>What kind of property are you looking to list?</Text>
+        <Text style={styles.stepLabel}>STEP 2 OF 8</Text>
+        <Text style={styles.title}>What type of property?</Text>
         <Text style={styles.subtitle}>
-          Choose the type that best describes your property
+          Choose the property type you&apos;re listing
         </Text>
 
-        <View style={styles.cardsContainer}>
-          {propertyTypes.map((type) => {
-            const Icon = type.icon;
-            const isSelected = selectedType === type.id;
-            
-            return (
-              <TouchableOpacity
-                key={type.id}
-                style={[
-                  styles.propertyCard,
-                  isSelected && styles.propertyCardSelected,
-                ]}
-                onPress={() => setSelectedType(type.id)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.iconContainer, { backgroundColor: type.color }]}>
-                  <Icon size={28} color="#fff" strokeWidth={2} />
-                </View>
-                <View style={styles.cardContent}>
-                  <Text style={styles.cardTitle}>{type.title}</Text>
-                  <Text style={styles.cardDescription}>{type.description}</Text>
-                </View>
-                <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
-                  {isSelected && <View style={styles.radioInner} />}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Listing Type</Text>
+          <View style={styles.switchContainer}>
+            <Text style={[styles.switchLabel, listingType === 'sale' && styles.switchLabelInactive]}>
+              Sale
+            </Text>
+            <Switch
+              value={listingType === 'rent'}
+              onValueChange={(value) => setListingType(value ? 'rent' : 'sale')}
+              trackColor={{ false: '#4A90E2', true: '#4A90E2' }}
+              thumbColor="#fff"
+              ios_backgroundColor="#4A90E2"
+            />
+            <Text style={[styles.switchLabel, listingType === 'rent' && styles.switchLabelInactive]}>
+              Rent
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.tipBox}>
-          <Text style={styles.tipTitle}>💡 Not sure which to choose?</Text>
-          <Text style={styles.tipText}>
-            • <Text style={styles.tipBold}>Apartment:</Text> Part of a larger building with multiple units{'\n'}
-            • <Text style={styles.tipBold}>Condo:</Text> You own the unit, shared common areas{'\n'}
-            • <Text style={styles.tipBold}>Room:</Text> Renting out a single room in your property{'\n'}
-            • <Text style={styles.tipBold}>House:</Text> Standalone single-family home
-          </Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Property Type</Text>
+          <View style={styles.grid}>
+            {propertyTypes.map((type) => {
+              const Icon = type.icon;
+              const isSelected = selectedType === type.id;
+              
+              return (
+                <TouchableOpacity
+                  key={type.id}
+                  style={[
+                    styles.propertyCard,
+                    isSelected && styles.propertyCardSelected,
+                  ]}
+                  onPress={() => setSelectedType(type.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.iconContainer}>
+                    <Icon size={40} color="#4A90E2" strokeWidth={1.5} />
+                  </View>
+                  <Text style={styles.cardTitle}>{type.title}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
       </ScrollView>
 
@@ -145,7 +146,7 @@ export default function PropertyTypeScreen() {
             disabled={!selectedType}
           >
             <Text style={[styles.nextButtonText, !selectedType && styles.nextButtonTextDisabled]}>
-              Continue
+              Next
             </Text>
           </TouchableOpacity>
         </Animated.View>
@@ -200,12 +201,19 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
   },
+  stepLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: '#999',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700' as const,
     color: '#1a1a1a',
     marginBottom: 8,
-    lineHeight: 34,
+    lineHeight: 38,
   },
   subtitle: {
     fontSize: 16,
@@ -213,82 +221,62 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     lineHeight: 24,
   },
-  cardsContainer: {
-    gap: 14,
-    marginBottom: 24,
+  section: {
+    marginBottom: 32,
   },
-  propertyCard: {
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 16,
+  },
+  switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5F8FA',
+    padding: 16,
+    borderRadius: 14,
+    gap: 16,
+  },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+  },
+  switchLabelInactive: {
+    color: '#999',
+    fontWeight: '500' as const,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  propertyCard: {
+    width: '48%',
     backgroundColor: '#fff',
-    padding: 18,
+    padding: 24,
     borderRadius: 16,
     borderWidth: 2,
     borderColor: '#E5E7EB',
-    gap: 16,
+    alignItems: 'center',
+    gap: 12,
   },
   propertyCardSelected: {
     borderColor: '#4A90E2',
     backgroundColor: '#F0F8FF',
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
+    width: 72,
+    height: 72,
+    borderRadius: 16,
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  cardContent: {
-    flex: 1,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
-    marginBottom: 4,
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  radioOuter: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioOuterSelected: {
-    borderColor: '#4A90E2',
-  },
-  radioInner: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#4A90E2',
-  },
-  tipBox: {
-    backgroundColor: '#F0F8FF',
-    padding: 18,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#D6EBFF',
-  },
-  tipTitle: {
     fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
-    marginBottom: 10,
-  },
-  tipText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 22,
-  },
-  tipBold: {
     fontWeight: '600' as const,
     color: '#1a1a1a',
   },

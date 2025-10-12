@@ -1,25 +1,18 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { 
-  ChevronLeft, 
-  Wifi, 
-  Tv, 
-  UtensilsCrossed,
-  WashingMachine,
-  Car
-} from 'lucide-react-native';
+import { ChevronLeft, ChevronDown } from 'lucide-react-native';
 
-type Amenity = {
-  id: string;
-  name: string;
-  icon: any;
-};
-
-export default function AmenitiesScreen() {
+export default function AddressScreen() {
   const router = useRouter();
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [country, setCountry] = useState<string>('United States');
+  const [street, setStreet] = useState<string>('');
+  const [apt, setApt] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [state, setState] = useState<string>('');
+  const [zip, setZip] = useState<string>('');
+  
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -38,25 +31,9 @@ export default function AmenitiesScreen() {
     ]).start(callback);
   };
 
-  const amenities: Amenity[] = [
-    { id: 'wifi', name: 'Wi-Fi', icon: Wifi },
-    { id: 'tv', name: 'TV', icon: Tv },
-    { id: 'kitchen', name: 'Kitchen', icon: UtensilsCrossed },
-    { id: 'washer', name: 'Washer', icon: WashingMachine },
-    { id: 'parking', name: 'Free parking', icon: Car },
-  ];
-
-  const toggleAmenity = (id: string) => {
-    setSelectedAmenities(prev => 
-      prev.includes(id) 
-        ? prev.filter(a => a !== id)
-        : [...prev, id]
-    );
-  };
-
   const handleNext = () => {
     animateButton(nextButtonScale, () => {
-      router.push('/add-property-v2/address' as any);
+      router.push('/add-property-v2/photos' as any);
     });
   };
 
@@ -74,9 +51,9 @@ export default function AmenitiesScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '75%' }]} />
+            <View style={[styles.progressFill, { width: '87.5%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 6 of 8</Text>
+          <Text style={styles.progressText}>Step 7 of 8</Text>
         </View>
       </View>
 
@@ -85,34 +62,79 @@ export default function AmenitiesScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.stepLabel}>STEP 6 OF 8</Text>
-        <Text style={styles.title}>What amenities do you offer?</Text>
+        <Text style={styles.stepLabel}>STEP 7 OF 8</Text>
+        <Text style={styles.title}>Provide a few final details</Text>
         <Text style={styles.subtitle}>
-          Select all the amenities available at your property
+          What&apos;s your residential address?
+        </Text>
+        <Text style={styles.note}>
+          Guests won&apos;t see this information.
         </Text>
 
-        <View style={styles.amenitiesList}>
-          {amenities.map((amenity) => {
-            const Icon = amenity.icon;
-            const isSelected = selectedAmenities.includes(amenity.id);
-            
-            return (
-              <TouchableOpacity
-                key={amenity.id}
-                style={styles.amenityItem}
-                onPress={() => toggleAmenity(amenity.id)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.amenityLeft}>
-                  <Icon size={24} color="#666" strokeWidth={1.5} />
-                  <Text style={styles.amenityName}>{amenity.name}</Text>
-                </View>
-                <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                  {isSelected && <View style={styles.checkboxInner} />}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Country / region</Text>
+          <TouchableOpacity style={styles.selectContainer}>
+            <Text style={styles.selectText}>{country}</Text>
+            <ChevronDown size={20} color="#666" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Street address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter street address"
+            placeholderTextColor="#999"
+            value={street}
+            onChangeText={setStreet}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Apt, suite, unit (if applicable)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter apartment, suite, or unit"
+            placeholderTextColor="#999"
+            value={apt}
+            onChangeText={setApt}
+          />
+        </View>
+
+        <View style={styles.row}>
+          <View style={styles.halfSection}>
+            <Text style={styles.sectionTitle}>City / town</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="City"
+              placeholderTextColor="#999"
+              value={city}
+              onChangeText={setCity}
+            />
+          </View>
+
+          <View style={styles.halfSection}>
+            <Text style={styles.sectionTitle}>State / territory</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="State"
+              placeholderTextColor="#999"
+              value={state}
+              onChangeText={setState}
+            />
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>ZIP code</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter ZIP code"
+            placeholderTextColor="#999"
+            value={zip}
+            onChangeText={setZip}
+            keyboardType="numeric"
+          />
         </View>
       </ScrollView>
 
@@ -193,50 +215,55 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  note: {
+    fontSize: 14,
+    color: '#999',
     marginBottom: 32,
-    lineHeight: 24,
   },
-  amenitiesList: {
-    gap: 12,
+  section: {
+    marginBottom: 24,
   },
-  amenityItem: {
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 8,
+  },
+  selectContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#F5F8FA',
-    padding: 20,
+    padding: 16,
     borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  amenityLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    flex: 1,
-  },
-  amenityName: {
+  selectText: {
     fontSize: 16,
-    fontWeight: '500' as const,
     color: '#1a1a1a',
+    fontWeight: '500' as const,
   },
-  checkbox: {
-    width: 28,
-    height: 28,
+  input: {
+    backgroundColor: '#F5F8FA',
+    padding: 16,
     borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontSize: 16,
+    color: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  checkboxSelected: {
-    borderColor: '#4A90E2',
-    backgroundColor: '#4A90E2',
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 24,
   },
-  checkboxInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#fff',
+  halfSection: {
+    flex: 1,
   },
   footer: {
     flexDirection: 'row',

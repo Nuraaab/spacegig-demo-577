@@ -1,25 +1,14 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { 
-  ChevronLeft, 
-  Wifi, 
-  Tv, 
-  UtensilsCrossed,
-  WashingMachine,
-  Car
-} from 'lucide-react-native';
+import { ChevronLeft, MapPin, Edit3 } from 'lucide-react-native';
 
-type Amenity = {
-  id: string;
-  name: string;
-  icon: any;
-};
-
-export default function AmenitiesScreen() {
+export default function LocationPriceScreen() {
   const router = useRouter();
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [location, setLocation] = useState<string>('');
+  const [price, setPrice] = useState<string>('0');
+  
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -38,25 +27,9 @@ export default function AmenitiesScreen() {
     ]).start(callback);
   };
 
-  const amenities: Amenity[] = [
-    { id: 'wifi', name: 'Wi-Fi', icon: Wifi },
-    { id: 'tv', name: 'TV', icon: Tv },
-    { id: 'kitchen', name: 'Kitchen', icon: UtensilsCrossed },
-    { id: 'washer', name: 'Washer', icon: WashingMachine },
-    { id: 'parking', name: 'Free parking', icon: Car },
-  ];
-
-  const toggleAmenity = (id: string) => {
-    setSelectedAmenities(prev => 
-      prev.includes(id) 
-        ? prev.filter(a => a !== id)
-        : [...prev, id]
-    );
-  };
-
   const handleNext = () => {
     animateButton(nextButtonScale, () => {
-      router.push('/add-property-v2/address' as any);
+      router.push('/add-property-v2/description' as any);
     });
   };
 
@@ -74,9 +47,9 @@ export default function AmenitiesScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '75%' }]} />
+            <View style={[styles.progressFill, { width: '50%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 6 of 8</Text>
+          <Text style={styles.progressText}>Step 4 of 8</Text>
         </View>
       </View>
 
@@ -85,34 +58,35 @@ export default function AmenitiesScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.stepLabel}>STEP 6 OF 8</Text>
-        <Text style={styles.title}>What amenities do you offer?</Text>
+        <Text style={styles.stepLabel}>STEP 4 OF 8</Text>
+        <Text style={styles.title}>Location & Price</Text>
         <Text style={styles.subtitle}>
-          Select all the amenities available at your property
+          Where is your property located and what&apos;s the price?
         </Text>
 
-        <View style={styles.amenitiesList}>
-          {amenities.map((amenity) => {
-            const Icon = amenity.icon;
-            const isSelected = selectedAmenities.includes(amenity.id);
-            
-            return (
-              <TouchableOpacity
-                key={amenity.id}
-                style={styles.amenityItem}
-                onPress={() => toggleAmenity(amenity.id)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.amenityLeft}>
-                  <Icon size={24} color="#666" strokeWidth={1.5} />
-                  <Text style={styles.amenityName}>{amenity.name}</Text>
-                </View>
-                <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                  {isSelected && <View style={styles.checkboxInner} />}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Location</Text>
+          <View style={styles.inputContainer}>
+            <MapPin size={20} color="#666" />
+            <TextInput
+              style={styles.input}
+              placeholder="Search for a location"
+              placeholderTextColor="#999"
+              value={location}
+              onChangeText={setLocation}
+            />
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Now, set a monthly price</Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.dollarSign}>$</Text>
+            <Text style={styles.priceValue}>{price}</Text>
+            <TouchableOpacity style={styles.editButton}>
+              <Edit3 size={20} color="#666" />
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 
@@ -197,46 +171,56 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     lineHeight: 24,
   },
-  amenitiesList: {
-    gap: 12,
+  section: {
+    marginBottom: 32,
   },
-  amenityItem: {
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#F5F8FA',
     padding: 20,
     borderRadius: 14,
+    gap: 16,
   },
-  amenityLeft: {
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1a1a1a',
+    fontWeight: '500' as const,
+  },
+  priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#F5F8FA',
+    padding: 32,
+    borderRadius: 14,
+    gap: 8,
   },
-  amenityName: {
-    fontSize: 16,
-    fontWeight: '500' as const,
+  dollarSign: {
+    fontSize: 48,
+    fontWeight: '700' as const,
     color: '#1a1a1a',
   },
-  checkbox: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
+  priceValue: {
+    fontSize: 48,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    flex: 1,
+  },
+  editButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  checkboxSelected: {
-    borderColor: '#4A90E2',
-    backgroundColor: '#4A90E2',
-  },
-  checkboxInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#fff',
   },
   footer: {
     flexDirection: 'row',
