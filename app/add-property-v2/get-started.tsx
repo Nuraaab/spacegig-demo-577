@@ -34,7 +34,7 @@ export default function GetStartedScreen() {
             onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
             activeOpacity={0.8}
           >
-            <Home size={22} color="#4A90E2" />
+            <Home size={20} color="#4A90E2" />
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={{ transform: [{ scale: closeButtonScale }] }}>
@@ -43,7 +43,7 @@ export default function GetStartedScreen() {
             onPress={() => animateButton(closeButtonScale, () => router.back())}
             activeOpacity={0.8}
           >
-            <X size={22} color="#666" />
+            <X size={20} color="#666" />
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -98,10 +98,10 @@ export default function GetStartedScreen() {
               </View>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Upload Photos</Text>
-              <Text style={styles.stepDescription}>Showcase your property with quality images</Text>
+              <Text style={styles.stepTitle}>Select Amenities</Text>
+              <Text style={styles.stepDescription}>Choose available features and amenities</Text>
             </View>
-            <CheckCircle size={20} color="#4CAF50" />
+            <CheckCircle size={16} color="#4CAF50" />
           </View>
 
           <View style={styles.stepItem}>
@@ -111,10 +111,23 @@ export default function GetStartedScreen() {
               </View>
             </View>
             <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Upload Photos</Text>
+              <Text style={styles.stepDescription}>Showcase your property with quality images</Text>
+            </View>
+            <CheckCircle size={16} color="#4CAF50" />
+          </View>
+
+          <View style={styles.stepItem}>
+            <View style={styles.stepIconContainer}>
+              <View style={styles.stepNumber}>
+                <Text style={styles.stepNumberText}>5</Text>
+              </View>
+            </View>
+            <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Review & Publish</Text>
               <Text style={styles.stepDescription}>Preview and publish your listing</Text>
             </View>
-            <CheckCircle size={20} color="#4CAF50" />
+            <CheckCircle size={16} color="#4CAF50" />
           </View>
         </View>
 

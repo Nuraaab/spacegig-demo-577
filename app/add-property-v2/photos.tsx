@@ -63,9 +63,9 @@ export default function PhotosScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '75%' }]} />
+            <View style={[styles.progressFill, { width: '80%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 3 of 4</Text>
+          <Text style={styles.progressText}>Step 4 of 5</Text>
         </View>
       </View>
 
@@ -94,7 +94,7 @@ export default function PhotosScreen() {
         {photos.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconContainer}>
-              <ImageIcon size={48} color="#4A90E2" strokeWidth={1.5} />
+              <ImageIcon size={40} color="#4A90E2" strokeWidth={1.5} />
             </View>
             <Text style={styles.emptyTitle}>No photos yet</Text>
             <Text style={styles.emptyDescription}>
@@ -129,7 +129,7 @@ export default function PhotosScreen() {
             disabled={photos.length >= 10}
             activeOpacity={0.8}
           >
-            <Camera size={24} color={photos.length >= 10 ? '#9CA3AF' : '#4A90E2'} />
+            <Camera size={20} color={photos.length >= 10 ? '#9CA3AF' : '#4A90E2'} />
             <Text style={[styles.uploadButtonText, photos.length >= 10 && styles.uploadButtonTextDisabled]}>
               Take Photo
             </Text>
@@ -141,7 +141,7 @@ export default function PhotosScreen() {
             disabled={photos.length >= 10}
             activeOpacity={0.8}
           >
-            <Upload size={24} color={photos.length >= 10 ? '#9CA3AF' : '#4A90E2'} />
+            <Upload size={20} color={photos.length >= 10 ? '#9CA3AF' : '#4A90E2'} />
             <Text style={[styles.uploadButtonText, photos.length >= 10 && styles.uploadButtonTextDisabled]}>
               Upload from Gallery
             </Text>

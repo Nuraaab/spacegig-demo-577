@@ -35,7 +35,7 @@ export default function PropertyDetailsScreen() {
 
   const handleNext = () => {
     animateButton(nextButtonScale, () => {
-      router.push('/add-property-v2/photos' as any);
+      router.push('/add-property-v2/amenities' as any);
     });
   };
 
@@ -53,9 +53,9 @@ export default function PropertyDetailsScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '50%' }]} />
+            <View style={[styles.progressFill, { width: '40%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 2 of 4</Text>
+          <Text style={styles.progressText}>Step 2 of 5</Text>
         </View>
       </View>
 
@@ -92,7 +92,7 @@ export default function PropertyDetailsScreen() {
           
           <View style={styles.counterRow}>
             <View style={styles.counterItem}>
-              <Bed size={24} color="#4A90E2" />
+              <Bed size={20} color="#4A90E2" />
               <Text style={styles.counterLabel}>Bedrooms</Text>
               <View style={styles.counterControls}>
                 <TouchableOpacity
@@ -112,7 +112,7 @@ export default function PropertyDetailsScreen() {
             </View>
 
             <View style={styles.counterItem}>
-              <Bath size={24} color="#4A90E2" />
+              <Bath size={20} color="#4A90E2" />
               <Text style={styles.counterLabel}>Bathrooms</Text>
               <View style={styles.counterControls}>
                 <TouchableOpacity
@@ -134,7 +134,7 @@ export default function PropertyDetailsScreen() {
 
           <View style={styles.counterRow}>
             <View style={styles.counterItem}>
-              <HomeIcon size={24} color="#4A90E2" />
+              <HomeIcon size={20} color="#4A90E2" />
               <Text style={styles.counterLabel}>Den</Text>
               <View style={styles.counterControls}>
                 <TouchableOpacity
@@ -154,7 +154,7 @@ export default function PropertyDetailsScreen() {
             </View>
 
             <View style={styles.counterItem}>
-              <Maximize size={24} color="#4A90E2" />
+              <Maximize size={20} color="#4A90E2" />
               <Text style={styles.counterLabel}>Square Feet</Text>
               <TextInput
                 style={styles.sqftInput}

@@ -2,13 +2,36 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Home, Building, Building2, Bed } from 'lucide-react-native';
+import { 
+  ChevronLeft, 
+  Wifi, 
+  Car, 
+  Wind, 
+  Waves, 
+  Dumbbell, 
+  Shirt, 
+  Tv, 
+  UtensilsCrossed,
+  PawPrint,
+  Cigarette,
+  Flame,
+  Snowflake,
+  Zap,
+  Droplets,
+  Shield,
+  Camera
+} from 'lucide-react-native';
 
-type PropertyType = 'apartment' | 'condo' | 'room' | 'house';
+type Amenity = {
+  id: string;
+  name: string;
+  icon: any;
+  color: string;
+};
 
-export default function PropertyTypeScreen() {
+export default function AmenitiesScreen() {
   const router = useRouter();
-  const [selectedType, setSelectedType] = useState<PropertyType | null>(null);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -27,41 +50,36 @@ export default function PropertyTypeScreen() {
     ]).start(callback);
   };
 
-  const propertyTypes = [
-    {
-      id: 'apartment' as PropertyType,
-      title: 'Apartment',
-      description: 'Multi-unit residential building',
-      icon: Building,
-      color: '#4A90E2',
-    },
-    {
-      id: 'condo' as PropertyType,
-      title: 'Condo',
-      description: 'Individually owned unit in a complex',
-      icon: Building2,
-      color: '#7B68EE',
-    },
-    {
-      id: 'room' as PropertyType,
-      title: 'Room',
-      description: 'Single room in a shared space',
-      icon: Bed,
-      color: '#FF6B9D',
-    },
-    {
-      id: 'house' as PropertyType,
-      title: 'House',
-      description: 'Standalone residential property',
-      icon: Home,
-      color: '#4CAF50',
-    },
+  const amenities: Amenity[] = [
+    { id: 'wifi', name: 'WiFi', icon: Wifi, color: '#4A90E2' },
+    { id: 'parking', name: 'Parking', icon: Car, color: '#7B68EE' },
+    { id: 'ac', name: 'Air Conditioning', icon: Wind, color: '#00BCD4' },
+    { id: 'pool', name: 'Pool', icon: Waves, color: '#2196F3' },
+    { id: 'gym', name: 'Gym', icon: Dumbbell, color: '#FF6B9D' },
+    { id: 'laundry', name: 'Laundry', icon: Shirt, color: '#9C27B0' },
+    { id: 'tv', name: 'TV', icon: Tv, color: '#607D8B' },
+    { id: 'dishwasher', name: 'Dishwasher', icon: UtensilsCrossed, color: '#FF9800' },
+    { id: 'pets', name: 'Pet Friendly', icon: PawPrint, color: '#8BC34A' },
+    { id: 'smoking', name: 'Smoking Allowed', icon: Cigarette, color: '#795548' },
+    { id: 'heating', name: 'Heating', icon: Flame, color: '#FF5722' },
+    { id: 'cooling', name: 'Cooling', icon: Snowflake, color: '#03A9F4' },
+    { id: 'electricity', name: 'Electricity Included', icon: Zap, color: '#FFC107' },
+    { id: 'water', name: 'Water Included', icon: Droplets, color: '#00BCD4' },
+    { id: 'security', name: 'Security System', icon: Shield, color: '#F44336' },
+    { id: 'surveillance', name: 'Surveillance', icon: Camera, color: '#9E9E9E' },
   ];
 
+  const toggleAmenity = (id: string) => {
+    setSelectedAmenities(prev => 
+      prev.includes(id) 
+        ? prev.filter(a => a !== id)
+        : [...prev, id]
+    );
+  };
+
   const handleNext = () => {
-    if (!selectedType) return;
     animateButton(nextButtonScale, () => {
-      router.push(`/add-property-v2/property-details?type=${selectedType}` as any);
+      router.push('/add-property-v2/photos' as any);
     });
   };
 
@@ -79,9 +97,9 @@ export default function PropertyTypeScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '25%' }]} />
+            <View style={[styles.progressFill, { width: '60%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 1 of 5</Text>
+          <Text style={styles.progressText}>Step 3 of 5</Text>
         </View>
       </View>
 
@@ -90,48 +108,57 @@ export default function PropertyTypeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>What kind of property are you looking to list?</Text>
+        <Text style={styles.title}>What amenities does your property have?</Text>
         <Text style={styles.subtitle}>
-          Choose the type that best describes your property
+          Select all that apply. This helps tenants find the perfect match.
         </Text>
 
-        <View style={styles.cardsContainer}>
-          {propertyTypes.map((type) => {
-            const Icon = type.icon;
-            const isSelected = selectedType === type.id;
+        <View style={styles.selectedCount}>
+          <Text style={styles.selectedCountText}>
+            {selectedAmenities.length} {selectedAmenities.length === 1 ? 'amenity' : 'amenities'} selected
+          </Text>
+        </View>
+
+        <View style={styles.amenitiesGrid}>
+          {amenities.map((amenity) => {
+            const Icon = amenity.icon;
+            const isSelected = selectedAmenities.includes(amenity.id);
             
             return (
               <TouchableOpacity
-                key={type.id}
+                key={amenity.id}
                 style={[
-                  styles.propertyCard,
-                  isSelected && styles.propertyCardSelected,
+                  styles.amenityCard,
+                  isSelected && styles.amenityCardSelected,
                 ]}
-                onPress={() => setSelectedType(type.id)}
+                onPress={() => toggleAmenity(amenity.id)}
                 activeOpacity={0.7}
               >
-                <View style={[styles.iconContainer, { backgroundColor: type.color }]}>
-                  <Icon size={28} color="#fff" strokeWidth={2} />
+                <View style={[
+                  styles.iconContainer, 
+                  { backgroundColor: isSelected ? amenity.color : '#F5F8FA' }
+                ]}>
+                  <Icon 
+                    size={22} 
+                    color={isSelected ? '#fff' : amenity.color} 
+                    strokeWidth={2} 
+                  />
                 </View>
-                <View style={styles.cardContent}>
-                  <Text style={styles.cardTitle}>{type.title}</Text>
-                  <Text style={styles.cardDescription}>{type.description}</Text>
-                </View>
-                <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
-                  {isSelected && <View style={styles.radioInner} />}
-                </View>
+                <Text style={[
+                  styles.amenityName,
+                  isSelected && styles.amenityNameSelected
+                ]}>
+                  {amenity.name}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
         <View style={styles.tipBox}>
-          <Text style={styles.tipTitle}>💡 Not sure which to choose?</Text>
+          <Text style={styles.tipTitle}>💡 Pro Tip</Text>
           <Text style={styles.tipText}>
-            • <Text style={styles.tipBold}>Apartment:</Text> Part of a larger building with multiple units{'\n'}
-            • <Text style={styles.tipBold}>Condo:</Text> You own the unit, shared common areas{'\n'}
-            • <Text style={styles.tipBold}>Room:</Text> Renting out a single room in your property{'\n'}
-            • <Text style={styles.tipBold}>House:</Text> Standalone single-family home
+            Properties with more amenities typically receive 40% more inquiries. Be thorough and accurate!
           </Text>
         </View>
       </ScrollView>
@@ -139,14 +166,11 @@ export default function PropertyTypeScreen() {
       <View style={styles.footer}>
         <Animated.View style={{ flex: 1, transform: [{ scale: nextButtonScale }] }}>
           <TouchableOpacity
-            style={[styles.nextButton, !selectedType && styles.nextButtonDisabled]}
+            style={styles.nextButton}
             onPress={handleNext}
             activeOpacity={0.9}
-            disabled={!selectedType}
           >
-            <Text style={[styles.nextButtonText, !selectedType && styles.nextButtonTextDisabled]}>
-              Continue
-            </Text>
+            <Text style={styles.nextButtonText}>Continue</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -210,65 +234,57 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 32,
+    marginBottom: 20,
     lineHeight: 24,
   },
-  cardsContainer: {
-    gap: 14,
+  selectedCount: {
+    backgroundColor: '#F0F8FF',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  selectedCountText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#4A90E2',
+  },
+  amenitiesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
     marginBottom: 24,
   },
-  propertyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  amenityCard: {
+    width: '48%',
     backgroundColor: '#fff',
-    padding: 18,
-    borderRadius: 16,
+    padding: 16,
+    borderRadius: 14,
     borderWidth: 2,
     borderColor: '#E5E7EB',
-    gap: 16,
+    alignItems: 'center',
+    gap: 10,
   },
-  propertyCardSelected: {
+  amenityCardSelected: {
     borderColor: '#4A90E2',
     backgroundColor: '#F0F8FF',
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cardContent: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 18,
+  amenityName: {
+    fontSize: 13,
     fontWeight: '600' as const,
-    color: '#1a1a1a',
-    marginBottom: 4,
-  },
-  cardDescription: {
-    fontSize: 14,
     color: '#666',
-    lineHeight: 20,
+    textAlign: 'center',
   },
-  radioOuter: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioOuterSelected: {
-    borderColor: '#4A90E2',
-  },
-  radioInner: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#4A90E2',
+  amenityNameSelected: {
+    color: '#1a1a1a',
   },
   tipBox: {
     backgroundColor: '#F0F8FF',
@@ -281,16 +297,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
     color: '#1a1a1a',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   tipText: {
     fontSize: 14,
     color: '#666',
     lineHeight: 22,
-  },
-  tipBold: {
-    fontWeight: '600' as const,
-    color: '#1a1a1a',
   },
   footer: {
     flexDirection: 'row',
@@ -310,17 +322,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  nextButtonDisabled: {
-    backgroundColor: '#E5E7EB',
-    shadowOpacity: 0,
-    elevation: 0,
-  },
   nextButtonText: {
     fontSize: 18,
     fontWeight: '700' as const,
     color: '#fff',
-  },
-  nextButtonTextDisabled: {
-    color: '#9CA3AF',
   },
 });

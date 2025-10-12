@@ -52,7 +52,7 @@ export default function ReviewScreen() {
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '100%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 4 of 4</Text>
+          <Text style={styles.progressText}>Step 5 of 5</Text>
         </View>
       </View>
 
@@ -62,7 +62,7 @@ export default function ReviewScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.titleSection}>
-          <CheckCircle size={48} color="#4CAF50" />
+          <CheckCircle size={40} color="#4CAF50" />
           <Text style={styles.title}>Review Your Listing</Text>
           <Text style={styles.subtitle}>
             Make sure everything looks good before publishing
@@ -80,7 +80,7 @@ export default function ReviewScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Property Details</Text>
             <TouchableOpacity style={styles.editButton}>
-              <Edit size={16} color="#4A90E2" />
+              <Edit size={14} color="#4A90E2" />
               <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
           </View>
@@ -89,7 +89,7 @@ export default function ReviewScreen() {
             <View style={styles.detailRow}>
               <View style={styles.detailItem}>
                 <View style={styles.detailIconContainer}>
-                  <HomeIcon size={20} color="#4A90E2" />
+                  <HomeIcon size={18} color="#4A90E2" />
                 </View>
                 <View>
                   <Text style={styles.detailLabel}>Type</Text>
@@ -98,7 +98,7 @@ export default function ReviewScreen() {
               </View>
               <View style={styles.detailItem}>
                 <View style={styles.detailIconContainer}>
-                  <DollarSign size={20} color="#4A90E2" />
+                  <DollarSign size={18} color="#4A90E2" />
                 </View>
                 <View>
                   <Text style={styles.detailLabel}>Price</Text>
@@ -111,15 +111,15 @@ export default function ReviewScreen() {
 
             <View style={styles.specsRow}>
               <View style={styles.specItem}>
-                <Bed size={20} color="#666" />
+                <Bed size={18} color="#666" />
                 <Text style={styles.specText}>2 beds</Text>
               </View>
               <View style={styles.specItem}>
-                <Bath size={20} color="#666" />
+                <Bath size={18} color="#666" />
                 <Text style={styles.specText}>2 baths</Text>
               </View>
               <View style={styles.specItem}>
-                <Maximize size={20} color="#666" />
+                <Maximize size={18} color="#666" />
                 <Text style={styles.specText}>1200 sqft</Text>
               </View>
             </View>
@@ -127,7 +127,7 @@ export default function ReviewScreen() {
             <View style={styles.divider} />
 
             <View style={styles.locationRow}>
-              <MapPin size={20} color="#4A90E2" />
+              <MapPin size={18} color="#4A90E2" />
               <Text style={styles.locationText}>Downtown, Toronto, ON</Text>
             </View>
           </View>
@@ -137,7 +137,7 @@ export default function ReviewScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Photos</Text>
             <TouchableOpacity style={styles.editButton}>
-              <Edit size={16} color="#4A90E2" />
+              <Edit size={14} color="#4A90E2" />
               <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
           </View>
