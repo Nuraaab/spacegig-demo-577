@@ -40,7 +40,7 @@ export default function OnboardingScreen() {
 
   const handleAddJob = () => {
     animateButton(addJobScale, () => {
-      router.push('/+not-found' as any);
+      router.push('/create-job/index' as any);
     });
   };
 
