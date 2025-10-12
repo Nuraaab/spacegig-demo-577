@@ -109,39 +109,27 @@ export default function PropertyTypeScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Listing Type</Text>
-          <View style={styles.toggleContainer}>
-            <TouchableOpacity
-              style={[
-                styles.toggleOption,
-                styles.toggleOptionLeft,
-                listingType === 'sale' && styles.toggleOptionActive,
-              ]}
-              onPress={() => setListingType('sale')}
-              activeOpacity={0.8}
-            >
-              <Text style={[
-                styles.toggleText,
-                listingType === 'sale' && styles.toggleTextActive,
-              ]}>
-                Sale
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.toggleOption,
-                styles.toggleOptionRight,
-                listingType === 'rent' && styles.toggleOptionActive,
-              ]}
-              onPress={() => setListingType('rent')}
-              activeOpacity={0.8}
-            >
-              <Text style={[
-                styles.toggleText,
-                listingType === 'rent' && styles.toggleTextActive,
-              ]}>
-                Rent
-              </Text>
-            </TouchableOpacity>
+          <View style={styles.listingTypeCard}>
+            <View style={styles.listingTypeHeader}>
+              <View>
+                <Text style={styles.listingTypeTitle}>Rent or Sale</Text>
+                <Text style={styles.listingTypeSubtitle}>Choose whether you&apos;re renting or selling</Text>
+              </View>
+              <View style={styles.toggleWrapper}>
+                <Text style={[styles.toggleLabel, listingType === 'sale' && styles.toggleLabelActive]}>Sale</Text>
+                <TouchableOpacity
+                  style={styles.toggleTrack}
+                  onPress={() => setListingType(listingType === 'rent' ? 'sale' : 'rent')}
+                  activeOpacity={0.8}
+                >
+                  <Animated.View style={[
+                    styles.toggleThumb,
+                    listingType === 'rent' && styles.toggleThumbActive,
+                  ]} />
+                </TouchableOpacity>
+                <Text style={[styles.toggleLabel, listingType === 'rent' && styles.toggleLabelActive]}>Rent</Text>
+              </View>
+            </View>
           </View>
         </View>
 
@@ -266,40 +254,63 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     marginBottom: 16,
   },
-  toggleContainer: {
+  listingTypeCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    padding: 20,
+  },
+  listingTypeHeader: {
     flexDirection: 'row',
-    backgroundColor: '#F5F8FA',
-    borderRadius: 12,
-    padding: 4,
-  },
-  toggleOption: {
-    flex: 1,
-    paddingVertical: 14,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
   },
-  toggleOptionLeft: {
-    marginRight: 2,
-  },
-  toggleOptionRight: {
-    marginLeft: 2,
-  },
-  toggleOptionActive: {
-    backgroundColor: '#4A90E2',
-    shadowColor: '#4A90E2',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  toggleText: {
+  listingTypeTitle: {
     fontSize: 16,
     fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  listingTypeSubtitle: {
+    fontSize: 13,
     color: '#666',
   },
-  toggleTextActive: {
-    color: '#fff',
+  toggleWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  toggleLabel: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+    color: '#999',
+  },
+  toggleLabelActive: {
+    color: '#1a1a1a',
+    fontWeight: '600' as const,
+  },
+  toggleTrack: {
+    width: 52,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#4DD0C0',
+    padding: 2,
+    justifyContent: 'center',
+  },
+  toggleThumb: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  toggleThumbActive: {
+    transform: [{ translateX: 20 }],
   },
   grid: {
     flexDirection: 'row',
