@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2, Sofa } from 'lucide-react-native';
+import { ChevronLeft, Bed, Bath, Home as HomeIcon, Maximize2, Check } from 'lucide-react-native';
 
 export default function PropertyDetailsScreen() {
   const router = useRouter();
@@ -135,42 +135,31 @@ export default function PropertyDetailsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Furnishing</Text>
-          <View style={styles.toggleContainer}>
+          <View style={styles.furnishingRow}>
+            <Text style={styles.sectionTitle}>Furnishing</Text>
             <TouchableOpacity
-              style={[
-                styles.toggleOption,
-                styles.toggleOptionLeft,
-                furnished === 'furnished' && styles.toggleOptionActive,
-              ]}
-              onPress={() => setFurnished('furnished')}
+              style={styles.modernToggle}
+              onPress={() => setFurnished(furnished === 'furnished' ? 'unfurnished' : 'furnished')}
               activeOpacity={0.8}
             >
-              <Sofa size={18} color={furnished === 'furnished' ? '#fff' : '#666'} />
-              <Text style={[
-                styles.toggleText,
-                furnished === 'furnished' && styles.toggleTextActive,
+              <Animated.View style={[
+                styles.toggleTrack,
+                furnished === 'furnished' && styles.toggleTrackActive,
               ]}>
-                Furnished
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.toggleOption,
-                styles.toggleOptionRight,
-                furnished === 'unfurnished' && styles.toggleOptionActive,
-              ]}
-              onPress={() => setFurnished('unfurnished')}
-              activeOpacity={0.8}
-            >
-              <Text style={[
-                styles.toggleText,
-                furnished === 'unfurnished' && styles.toggleTextActive,
-              ]}>
-                Unfurnished
-              </Text>
+                <Animated.View style={[
+                  styles.toggleThumb,
+                  furnished === 'furnished' && styles.toggleThumbActive,
+                ]}>
+                  {furnished === 'furnished' && (
+                    <Check size={16} color="#00C853" strokeWidth={3} />
+                  )}
+                </Animated.View>
+              </Animated.View>
             </TouchableOpacity>
           </View>
+          <Text style={styles.furnishingLabel}>
+            {furnished === 'furnished' ? 'Furnished' : 'Unfurnished'}
+          </Text>
         </View>
 
         <View style={styles.section}>
@@ -349,41 +338,46 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     color: '#fff',
   },
-  toggleContainer: {
+  furnishingRow: {
     flexDirection: 'row',
-    backgroundColor: '#F5F8FA',
-    borderRadius: 12,
-    padding: 4,
-  },
-  toggleOption: {
-    flex: 1,
-    paddingVertical: 14,
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  furnishingLabel: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500' as const,
+  },
+  modernToggle: {
+    width: 60,
+    height: 34,
+  },
+  toggleTrack: {
+    width: 60,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#E0E0E0',
     justifyContent: 'center',
-    borderRadius: 10,
-    flexDirection: 'row',
-    gap: 8,
+    padding: 2,
   },
-  toggleOptionLeft: {
-    marginRight: 2,
+  toggleTrackActive: {
+    backgroundColor: '#00C853',
   },
-  toggleOptionRight: {
-    marginLeft: 2,
-  },
-  toggleOptionActive: {
-    backgroundColor: '#4A90E2',
-    shadowColor: '#4A90E2',
+  toggleThumb: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  toggleText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#666',
-  },
-  toggleTextActive: {
-    color: '#fff',
+  toggleThumbActive: {
+    alignSelf: 'flex-end',
   },
 });
