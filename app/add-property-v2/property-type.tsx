@@ -73,9 +73,9 @@ export default function PropertyTypeScreen() {
         </Animated.View>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '25%' }]} />
+            <View style={[styles.progressFill, { width: '12.5%' }]} />
           </View>
-          <Text style={styles.progressText}>Step 2 of 8</Text>
+          <Text style={styles.progressText}>Step 1 of 8</Text>
         </View>
       </View>
 
@@ -84,7 +84,7 @@ export default function PropertyTypeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.stepLabel}>STEP 2 OF 8</Text>
+        <Text style={styles.stepLabel}>STEP 1 OF 8</Text>
         <Text style={styles.title}>What type of property?</Text>
         <Text style={styles.subtitle}>
           Choose the property type you&apos;re listing
