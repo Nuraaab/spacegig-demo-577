@@ -1,6 +1,6 @@
 import { Tabs, useRouter } from "expo-router";
 import { Home, Heart, User, Users, Plus } from "lucide-react-native";
-import { TouchableOpacity, StyleSheet, Animated, Text, View } from "react-native";
+import { StyleSheet, Animated, View } from "react-native";
 import { useRef } from "react";
 
 export default function TabLayout() {
@@ -60,20 +60,19 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: () => (
-            <TouchableOpacity
-              onPress={handleAddPress}
-              style={styles.addJobContainer}
-              activeOpacity={0.8}
-            >
-              <Animated.View style={{ transform: [{ scale: addButtonScale }] }}>
-                <View style={styles.addButton}>
-                  <Plus size={28} color="#fff" strokeWidth={2.5} />
-                </View>
-              </Animated.View>
-              <Text style={styles.addJobLabel}>Add Property</Text>
-            </TouchableOpacity>
+            <Animated.View style={{ transform: [{ scale: addButtonScale }], marginTop: -20 }}>
+              <View style={styles.addButton}>
+                <Plus size={28} color="#fff" strokeWidth={2.5} />
+              </View>
+            </Animated.View>
           ),
-          tabBarButton: () => null,
+          tabBarLabel: () => null,
+        }}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            handleAddPress();
+          },
         }}
       />
       <Tabs.Screen
@@ -95,13 +94,9 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  addJobContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   addButton: {
     width: 56,
-    height: 40,
+    height: 56,
     borderRadius: 12,
     backgroundColor: '#4A90E2',
     justifyContent: 'center',
@@ -111,14 +106,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-    marginBottom: 20,
-  },
-  addJobLabel: {
-    fontSize: 10,
-    fontWeight: '600' as const,
-    color: '#4A90E2',
-    marginTop: -16,
-    textAlign: 'center',
-    width: 80,
   },
 });
