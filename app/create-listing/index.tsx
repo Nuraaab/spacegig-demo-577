@@ -3,9 +3,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X, Home } from 'lucide-react-native';
 import { useRef } from 'react';
+import { useListing } from '@/contexts/ListingContext';
 
 export default function CreateListingIntro() {
   const router = useRouter();
+  const { updateFormData, resetForm } = useListing();
   const homeButtonScale = useRef(new Animated.Value(1)).current;
   const closeButtonScale = useRef(new Animated.Value(1)).current;
   const startButtonScale = useRef(new Animated.Value(1)).current;
@@ -92,7 +94,11 @@ export default function CreateListingIntro() {
         <Animated.View style={{ transform: [{ scale: startButtonScale }] }}>
           <TouchableOpacity
             style={styles.getStartedButton}
-            onPress={() => animateButton(startButtonScale, () => router.push('/create-listing/steps' as any))}
+            onPress={() => animateButton(startButtonScale, () => {
+              resetForm();
+              updateFormData({ listingCategory: 'property' });
+              router.push('/create-listing/steps' as any);
+            })}
             activeOpacity={0.8}
           >
             <Text style={styles.getStartedButtonText}>Get Started</Text>
