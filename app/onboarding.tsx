@@ -168,7 +168,6 @@ export default function OnboardingScreen() {
 
   const handleAddProperty2 = () => {
     animateButton(addProperty2Scale, () => {
-      router.push('/create-listing/index' as any);
     });
   };
 
