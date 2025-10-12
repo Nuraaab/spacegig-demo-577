@@ -20,7 +20,7 @@ export default function TabLayout() {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      router.push('/add-property-v2/get-started' as any);
+      router.push('/add-property-v2/property-type' as any);
     });
   };
 
