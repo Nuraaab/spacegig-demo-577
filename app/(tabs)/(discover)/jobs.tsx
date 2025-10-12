@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   View,
@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, Home, LayoutGrid, Layers } from 'lucide-react-native';
@@ -27,6 +28,10 @@ export default function JobsDiscoverScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'stack' | 'grid'>('stack');
+  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [salaryRange, setSalaryRange] = useState<{ min: number; max: number }>({ min: 0, max: 500000 });
+  const [remoteOnly, setRemoteOnly] = useState<boolean>(false);
 
   const position = useRef(new Animated.ValueXY()).current;
   const rotate = position.x.interpolate({
@@ -47,7 +52,62 @@ export default function JobsDiscoverScreen() {
     extrapolate: 'clamp',
   });
 
-  const job = mockJobs[currentIndex];
+  const jobTypes = useMemo(() => {
+    const types = new Set<string>();
+    mockJobs.forEach(job => types.add(job.jobType));
+    return Array.from(types);
+  }, []);
+
+  const locations = useMemo(() => {
+    const locs = new Set<string>();
+    mockJobs.forEach(job => locs.add(`${job.location.city}, ${job.location.state}`));
+    return Array.from(locs);
+  }, []);
+
+  const filteredJobs = useMemo(() => {
+    return mockJobs.filter(job => {
+      if (selectedJobTypes.length > 0 && !selectedJobTypes.includes(job.jobType)) {
+        return false;
+      }
+      if (selectedLocations.length > 0 && !selectedLocations.includes(`${job.location.city}, ${job.location.state}`)) {
+        return false;
+      }
+      if (job.salary.max < salaryRange.min || job.salary.min > salaryRange.max) {
+        return false;
+      }
+      if (remoteOnly && !job.location.remote) {
+        return false;
+      }
+      if (searchQuery && !job.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
+          !job.company.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
+  }, [selectedJobTypes, selectedLocations, salaryRange, remoteOnly, searchQuery]);
+
+  const job = filteredJobs[currentIndex];
+
+  const toggleJobType = (type: string) => {
+    setSelectedJobTypes(prev => 
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
+  };
+
+  const toggleLocation = (location: string) => {
+    setSelectedLocations(prev => 
+      prev.includes(location) ? prev.filter(l => l !== location) : [...prev, location]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedJobTypes([]);
+    setSelectedLocations([]);
+    setSalaryRange({ min: 0, max: 500000 });
+    setRemoteOnly(false);
+  };
+
+  const activeFiltersCount = selectedJobTypes.length + selectedLocations.length + (remoteOnly ? 1 : 0);
 
   const handleSwipeComplete = (direction: 'left' | 'right') => {
     if (direction === 'right' && job) {
@@ -321,7 +381,7 @@ export default function JobsDiscoverScreen() {
           contentContainerStyle={styles.gridContent}
           showsVerticalScrollIndicator={false}
         >
-          {mockJobs.map((jobItem) => (
+          {filteredJobs.map((jobItem) => (
             <TouchableOpacity
               key={jobItem.id}
               style={styles.gridCard}
@@ -360,6 +420,143 @@ export default function JobsDiscoverScreen() {
           <Text style={styles.confirmationText}>Added to favorites!</Text>
         </View>
       )}
+
+      <Modal
+        visible={showFilters}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowFilters(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Filters</Text>
+              {activeFiltersCount > 0 && (
+                <TouchableOpacity onPress={clearFilters} style={styles.clearButton}>
+                  <Text style={styles.clearButtonText}>Clear All</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity onPress={() => setShowFilters(false)} style={styles.closeButton}>
+                <X size={24} color="#1a1a1a" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.filterScroll} showsVerticalScrollIndicator={false}>
+              <View style={styles.filterSection}>
+                <Text style={styles.filterSectionTitle}>Job Type</Text>
+                <View style={styles.filterChips}>
+                  {jobTypes.map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[
+                        styles.filterChip,
+                        selectedJobTypes.includes(type) && styles.filterChipActive,
+                      ]}
+                      onPress={() => toggleJobType(type)}
+                    >
+                      <Text
+                        style={[
+                          styles.filterChipText,
+                          selectedJobTypes.includes(type) && styles.filterChipTextActive,
+                        ]}
+                      >
+                        {type}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.filterSection}>
+                <Text style={styles.filterSectionTitle}>Location</Text>
+                <View style={styles.filterChips}>
+                  {locations.map((location) => (
+                    <TouchableOpacity
+                      key={location}
+                      style={[
+                        styles.filterChip,
+                        selectedLocations.includes(location) && styles.filterChipActive,
+                      ]}
+                      onPress={() => toggleLocation(location)}
+                    >
+                      <Text
+                        style={[
+                          styles.filterChipText,
+                          selectedLocations.includes(location) && styles.filterChipTextActive,
+                        ]}
+                      >
+                        {location}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.filterSection}>
+                <Text style={styles.filterSectionTitle}>Salary Range</Text>
+                <View style={styles.salaryInputs}>
+                  <View style={styles.salaryInputContainer}>
+                    <Text style={styles.salaryLabel}>Min</Text>
+                    <TextInput
+                      style={styles.salaryInput}
+                      value={salaryRange.min.toString()}
+                      onChangeText={(text) => {
+                        const value = parseInt(text) || 0;
+                        setSalaryRange(prev => ({ ...prev, min: value }));
+                      }}
+                      keyboardType="numeric"
+                      placeholder="0"
+                    />
+                  </View>
+                  <Text style={styles.salaryDivider}>-</Text>
+                  <View style={styles.salaryInputContainer}>
+                    <Text style={styles.salaryLabel}>Max</Text>
+                    <TextInput
+                      style={styles.salaryInput}
+                      value={salaryRange.max.toString()}
+                      onChangeText={(text) => {
+                        const value = parseInt(text) || 500000;
+                        setSalaryRange(prev => ({ ...prev, max: value }));
+                      }}
+                      keyboardType="numeric"
+                      placeholder="500000"
+                    />
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.filterSection}>
+                <TouchableOpacity
+                  style={styles.remoteToggle}
+                  onPress={() => setRemoteOnly(!remoteOnly)}
+                >
+                  <View style={styles.remoteToggleLeft}>
+                    <Text style={styles.filterSectionTitle}>Remote Only</Text>
+                    <Text style={styles.remoteToggleSubtext}>Show only remote positions</Text>
+                  </View>
+                  <View style={[styles.toggleSwitch, remoteOnly && styles.toggleSwitchActive]}>
+                    <View style={[styles.toggleThumb, remoteOnly && styles.toggleThumbActive]} />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalFooter}>
+              <TouchableOpacity
+                style={styles.applyButton}
+                onPress={() => {
+                  setCurrentIndex(0);
+                  setShowFilters(false);
+                }}
+              >
+                <Text style={styles.applyButtonText}>
+                  Show {filteredJobs.length} {filteredJobs.length === 1 ? 'Job' : 'Jobs'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -742,5 +939,177 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: '#10B981',
     textTransform: 'capitalize' as const,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '85%',
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    flex: 1,
+  },
+  clearButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 12,
+  },
+  clearButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#10B981',
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterScroll: {
+    flex: 1,
+  },
+  filterSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  filterSectionTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  filterChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  filterChipActive: {
+    backgroundColor: '#E8F5E9',
+    borderColor: '#10B981',
+  },
+  filterChipText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#666',
+    textTransform: 'capitalize' as const,
+  },
+  filterChipTextActive: {
+    color: '#10B981',
+  },
+  salaryInputs: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  salaryInputContainer: {
+    flex: 1,
+  },
+  salaryLabel: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#666',
+    marginBottom: 8,
+  },
+  salaryInput: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  salaryDivider: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#666',
+    marginTop: 24,
+  },
+  remoteToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  remoteToggleLeft: {
+    flex: 1,
+  },
+  remoteToggleSubtext: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  toggleSwitch: {
+    width: 52,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#e0e0e0',
+    padding: 2,
+    justifyContent: 'center',
+  },
+  toggleSwitchActive: {
+    backgroundColor: '#10B981',
+  },
+  toggleThumb: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  toggleThumbActive: {
+    transform: [{ translateX: 20 }],
+  },
+  modalFooter: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  applyButton: {
+    backgroundColor: '#10B981',
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  applyButtonText: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#fff',
   },
 });
