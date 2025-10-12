@@ -13,7 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, Home, LayoutGrid, Layers } from 'lucide-react-native';
+import { Heart, X, MapPin, DollarSign, Briefcase, Search, SlidersHorizontal, Home, LayoutGrid, Layers, ArrowLeft } from 'lucide-react-native';
 import { mockJobs } from '@/mocks/jobs';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -89,6 +89,7 @@ export default function JobsDiscoverScreen() {
   const likeButtonScale = useRef(new Animated.Value(1)).current;
   const passButtonScale = useRef(new Animated.Value(1)).current;
   const homeButtonScale = useRef(new Animated.Value(1)).current;
+  const backButtonScale = useRef(new Animated.Value(1)).current;
   const filterButtonScale = useRef(new Animated.Value(1)).current;
   const viewButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -132,12 +133,18 @@ export default function JobsDiscoverScreen() {
           options={{
             title: 'Discover Jobs',
             headerLeft: () => (
-              <TouchableOpacity
-                onPress={() => router.replace('/onboarding')}
-                style={{ marginLeft: 8 }}
-              >
-                <Home size={24} color="#1a1a1a" />
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginLeft: 8 }}>
+                <TouchableOpacity
+                  onPress={() => router.replace('/onboarding')}
+                >
+                  <Home size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => router.back()}
+                >
+                  <ArrowLeft size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+              </View>
             ),
 
           }}
@@ -156,20 +163,50 @@ export default function JobsDiscoverScreen() {
         options={{
           title: 'Discover Jobs',
           headerLeft: () => (
-            <Animated.View style={{ transform: [{ scale: homeButtonScale }], marginLeft: 8 }}>
-              <TouchableOpacity
-                onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
-                activeOpacity={0.8}
-              >
-                <Home size={24} color="#1a1a1a" />
-              </TouchableOpacity>
-            </Animated.View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginLeft: 8 }}>
+              <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
+                <TouchableOpacity
+                  onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
+                  activeOpacity={0.8}
+                >
+                  <Home size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+              </Animated.View>
+              <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
+                <TouchableOpacity
+                  onPress={() => animateButton(backButtonScale, () => router.back())}
+                  activeOpacity={0.8}
+                >
+                  <ArrowLeft size={24} color="#1a1a1a" />
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
           ),
 
         }}
       />
 
       <View style={[styles.searchContainer, { paddingTop: insets.top + 12 }]}>
+        <View style={styles.headerButtons}>
+          <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
+              activeOpacity={0.8}
+            >
+              <Home size={20} color="#1a1a1a" />
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => animateButton(backButtonScale, () => router.back())}
+              activeOpacity={0.8}
+            >
+              <ArrowLeft size={20} color="#1a1a1a" />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
         <View style={styles.searchBar}>
           <Search size={20} color="#999" />
           <TextInput
@@ -357,10 +394,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     paddingBottom: 12,
-    gap: 12,
+    gap: 8,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerButton: {
+    width: 40,
+    height: 48,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   searchBar: {
     flex: 1,
