@@ -2,13 +2,14 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Home, Bed, Bath } from 'lucide-react-native';
+import { ChevronLeft, Home, Bed, Bath, Sofa } from 'lucide-react-native';
 
 export default function PropertyDetailsScreen() {
   const router = useRouter();
   const [beds, setBeds] = useState<number>(1);
   const [baths, setBaths] = useState<number>(1);
   const [bathrooms, setBathrooms] = useState<number>(1);
+  const [isFurnished, setIsFurnished] = useState<boolean>(false);
   
   const bathroomOptions = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8];
   
@@ -151,6 +152,29 @@ export default function PropertyDetailsScreen() {
               <Text style={styles.buttonText}>+</Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.row}>
+          <View style={styles.labelContainer}>
+            <View style={styles.iconContainer}>
+              <Sofa size={20} color="#4A90E2" />
+            </View>
+            <Text style={styles.label}>Furnished</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.toggleContainer, isFurnished && styles.toggleContainerActive]}
+            onPress={() => setIsFurnished(!isFurnished)}
+            activeOpacity={0.8}
+          >
+            <Animated.View
+              style={[
+                styles.toggleThumb,
+                isFurnished && styles.toggleThumbActive,
+              ]}
+            />
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -316,5 +340,29 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     color: '#fff',
   },
-
+  toggleContainer: {
+    width: 56,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#E5E7EB',
+    padding: 2,
+    justifyContent: 'center',
+  },
+  toggleContainerActive: {
+    backgroundColor: '#4A90E2',
+  },
+  toggleThumb: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  toggleThumbActive: {
+    transform: [{ translateX: 24 }],
+  },
 });
