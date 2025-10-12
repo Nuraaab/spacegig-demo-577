@@ -9,10 +9,11 @@ type ListingType = 'rent' | 'sale';
 
 export default function PropertyTypeScreen() {
   const router = useRouter();
-  const [listingType] = useState<ListingType>('rent');
+  const [listingType, setListingType] = useState<ListingType>('rent');
   const [selectedType, setSelectedType] = useState<PropertyType | null>(null);
   const backButtonScale = useRef(new Animated.Value(1)).current;
   const nextButtonScale = useRef(new Animated.Value(1)).current;
+  const toggleAnimation = useRef(new Animated.Value(0)).current;
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -69,6 +70,21 @@ export default function PropertyTypeScreen() {
     ? [...basePropertyTypes, ...rentOnlyTypes]
     : basePropertyTypes;
 
+  const handleToggle = (type: ListingType) => {
+    if (listingType === type) return;
+    
+    setListingType(type);
+    if (type === 'sale' && (selectedType === 'basement' || selectedType === 'room')) {
+      setSelectedType(null);
+    }
+    
+    Animated.timing(toggleAnimation, {
+      toValue: type === 'sale' ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
   const handleNext = () => {
     if (!selectedType) return;
     animateButton(nextButtonScale, () => {
@@ -106,6 +122,45 @@ export default function PropertyTypeScreen() {
         <Text style={styles.subtitle}>
           Choose the property type you&apos;re listing
         </Text>
+
+        <View style={styles.toggleSection}>
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                styles.toggleOption,
+                listingType === 'rent' && styles.toggleOptionActive,
+              ]}
+              onPress={() => handleToggle('rent')}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.toggleText,
+                  listingType === 'rent' && styles.toggleTextActive,
+                ]}
+              >
+                Rent
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.toggleOption,
+                listingType === 'sale' && styles.toggleOptionActive,
+              ]}
+              onPress={() => handleToggle('sale')}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.toggleText,
+                  listingType === 'sale' && styles.toggleTextActive,
+                ]}
+              >
+                Sale
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Property Type</Text>
@@ -290,5 +345,39 @@ const styles = StyleSheet.create({
   },
   nextButtonTextDisabled: {
     color: '#9CA3AF',
+  },
+  toggleSection: {
+    marginBottom: 32,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F8FA',
+    borderRadius: 12,
+    padding: 4,
+    gap: 4,
+  },
+  toggleOption: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleOptionActive: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  toggleText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  toggleTextActive: {
+    color: '#1a1a1a',
   },
 });
