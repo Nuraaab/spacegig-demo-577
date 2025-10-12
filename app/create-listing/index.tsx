@@ -56,7 +56,7 @@ export default function CreateListingIntro() {
           style={styles.heroImage}
         />
 
-        <Text style={styles.title}>It&apos;s easy to get started on SpaceGig</Text>
+        <Text style={styles.title}>It&apos;s easy to get started on PostIt</Text>
         <Text style={styles.subtitle}>Create your property listing in just a few simple steps</Text>
 
         <View style={styles.stepsContainer}>
@@ -65,9 +65,10 @@ export default function CreateListingIntro() {
               <Text style={styles.stepNumberText}>1</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Property details</Text>
-              <Text style={styles.stepDescription}>Add property type, size, and specifications</Text>
+              <Text style={styles.stepTitle}>Tell us what you are posting</Text>
+              <Text style={styles.stepDescription}>Choose between property or job listing</Text>
             </View>
+            <View style={styles.checkmark} />
           </View>
 
           <View style={styles.stepItem}>
@@ -75,9 +76,10 @@ export default function CreateListingIntro() {
               <Text style={styles.stepNumberText}>2</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Location & pricing</Text>
-              <Text style={styles.stepDescription}>Set your location and rental price</Text>
+              <Text style={styles.stepTitle}>Add details and photos</Text>
+              <Text style={styles.stepDescription}>Fill in the information and upload images</Text>
             </View>
+            <View style={styles.checkmark} />
           </View>
 
           <View style={styles.stepItem}>
@@ -88,6 +90,7 @@ export default function CreateListingIntro() {
               <Text style={styles.stepTitle}>Review and publish</Text>
               <Text style={styles.stepDescription}>Preview your listing and go live</Text>
             </View>
+            <View style={styles.checkmark} />
           </View>
         </View>
 
@@ -163,7 +166,11 @@ const styles = StyleSheet.create({
   },
   stepItem: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 16,
+    backgroundColor: '#F8F9FA',
+    padding: 16,
+    borderRadius: 12,
   },
   stepNumber: {
     width: 40,
@@ -190,6 +197,13 @@ const styles = StyleSheet.create({
   stepDescription: {
     fontSize: 14,
     color: '#666',
+  },
+  checkmark: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
   },
   getStartedButton: {
     backgroundColor: '#4A90E2',

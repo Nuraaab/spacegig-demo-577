@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Switch, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Home, Building, Building2, MapPin, Bed, Bath, HomeIcon, Maximize, Sparkles, Image as ImageIcon, FileText, DollarSign, CheckCircle2 } from 'lucide-react-native';
+import { ChevronLeft, Home, Building, Building2, MapPin, Bed, Bath, HomeIcon, Maximize, Sparkles, Image as ImageIcon, FileText, DollarSign, CheckCircle2, Briefcase } from 'lucide-react-native';
 import { useRef } from 'react';
 import { useListing } from '@/contexts/ListingContext';
 import { PROPERTY_TYPES, AMENITIES } from '@/mocks/properties';
@@ -28,7 +28,7 @@ export default function CreateListingSteps() {
     ]).start(callback);
   };
 
-  const totalSteps = 7;
+  const totalSteps = 8;
   const progress = (currentStep / totalSteps) * 100;
 
   const handleNext = () => {
@@ -66,7 +66,39 @@ export default function CreateListingSteps() {
       case 1:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepLabel}>STEP 1 OF {totalSteps}</Text>
+            <Text style={styles.stepTitle}>What are you posting?</Text>
+            <Text style={styles.stepSubtitle}>Choose the type of listing you want to create</Text>
+
+            <View style={styles.optionsGrid}>
+              <TouchableOpacity
+                style={[
+                  styles.optionCard,
+                  formData.listingCategory === 'property' && styles.optionCardSelected,
+                ]}
+                onPress={() => updateFormData({ listingCategory: 'property' })}
+              >
+                <Home size={48} color="#4A90E2" />
+                <Text style={styles.optionText}>Property</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.optionCard,
+                  formData.listingCategory === 'job' && styles.optionCardSelected,
+                ]}
+                onPress={() => updateFormData({ listingCategory: 'job' })}
+              >
+                <Briefcase size={48} color="#4A90E2" />
+                <Text style={styles.optionText}>Job</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+
+      case 2:
+        return (
+          <View style={styles.stepContainer}>
+            <Text style={styles.stepLabel}>STEP 2 OF {totalSteps}</Text>
             <Text style={styles.stepTitle}>What type of property?</Text>
             <Text style={styles.stepSubtitle}>Choose the property type you&apos;re listing</Text>
 
@@ -112,10 +144,10 @@ export default function CreateListingSteps() {
           </View>
         );
 
-      case 2:
+      case 3:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepLabel}>STEP 2 OF {totalSteps}</Text>
+            <Text style={styles.stepLabel}>STEP 3 OF {totalSteps}</Text>
             <Text style={styles.stepTitle}>Property specifications</Text>
             <Text style={styles.stepSubtitle}>Tell us about the size and features</Text>
 
@@ -193,10 +225,10 @@ export default function CreateListingSteps() {
           </View>
         );
 
-      case 3:
+      case 4:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepLabel}>STEP 3 OF {totalSteps}</Text>
+            <Text style={styles.stepLabel}>STEP 4 OF {totalSteps}</Text>
             <Text style={styles.stepTitle}>Location & Price</Text>
             <Text style={styles.stepSubtitle}>Where is your property located and what&apos;s the price?</Text>
 
@@ -224,10 +256,10 @@ export default function CreateListingSteps() {
           </View>
         );
 
-      case 4:
+      case 5:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepLabel}>STEP 4 OF {totalSteps}</Text>
+            <Text style={styles.stepLabel}>STEP 5 OF {totalSteps}</Text>
             <Text style={styles.stepTitle}>Describe your property</Text>
             <Text style={styles.stepSubtitle}>
               Write a detailed description that highlights the best features of your property
@@ -262,10 +294,10 @@ export default function CreateListingSteps() {
           </View>
         );
 
-      case 5:
+      case 6:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepLabel}>STEP 5 OF {totalSteps}</Text>
+            <Text style={styles.stepLabel}>STEP 6 OF {totalSteps}</Text>
             <Text style={styles.stepTitle}>What amenities do you offer?</Text>
             <Text style={styles.stepSubtitle}>Select all the amenities available at your property</Text>
 
@@ -300,10 +332,10 @@ export default function CreateListingSteps() {
           </View>
         );
 
-      case 6:
+      case 7:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepLabel}>STEP 6 OF {totalSteps}</Text>
+            <Text style={styles.stepLabel}>STEP 7 OF {totalSteps}</Text>
             <Text style={styles.stepTitle}>Provide a few final details</Text>
             <Text style={styles.stepSubtitle}>What&apos;s your residential address?</Text>
             <Text style={styles.privacyNote}>Guests won&apos;t see this information.</Text>
@@ -363,10 +395,10 @@ export default function CreateListingSteps() {
           </View>
         );
 
-      case 7:
+      case 8:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepLabel}>STEP 7 OF {totalSteps}</Text>
+            <Text style={styles.stepLabel}>STEP 8 OF {totalSteps}</Text>
             <Text style={styles.stepTitle}>Review and publish</Text>
             <Text style={styles.stepSubtitle}>Review your listing before publishing</Text>
 
