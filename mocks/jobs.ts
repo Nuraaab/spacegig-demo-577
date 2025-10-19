@@ -57,6 +57,17 @@ export interface JobOpening {
   featured?: boolean;
 }
 
+export type BoostTier = 'none' | 'basic' | 'featured' | 'premium';
+
+export interface BoostDetails {
+  tier: BoostTier;
+  startDate?: string;
+  endDate?: string;
+  impressions?: number;
+  views?: number;
+  cost?: number;
+}
+
 export interface Job {
   id: string;
   title: string;
@@ -77,6 +88,8 @@ export interface Job {
   benefits: string[];
   images: string[];
   featured: boolean;
+  boost?: BoostDetails;
+  ownerId?: string;
 }
 
 export const mockJobs: Job[] = [

@@ -3,6 +3,17 @@ import { Wifi, Tv, UtensilsCrossed, WashingMachine, Car, Wind, Flame, Waves, Dum
 export type PropertyType = 'house' | 'apartment' | 'condo' | 'land' | 'commercial' | 'basement' | 'room';
 export type ListingType = 'rent' | 'sale';
 
+export type BoostTier = 'none' | 'basic' | 'featured' | 'premium';
+
+export interface BoostDetails {
+  tier: BoostTier;
+  startDate?: string;
+  endDate?: string;
+  impressions?: number;
+  views?: number;
+  cost?: number;
+}
+
 export interface Property {
   id: string;
   title: string;
@@ -32,6 +43,8 @@ export interface Property {
   is_deal: boolean;
   is_new: boolean;
   listed_at: string;
+  boost?: BoostDetails;
+  ownerId?: string;
 }
 
 export const AMENITIES = [

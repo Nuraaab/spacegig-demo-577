@@ -30,6 +30,10 @@ import {
   Home,
   Home as HomeIcon,
   Trees,
+  TrendingUp,
+  Zap,
+  Crown,
+  Eye,
 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
@@ -196,6 +200,56 @@ export default function PropertyDetailScreen() {
               })}
             </View>
           </View>
+
+          {property.boost && property.boost.tier !== 'none' && (
+            <View style={styles.boostSection}>
+              <View style={styles.boostHeader}>
+                <View style={[styles.boostBadge, styles[`boost${property.boost.tier.charAt(0).toUpperCase() + property.boost.tier.slice(1)}` as keyof typeof styles]]}>
+                  {property.boost.tier === 'basic' && <TrendingUp size={16} color="#4A90E2" />}
+                  {property.boost.tier === 'featured' && <Zap size={16} color="#F59E0B" />}
+                  {property.boost.tier === 'premium' && <Crown size={16} color="#8B5CF6" />}
+                  <Text style={[styles.boostBadgeText, styles[`boost${property.boost.tier.charAt(0).toUpperCase() + property.boost.tier.slice(1)}Text` as keyof typeof styles]]}>
+                    {property.boost.tier.charAt(0).toUpperCase() + property.boost.tier.slice(1)} Boost
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.boostAnalyticsButton}
+                  onPress={() => console.log('View analytics')}
+                >
+                  <Eye size={16} color="#666" />
+                  <Text style={styles.boostAnalyticsText}>
+                    {property.boost.views || 0} views
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.boostStats}>
+                <View style={styles.boostStat}>
+                  <Text style={styles.boostStatLabel}>Impressions</Text>
+                  <Text style={styles.boostStatValue}>{property.boost.impressions || 0}</Text>
+                </View>
+                <View style={styles.boostStat}>
+                  <Text style={styles.boostStatLabel}>Active Until</Text>
+                  <Text style={styles.boostStatValue}>
+                    {property.boost.endDate ? new Date(property.boost.endDate).toLocaleDateString() : 'N/A'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={styles.boostListingButton}
+            onPress={() => {
+              if (!isAuthenticated) {
+                router.push('/auth');
+              } else {
+                console.log('Boost listing');
+              }
+            }}
+          >
+            <TrendingUp size={20} color="#fff" />
+            <Text style={styles.boostListingButtonText}>Boost This Listing</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.contactButton}
@@ -425,5 +479,103 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     color: '#666',
+  },
+  boostSection: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  boostHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  boostBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+  },
+  boostBasic: {
+    backgroundColor: '#EFF6FF',
+  },
+  boostFeatured: {
+    backgroundColor: '#FEF3C7',
+  },
+  boostPremium: {
+    backgroundColor: '#F3E8FF',
+  },
+  boostBadgeText: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+  },
+  boostBasicText: {
+    color: '#4A90E2',
+  },
+  boostFeaturedText: {
+    color: '#F59E0B',
+  },
+  boostPremiumText: {
+    color: '#8B5CF6',
+  },
+  boostAnalyticsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+  },
+  boostAnalyticsText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  boostStats: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  boostStat: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 12,
+  },
+  boostStatLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  boostStatValue: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+  },
+  boostListingButton: {
+    backgroundColor: '#10B981',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 12,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  boostListingButtonText: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: '#fff',
   },
 });
