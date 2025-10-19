@@ -67,7 +67,10 @@ export default function ProfileScreen() {
             <ChevronRight size={20} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => router.push('/my-listings' as any)}
+          >
             <Home size={20} color="#666" />
             <Text style={styles.menuItemText}>My Listings</Text>
             <ChevronRight size={20} color="#999" />
