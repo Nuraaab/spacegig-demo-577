@@ -244,7 +244,7 @@ export default function JobDetailScreen() {
 
           <TouchableOpacity 
             style={styles.boostListingButton}
-            onPress={() => console.log('Boost job listing')}
+            onPress={() => router.push(`/boost-listing?id=${id}&type=jobs` as any)}
             activeOpacity={0.8}
           >
             <TrendingUp size={20} color="#fff" />
