@@ -84,7 +84,7 @@ export default function MyListingsScreen() {
 
   const handleBoostPress = (listing: Property | Job) => {
     setSelectedListing(listing);
-    setBoostModalVisible(true);
+    router.push(`/boost-listing?id=${listing.id}&type=${activeTab}` as any);
   };
 
   const handleConfirmBoost = () => {
