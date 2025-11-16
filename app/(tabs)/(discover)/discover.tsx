@@ -27,7 +27,7 @@ export default function DiscoverScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('swipe');
-  const [selectedTab, setSelectedTab] = useState<'explore' | 'social' | 'dating'>('explore');
+
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
   const viewModeButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -235,44 +235,6 @@ export default function DiscoverScreen() {
           />
           <TouchableOpacity onPress={() => setShowFilters(true)}>
             <SlidersHorizontal size={20} color="#666" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity
-            style={styles.tabButton}
-            onPress={() => setSelectedTab('explore')}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.tabIcon, selectedTab === 'explore' && styles.tabIconActive]}>
-              <Search size={20} color={selectedTab === 'explore' ? '#FF6B6B' : '#999'} />
-            </View>
-            <Text style={[styles.tabText, selectedTab === 'explore' && styles.tabTextActive]}>Explore</Text>
-            {selectedTab === 'explore' && <View style={styles.tabIndicator} />}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.tabButton}
-            onPress={() => setSelectedTab('social')}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.tabIcon, selectedTab === 'social' && styles.tabIconActive]}>
-              <Users size={20} color={selectedTab === 'social' ? '#FF6B6B' : '#999'} />
-            </View>
-            <Text style={[styles.tabText, selectedTab === 'social' && styles.tabTextActive]}>Social</Text>
-            {selectedTab === 'social' && <View style={styles.tabIndicator} />}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.tabButton}
-            onPress={() => setSelectedTab('dating')}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.tabIcon, selectedTab === 'dating' && styles.tabIconActive]}>
-              <Heart size={20} color={selectedTab === 'dating' ? '#FF6B6B' : '#999'} />
-            </View>
-            <Text style={[styles.tabText, selectedTab === 'dating' && styles.tabTextActive]}>Dating</Text>
-            {selectedTab === 'dating' && <View style={styles.tabIndicator} />}
           </TouchableOpacity>
         </View>
 
@@ -728,45 +690,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#1a1a1a',
   },
-  tabsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingBottom: 12,
-    marginBottom: 16,
-  },
-  tabButton: {
-    alignItems: 'center',
-    gap: 8,
-    position: 'relative' as const,
-  },
-  tabIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f5f5f5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tabIconActive: {
-    backgroundColor: '#FFE8E8',
-  },
-  tabText: {
-    fontSize: 13,
-    color: '#999',
-    fontWeight: '500' as const,
-  },
-  tabTextActive: {
-    color: '#1a1a1a',
-    fontWeight: '600' as const,
-  },
-  tabIndicator: {
-    position: 'absolute' as const,
-    bottom: -12,
-    width: 48,
-    height: 3,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 2,
-  },
+
   categoriesSection: {
     paddingBottom: 16,
   },
