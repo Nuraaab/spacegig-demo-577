@@ -70,7 +70,7 @@ function CategoryItem({ category, isSelected, onPress }: CategoryItemProps) {
         ]}>
           <Icon
             size={24}
-            color={isSelected ? '#fff' : '#0A5C36'}
+            color={isSelected ? '#fff' : '#2f95dc'}
           />
         </View>
         <View style={styles.categoryTextContainer}>
@@ -299,7 +299,7 @@ export default function DiscoverScreen() {
 
         <View style={styles.categoriesSection}>
           <View style={styles.categoriesHeader}>
-            <Grid3x3 size={18} color="#0A5C36" />
+            <Grid3x3 size={18} color="#2f95dc" />
             <Text style={styles.categoriesTitle}>Categories</Text>
           </View>
 
@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
   categoriesTitle: {
     fontSize: 18,
     fontWeight: '700' as const,
-    color: '#0A5C36',
+    color: '#2f95dc',
   },
   categoriesScrollContent: {
     paddingRight: 20,
@@ -753,7 +753,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     gap: 12,
     borderWidth: 2,
-    borderColor: '#E8F5F0',
+    borderColor: '#E8F4FF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -761,9 +761,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   categoryCardActive: {
-    backgroundColor: '#0A5C36',
-    borderColor: '#0A5C36',
-    shadowColor: '#0A5C36',
+    backgroundColor: '#2f95dc',
+    borderColor: '#2f95dc',
+    shadowColor: '#2f95dc',
     shadowOpacity: 0.25,
     shadowRadius: 12,
     elevation: 6,
@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#E8F5F0',
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -785,7 +785,7 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontSize: 16,
     fontWeight: '700' as const,
-    color: '#0A5C36',
+    color: '#2f95dc',
     marginBottom: 2,
   },
   categoryLabelActive: {
