@@ -1,5 +1,5 @@
 import { Tabs, useRouter } from "expo-router";
-import { Home, Heart, User, Users, Plus, List } from "lucide-react-native";
+import { Home, User, Users, Plus, List } from "lucide-react-native";
 import { StyleSheet, Animated, View } from "react-native";
 import { useRef } from "react";
 
@@ -55,13 +55,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <List size={24} color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="favorites"
-        options={{
-          title: "Favorites",
-          tabBarIcon: ({ color }) => <Heart size={24} color={color} />,
-        }}
-      />
+
       <Tabs.Screen
         name="add-job"
         options={{
