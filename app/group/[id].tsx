@@ -53,6 +53,9 @@ export default function GroupDetailScreen() {
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [selectedProfile, setSelectedProfile] = useState<typeof mockCommunityUsers[0] | null>(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(0);
+  const [likedMembers, setLikedMembers] = useState<Set<string>>(new Set());
+  const [nudgedMembers, setNudgedMembers] = useState<Set<string>>(new Set());
+  const [superLikedMembers, setSuperLikedMembers] = useState<Set<string>>(new Set());
   const [editData, setEditData] = useState({
     name: '',
     description: '',
@@ -104,15 +107,33 @@ export default function GroupDetailScreen() {
   const handleLike = async (memberId: string, memberName: string) => {
     if (user) {
       await likeUser(user.id, memberId);
-      triggerConfetti(memberId);
+      setLikedMembers(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(memberId)) {
+          newSet.delete(memberId);
+        } else {
+          newSet.add(memberId);
+          triggerConfetti(memberId);
+        }
+        return newSet;
+      });
     }
   };
 
   const handleNudge = async (memberId: string, memberName: string) => {
     if (user) {
       try {
-        await nudgeUser(user.id, memberId);
-        triggerConfetti(memberId);
+        if (nudgedMembers.has(memberId)) {
+          setNudgedMembers(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(memberId);
+            return newSet;
+          });
+        } else {
+          await nudgeUser(user.id, memberId);
+          setNudgedMembers(prev => new Set(prev).add(memberId));
+          triggerConfetti(memberId);
+        }
       } catch {
         Alert.alert('Error', 'No nudges remaining this month');
       }
@@ -122,7 +143,16 @@ export default function GroupDetailScreen() {
   const handleSuperLike = async (memberId: string, memberName: string) => {
     if (user) {
       await likeUser(user.id, memberId);
-      triggerConfetti(memberId);
+      setSuperLikedMembers(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(memberId)) {
+          newSet.delete(memberId);
+        } else {
+          newSet.add(memberId);
+          triggerConfetti(memberId);
+        }
+        return newSet;
+      });
     }
   };
 
@@ -269,29 +299,86 @@ export default function GroupDetailScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={[
+                    styles.actionButton,
+                    nudgedMembers.has(member.id) && styles.actionButtonActive,
+                  ]}
                   onPress={() => handleNudge(member.id, member.name)}
                   activeOpacity={0.7}
                 >
-                  <Zap size={16} color="#f59e0b" />
+                  <Animated.View
+                    style={{
+                      transform: [
+                        {
+                          scale: confettiAnimations[member.id]
+                            ? 1.2
+                            : 1,
+                        },
+                      ],
+                    }}
+                  >
+                    <Zap
+                      size={16}
+                      color="#f59e0b"
+                      fill={nudgedMembers.has(member.id) ? '#f59e0b' : 'transparent'}
+                    />
+                  </Animated.View>
                   {confettiAnimations[member.id] && <ConfettiAnimation />}
                 </TouchableOpacity>
                 
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={[
+                    styles.actionButton,
+                    likedMembers.has(member.id) && styles.actionButtonActive,
+                  ]}
                   onPress={() => handleLike(member.id, member.name)}
                   activeOpacity={0.7}
                 >
-                  <Heart size={16} color="#f43f5e" />
+                  <Animated.View
+                    style={{
+                      transform: [
+                        {
+                          scale: confettiAnimations[member.id]
+                            ? 1.2
+                            : 1,
+                        },
+                      ],
+                    }}
+                  >
+                    <Heart
+                      size={16}
+                      color="#f43f5e"
+                      fill={likedMembers.has(member.id) ? '#f43f5e' : 'transparent'}
+                    />
+                  </Animated.View>
                   {confettiAnimations[member.id] && <ConfettiAnimation />}
                 </TouchableOpacity>
                 
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={[
+                    styles.actionButton,
+                    superLikedMembers.has(member.id) && styles.actionButtonActive,
+                  ]}
                   onPress={() => handleSuperLike(member.id, member.name)}
                   activeOpacity={0.7}
                 >
-                  <Sparkles size={16} color="#8b5cf6" />
+                  <Animated.View
+                    style={{
+                      transform: [
+                        {
+                          scale: confettiAnimations[member.id]
+                            ? 1.2
+                            : 1,
+                        },
+                      ],
+                    }}
+                  >
+                    <Sparkles
+                      size={16}
+                      color="#8b5cf6"
+                      fill={superLikedMembers.has(member.id) ? '#8b5cf6' : 'transparent'}
+                    />
+                  </Animated.View>
                   {confettiAnimations[member.id] && <ConfettiAnimation />}
                 </TouchableOpacity>
               </View>
@@ -865,6 +952,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative' as const,
+  },
+  actionButtonActive: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   errorContainer: {
     flex: 1,
