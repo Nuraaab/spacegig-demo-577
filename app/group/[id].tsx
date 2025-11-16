@@ -50,6 +50,9 @@ export default function GroupDetailScreen() {
   const [messageInput, setMessageInput] = useState<string>('');
   const [messages, setMessages] = useState<Array<{ id: string; text: string; sent: boolean }>>([]);
   const [confettiAnimations, setConfettiAnimations] = useState<{ [key: string]: boolean }>({});
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+  const [selectedProfile, setSelectedProfile] = useState<typeof mockCommunityUsers[0] | null>(null);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(0);
   const [editData, setEditData] = useState({
     name: '',
     description: '',
@@ -139,6 +142,34 @@ export default function GroupDetailScreen() {
     setShowChatModal(true);
   };
 
+  const handleProfileTap = (member: typeof mockCommunityUsers[0]) => {
+    setSelectedProfile(member);
+    setCurrentPhotoIndex(0);
+    setShowProfileModal(true);
+  };
+
+  const handleNextPhoto = () => {
+    if (selectedProfile) {
+      const photos = getProfilePhotos(selectedProfile);
+      setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
+    }
+  };
+
+  const handlePrevPhoto = () => {
+    if (selectedProfile) {
+      const photos = getProfilePhotos(selectedProfile);
+      setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+    }
+  };
+
+  const getProfilePhotos = (user: typeof mockCommunityUsers[0]) => {
+    return [
+      user.avatar,
+      'https://i.pravatar.cc/400?img=' + (parseInt(user.id) + 10),
+      'https://i.pravatar.cc/400?img=' + (parseInt(user.id) + 20),
+    ];
+  };
+
   const sendMessage = () => {
     if (messageInput.trim() === '') return;
     const newMessage = {
@@ -218,7 +249,9 @@ export default function GroupDetailScreen() {
 
           {members.map((member) => (
             <View key={member.id} style={styles.memberCard}>
-              <Image source={{ uri: member.avatar }} style={styles.memberAvatar} />
+              <TouchableOpacity onPress={() => handleProfileTap(member)} activeOpacity={0.8}>
+                <Image source={{ uri: member.avatar }} style={styles.memberAvatar} />
+              </TouchableOpacity>
               <View style={styles.memberInfo}>
                 <Text style={styles.memberName}>{member.name}</Text>
                 <Text style={styles.memberBio} numberOfLines={1}>
@@ -228,11 +261,11 @@ export default function GroupDetailScreen() {
 
               <View style={styles.memberActions}>
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={styles.hiButton}
                   onPress={() => handleSayHi({ id: member.id, name: member.name, avatar: member.avatar })}
                   activeOpacity={0.7}
                 >
-                  <MessageCircle size={16} color="#4A90E2" />
+                  <Text style={styles.hiButtonText}>Hi 👋</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -451,6 +484,126 @@ export default function GroupDetailScreen() {
               <Send size={20} color="#fff" />
             </TouchableOpacity>
           </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showProfileModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowProfileModal(false)}
+      >
+        <View style={styles.profileModalOverlay}>
+          <TouchableOpacity 
+            style={styles.profileModalCloseArea}
+            activeOpacity={1}
+            onPress={() => setShowProfileModal(false)}
+          />
+          <View style={styles.profileModalContent}>
+            {selectedProfile && (
+              <>
+                <View style={styles.profilePhotoContainer}>
+                  <Image 
+                    source={{ uri: getProfilePhotos(selectedProfile)[currentPhotoIndex] }} 
+                    style={styles.profilePhoto}
+                    resizeMode="cover"
+                  />
+                  
+                  {getProfilePhotos(selectedProfile).length > 1 && (
+                    <>
+                      <TouchableOpacity
+                        style={[styles.photoNavButton, styles.photoNavLeft]}
+                        onPress={handlePrevPhoto}
+                        activeOpacity={0.8}
+                      >
+                        <ArrowLeft size={24} color="#fff" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.photoNavButton, styles.photoNavRight]}
+                        onPress={handleNextPhoto}
+                        activeOpacity={0.8}
+                      >
+                        <ArrowLeft size={24} color="#fff" style={{ transform: [{ rotate: '180deg' }] }} />
+                      </TouchableOpacity>
+                    </>
+                  )}
+                  
+                  {getProfilePhotos(selectedProfile).length > 1 && (
+                    <View style={styles.photoIndicators}>
+                      {getProfilePhotos(selectedProfile).map((_, index) => (
+                        <View
+                          key={index}
+                          style={[
+                            styles.photoIndicator,
+                            index === currentPhotoIndex && styles.photoIndicatorActive,
+                          ]}
+                        />
+                      ))}
+                    </View>
+                  )}
+                  
+                  <TouchableOpacity
+                    style={styles.profileCloseButton}
+                    onPress={() => setShowProfileModal(false)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.profileCloseButtonText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.profileInfoSection}>
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    <Text style={styles.profileModalName}>{selectedProfile.name}</Text>
+                    <Text style={styles.profileModalLocation}>{selectedProfile.location}</Text>
+                    
+                    <View style={styles.profileSection}>
+                      <Text style={styles.profileSectionTitle}>About</Text>
+                      <Text style={styles.profileSectionText}>{selectedProfile.bio}</Text>
+                    </View>
+
+                    {selectedProfile.interests && selectedProfile.interests.length > 0 && (
+                      <View style={styles.profileSection}>
+                        <Text style={styles.profileSectionTitle}>Interests</Text>
+                        <View style={styles.tagsContainer}>
+                          {selectedProfile.interests.map((interest, index) => (
+                            <View key={index} style={styles.tag}>
+                              <Text style={styles.tagText}>{interest}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    )}
+
+                    {selectedProfile.skills && selectedProfile.skills.length > 0 && (
+                      <View style={styles.profileSection}>
+                        <Text style={styles.profileSectionTitle}>Skills</Text>
+                        <View style={styles.tagsContainer}>
+                          {selectedProfile.skills.map((skill, index) => (
+                            <View key={index} style={[styles.tag, styles.tagSkill]}>
+                              <Text style={[styles.tagText, styles.tagTextSkill]}>{skill}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    )}
+
+                    {selectedProfile.industries && selectedProfile.industries.length > 0 && (
+                      <View style={styles.profileSection}>
+                        <Text style={styles.profileSectionTitle}>Industries</Text>
+                        <View style={styles.tagsContainer}>
+                          {selectedProfile.industries.map((industry, index) => (
+                            <View key={index} style={styles.tag}>
+                              <Text style={styles.tagText}>{industry}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    )}
+                  </ScrollView>
+                </View>
+              </>
+            )}
+          </View>
         </View>
       </Modal>
     </View>
@@ -693,6 +846,17 @@ const styles = StyleSheet.create({
     gap: 8,
     alignItems: 'center',
   },
+  hiButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 18,
+    backgroundColor: '#4A90E2',
+  },
+  hiButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#fff',
+  },
   actionButton: {
     width: 36,
     height: 36,
@@ -925,5 +1089,138 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
+  },
+  profileModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileModalCloseArea: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  profileModalContent: {
+    width: '90%',
+    maxWidth: 500,
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    overflow: 'hidden',
+    maxHeight: '85%',
+  },
+  profilePhotoContainer: {
+    width: '100%',
+    height: 400,
+    position: 'relative' as const,
+  },
+  profilePhoto: {
+    width: '100%',
+    height: '100%',
+  },
+  photoNavButton: {
+    position: 'absolute' as const,
+    top: '50%',
+    transform: [{ translateY: -22 }],
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photoNavLeft: {
+    left: 16,
+  },
+  photoNavRight: {
+    right: 16,
+  },
+  photoIndicators: {
+    position: 'absolute' as const,
+    bottom: 16,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  photoIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  photoIndicatorActive: {
+    backgroundColor: '#fff',
+    width: 24,
+  },
+  profileCloseButton: {
+    position: 'absolute' as const,
+    top: 16,
+    right: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileCloseButtonText: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: '300' as const,
+  },
+  profileInfoSection: {
+    padding: 20,
+    maxHeight: 300,
+  },
+  profileModalName: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  profileModalLocation: {
+    fontSize: 15,
+    color: '#666',
+    marginBottom: 20,
+  },
+  profileSection: {
+    marginBottom: 20,
+  },
+  profileSectionTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginBottom: 8,
+  },
+  profileSectionText: {
+    fontSize: 15,
+    color: '#666',
+    lineHeight: 22,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#E8F4FF',
+  },
+  tagSkill: {
+    backgroundColor: '#f0fdf4',
+  },
+  tagText: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    color: '#4A90E2',
+  },
+  tagTextSkill: {
+    color: '#10b981',
   },
 });
