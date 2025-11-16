@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,9 +19,78 @@ import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
-const DIAL_RADIUS = 180;
-const DIAL_SIZE = 340;
-const CATEGORY_SIZE = 70;
+
+interface CategoryItemProps {
+  category: { key: string; icon: any; label: string; count: string };
+  isSelected: boolean;
+  onPress: () => void;
+}
+
+function CategoryItem({ category, isSelected, onPress }: CategoryItemProps) {
+  const Icon = category.icon;
+  const slideAnim = useRef(new Animated.Value(isSelected ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(slideAnim, {
+      toValue: isSelected ? 1 : 0,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 7,
+    }).start();
+  }, [isSelected, slideAnim]);
+
+  const scale = slideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.95, 1],
+  });
+
+  const translateY = slideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -4],
+  });
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={onPress}
+      style={styles.categoryItem}
+    >
+      <Animated.View
+        style={[
+          styles.categoryCard,
+          isSelected && styles.categoryCardActive,
+          {
+            transform: [{ scale }, { translateY }],
+          },
+        ]}
+      >
+        <View style={[
+          styles.categoryIconContainer,
+          isSelected && styles.categoryIconContainerActive,
+        ]}>
+          <Icon
+            size={24}
+            color={isSelected ? '#fff' : '#0A5C36'}
+          />
+        </View>
+        <View style={styles.categoryTextContainer}>
+          <Text style={[
+            styles.categoryLabel,
+            isSelected && styles.categoryLabelActive,
+          ]}>
+            {category.label}
+          </Text>
+          <Text style={[
+            styles.categoryCount,
+            isSelected && styles.categoryCountActive,
+          ]}>
+            {category.count}
+          </Text>
+        </View>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
 
 export default function DiscoverScreen() {
   const router = useRouter();
@@ -29,13 +98,9 @@ export default function DiscoverScreen() {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('stack');
+  const viewMode = 'stack';
 
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
-  const dialRotation = useRef(new Animated.Value(0)).current;
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const dragPosition = useRef({ x: 0, y: 0 });
-  const lastAngle = useRef(0);
 
   const [filters, setFilters] = useState({
     propertyTypes: [] as PropertyType[],
@@ -116,59 +181,6 @@ export default function DiscoverScreen() {
     { key: 'rooms', icon: HomeIcon, label: 'Rooms', count: '124 listings' },
     { key: 'apartments', icon: LayoutGrid, label: 'Apartments', count: '30 listings' },
   ];
-
-  useEffect(() => {
-    const targetRotation = -currentIndex * (360 / categories.length);
-    Animated.spring(dialRotation, {
-      toValue: targetRotation,
-      useNativeDriver: true,
-      tension: 40,
-      friction: 7,
-    }).start();
-  }, [currentIndex]);
-
-  const rotateDialBy = (delta: number) => {
-    const newIndex = (currentIndex + delta + categories.length) % categories.length;
-    setCurrentIndex(newIndex);
-    setSelectedCategory(categories[newIndex].key as any);
-  };
-
-  const dialPanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (_, gesture) => {
-        dragPosition.current = { x: gesture.x0, y: gesture.y0 };
-        const centerX = SCREEN_WIDTH / 2;
-        const centerY = DIAL_SIZE / 2;
-        const deltaX = dragPosition.current.x - centerX;
-        const deltaY = dragPosition.current.y - centerY;
-        lastAngle.current = Math.atan2(deltaY, deltaX);
-      },
-      onPanResponderMove: (_, gesture) => {
-        const centerX = SCREEN_WIDTH / 2;
-        const centerY = DIAL_SIZE / 2;
-        const deltaX = (dragPosition.current.x + gesture.dx) - centerX;
-        const deltaY = (dragPosition.current.y + gesture.dy) - centerY;
-        const currentAngle = Math.atan2(deltaY, deltaX);
-        const angleDelta = currentAngle - lastAngle.current;
-        
-        dialRotation.setValue(dialRotation._value + (angleDelta * 180 / Math.PI) * 1.5);
-        lastAngle.current = currentAngle;
-      },
-      onPanResponderRelease: (_, gesture) => {
-        const velocity = Math.sqrt(gesture.vx * gesture.vx + gesture.vy * gesture.vy);
-        const currentRotation = dialRotation._value;
-        const segmentAngle = 360 / categories.length;
-        
-        let targetIndex = Math.round(-currentRotation / segmentAngle) % categories.length;
-        if (targetIndex < 0) targetIndex += categories.length;
-        
-        setCurrentIndex(targetIndex);
-        setSelectedCategory(categories[targetIndex].key as any);
-      },
-    })
-  ).current;
 
   const handleSwipeComplete = (direction: 'left' | 'right') => {
     if (direction === 'right' && property) {
@@ -291,107 +303,20 @@ export default function DiscoverScreen() {
             <Text style={styles.categoriesTitle}>Categories</Text>
           </View>
 
-          <View style={styles.dialContainer} {...dialPanResponder.panHandlers}>
-            <View style={styles.dialBackground}>
-              <View style={styles.dialRing} />
-              <View style={styles.dialCenter} />
-              <View style={styles.dialMarker} />
-            </View>
-
-            <Animated.View
-              style={[
-                styles.dialRotator,
-                {
-                  transform: [
-                    { rotate: dialRotation.interpolate({
-                      inputRange: [-360, 0, 360],
-                      outputRange: ['-360deg', '0deg', '360deg'],
-                    }) },
-                  ],
-                },
-              ]}
-            >
-              {categories.map((category, index) => {
-                const angle = (index * 360) / categories.length;
-                const radian = (angle * Math.PI) / 180;
-                const x = Math.cos(radian) * DIAL_RADIUS;
-                const y = Math.sin(radian) * DIAL_RADIUS;
-
-                const rotation = dialRotation.interpolate({
-                  inputRange: [-360, 0, 360],
-                  outputRange: ['360deg', '0deg', '-360deg'],
-                });
-
-                const isCenter = currentIndex === index;
-                const distanceFromCenter = Math.abs((currentIndex - index + categories.length) % categories.length);
-                const normalizedDistance = Math.min(distanceFromCenter, categories.length - distanceFromCenter);
-
-                const scale = dialRotation.interpolate({
-                  inputRange: [
-                    -(index + 1) * (360 / categories.length),
-                    -index * (360 / categories.length),
-                    -(index - 1) * (360 / categories.length),
-                  ],
-                  outputRange: [0.7, 1.3, 0.7],
-                  extrapolate: 'clamp',
-                });
-
-                const opacity = dialRotation.interpolate({
-                  inputRange: [
-                    -(index + 1) * (360 / categories.length),
-                    -index * (360 / categories.length),
-                    -(index - 1) * (360 / categories.length),
-                  ],
-                  outputRange: [0.4, 1, 0.4],
-                  extrapolate: 'clamp',
-                });
-
-                const Icon = category.icon;
-
-                return (
-                  <TouchableOpacity
-                    key={category.key}
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      setCurrentIndex(index);
-                      setSelectedCategory(category.key as any);
-                    }}
-                    style={[
-                      styles.dialItem,
-                      {
-                        left: DIAL_SIZE / 2 + x - CATEGORY_SIZE / 2,
-                        top: DIAL_SIZE / 2 + y - CATEGORY_SIZE / 2,
-                      },
-                    ]}
-                  >
-                    <Animated.View
-                      style={[
-                        styles.categoryCircle,
-                        isCenter && styles.categoryCircleActive,
-                        {
-                          transform: [
-                            { rotate: rotation },
-                            { scale },
-                          ],
-                          opacity,
-                        },
-                      ]}
-                    >
-                      <Icon
-                        size={isCenter ? 32 : 24}
-                        color={isCenter ? '#fff' : '#0A5C36'}
-                      />
-                    </Animated.View>
-                  </TouchableOpacity>
-                );
-              })}
-            </Animated.View>
-
-            <View style={styles.dialInfo}>
-              <Text style={styles.dialLabel}>{categories[currentIndex].label}</Text>
-              <Text style={styles.dialCount}>{categories[currentIndex].count}</Text>
-            </View>
-          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesScrollContent}
+          >
+            {categories.map((category) => (
+              <CategoryItem
+                key={category.key}
+                category={category}
+                isSelected={selectedCategory === category.key}
+                onPress={() => setSelectedCategory(category.key as any)}
+              />
+            ))}
+          </ScrollView>
         </View>
       </View>
 
@@ -805,111 +730,74 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   categoriesTitle: {
     fontSize: 18,
     fontWeight: '700' as const,
     color: '#0A5C36',
   },
-  dialContainer: {
-    height: DIAL_SIZE,
-    width: '100%',
-    justifyContent: 'center',
+  categoriesScrollContent: {
+    paddingRight: 20,
+    gap: 12,
+  },
+  categoryItem: {
+    marginRight: 12,
+  },
+  categoryCard: {
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
-  },
-  dialBackground: {
-    position: 'absolute',
-    width: DIAL_SIZE,
-    height: DIAL_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dialRing: {
-    position: 'absolute',
-    width: DIAL_RADIUS * 2 + 40,
-    height: DIAL_RADIUS * 2 + 40,
-    borderRadius: (DIAL_RADIUS * 2 + 40) / 2,
-    borderWidth: 2,
-    borderColor: 'rgba(10, 92, 54, 0.15)',
-    borderStyle: 'dashed' as const,
-  },
-  dialCenter: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
     backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
-    borderWidth: 3,
-    borderColor: '#E8F5F0',
-  },
-  dialMarker: {
-    position: 'absolute',
-    top: 20,
-    width: 0,
-    height: 0,
-    borderLeftWidth: 8,
-    borderRightWidth: 8,
-    borderBottomWidth: 12,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#0A5C36',
-  },
-  dialRotator: {
-    position: 'absolute',
-    width: DIAL_SIZE,
-    height: DIAL_SIZE,
-  },
-  dialItem: {
-    position: 'absolute',
-    width: CATEGORY_SIZE,
-    height: CATEGORY_SIZE,
-  },
-  categoryCircle: {
-    width: CATEGORY_SIZE,
-    height: CATEGORY_SIZE,
-    borderRadius: CATEGORY_SIZE / 2,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    gap: 12,
     borderWidth: 2,
     borderColor: '#E8F5F0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 3,
   },
-  categoryCircleActive: {
+  categoryCardActive: {
     backgroundColor: '#0A5C36',
     borderColor: '#0A5C36',
     shadowColor: '#0A5C36',
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
-    borderWidth: 4,
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  dialInfo: {
-    position: 'absolute',
+  categoryIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#E8F5F0',
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  categoryIconContainerActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  categoryTextContainer: {
     justifyContent: 'center',
   },
-  dialLabel: {
-    fontSize: 20,
+  categoryLabel: {
+    fontSize: 16,
     fontWeight: '700' as const,
     color: '#0A5C36',
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  dialCount: {
-    fontSize: 13,
+  categoryLabelActive: {
+    color: '#fff',
+  },
+  categoryCount: {
+    fontSize: 12,
     color: '#666',
     fontWeight: '500' as const,
+  },
+  categoryCountActive: {
+    color: 'rgba(255, 255, 255, 0.8)',
   },
   filterButton: {
     width: 48,
@@ -921,7 +809,7 @@ const styles = StyleSheet.create({
   },
   card: {
     position: 'absolute',
-    top: 280,
+    top: 220,
     left: 20,
     right: 20,
     height: SCREEN_HEIGHT * 0.55,
