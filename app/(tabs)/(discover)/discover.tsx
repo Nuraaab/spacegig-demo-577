@@ -26,7 +26,7 @@ export default function DiscoverScreen() {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('swipe');
+  const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('stack');
 
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
 
