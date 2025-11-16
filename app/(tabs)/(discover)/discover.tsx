@@ -13,7 +13,7 @@ import {
   Modal,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, LayoutGrid, Grid3x3 } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, LayoutGrid, Grid3x3, Users } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -180,6 +180,7 @@ export default function DiscoverScreen() {
     { key: 'all', icon: Grid3x3, label: 'All', count: '154 listings' },
     { key: 'rooms', icon: HomeIcon, label: 'Rooms', count: '124 listings' },
     { key: 'apartments', icon: LayoutGrid, label: 'Apartments', count: '30 listings' },
+    { key: 'roommates', icon: Users, label: 'Roommates', count: 'Find matches' },
   ];
 
   const handleSwipeComplete = (direction: 'left' | 'right') => {
@@ -313,7 +314,13 @@ export default function DiscoverScreen() {
                 key={category.key}
                 category={category}
                 isSelected={selectedCategory === category.key}
-                onPress={() => setSelectedCategory(category.key as any)}
+                onPress={() => {
+                  if (category.key === 'roommates') {
+                    router.push('/roommates' as any);
+                  } else {
+                    setSelectedCategory(category.key as any);
+                  }
+                }}
               />
             ))}
           </ScrollView>
