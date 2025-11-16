@@ -204,7 +204,13 @@ export default function CommunityScreen() {
                   }}
                   activeOpacity={0.9}
                 >
-                  <Image source={{ uri: group.coverImage }} style={styles.groupImage} />
+                  {group.coverImage && group.coverImage.trim() !== '' ? (
+                    <Image source={{ uri: group.coverImage }} style={styles.groupImage} />
+                  ) : (
+                    <View style={[styles.groupImage, styles.placeholderImage]}>
+                      <Users size={40} color="#ccc" />
+                    </View>
+                  )}
                   <View style={styles.groupContent}>
                     <View style={styles.groupHeader}>
                       <Text style={styles.groupName}>{group.name}</Text>
@@ -506,6 +512,11 @@ const styles = StyleSheet.create({
   groupImage: {
     width: '100%',
     height: 140,
+  },
+  placeholderImage: {
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   groupContent: {
     padding: 16,
