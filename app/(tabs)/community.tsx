@@ -199,7 +199,7 @@ export default function CommunityScreen() {
                   style={styles.groupCard}
                   onPress={() => {
                     if (isJoined) {
-                      router.push(`/community/group/${group.id}` as any);
+                      router.push(`/group/${group.id}` as any);
                     }
                   }}
                   activeOpacity={0.9}

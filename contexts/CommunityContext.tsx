@@ -257,6 +257,18 @@ export const [CommunityProvider, useCommunity] = createContextHook(() => {
     return group ? group.adminIds.includes(userId) : false;
   }, [groups]);
 
+  const updateGroup = useCallback(async (groupId: string, updates: Partial<Omit<Group, 'id' | 'createdAt'>>) => {
+    const updatedGroups = groups.map(g => 
+      g.id === groupId ? { ...g, ...updates } : g
+    );
+    setGroups(updatedGroups);
+    await AsyncStorage.setItem('community_groups', JSON.stringify(updatedGroups));
+  }, [groups]);
+
+  const getGroup = useCallback((groupId: string) => {
+    return groups.find(g => g.id === groupId);
+  }, [groups]);
+
   return useMemo(() => ({
     groups,
     joinRequests,
@@ -272,6 +284,8 @@ export const [CommunityProvider, useCommunity] = createContextHook(() => {
     getPendingRequests,
     isGroupMember,
     isGroupAdmin,
+    updateGroup,
+    getGroup,
   }), [
     groups,
     joinRequests,
@@ -287,5 +301,7 @@ export const [CommunityProvider, useCommunity] = createContextHook(() => {
     getPendingRequests,
     isGroupMember,
     isGroupAdmin,
+    updateGroup,
+    getGroup,
   ]);
 });
