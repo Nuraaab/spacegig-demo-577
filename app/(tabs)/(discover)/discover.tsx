@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,8 +19,9 @@ import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
-const CATEGORY_ITEM_WIDTH = 160;
-const CATEGORY_SPACING = 20;
+const DIAL_RADIUS = 180;
+const DIAL_SIZE = 340;
+const CATEGORY_SIZE = 70;
 
 export default function DiscoverScreen() {
   const router = useRouter();
@@ -31,8 +32,10 @@ export default function DiscoverScreen() {
   const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('stack');
 
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const categoryScrollRef = useRef<ScrollView>(null);
+  const dialRotation = useRef(new Animated.Value(0)).current;
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const dragPosition = useRef({ x: 0, y: 0 });
+  const lastAngle = useRef(0);
 
   const [filters, setFilters] = useState({
     propertyTypes: [] as PropertyType[],
@@ -107,6 +110,65 @@ export default function DiscoverScreen() {
   }, [properties, searchQuery, filters, selectedCategory]);
 
   const property = getCurrentProperty();
+
+  const categories = [
+    { key: 'all', icon: Grid3x3, label: 'All', count: '154 listings' },
+    { key: 'rooms', icon: HomeIcon, label: 'Rooms', count: '124 listings' },
+    { key: 'apartments', icon: LayoutGrid, label: 'Apartments', count: '30 listings' },
+  ];
+
+  useEffect(() => {
+    const targetRotation = -currentIndex * (360 / categories.length);
+    Animated.spring(dialRotation, {
+      toValue: targetRotation,
+      useNativeDriver: true,
+      tension: 40,
+      friction: 7,
+    }).start();
+  }, [currentIndex]);
+
+  const rotateDialBy = (delta: number) => {
+    const newIndex = (currentIndex + delta + categories.length) % categories.length;
+    setCurrentIndex(newIndex);
+    setSelectedCategory(categories[newIndex].key as any);
+  };
+
+  const dialPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (_, gesture) => {
+        dragPosition.current = { x: gesture.x0, y: gesture.y0 };
+        const centerX = SCREEN_WIDTH / 2;
+        const centerY = DIAL_SIZE / 2;
+        const deltaX = dragPosition.current.x - centerX;
+        const deltaY = dragPosition.current.y - centerY;
+        lastAngle.current = Math.atan2(deltaY, deltaX);
+      },
+      onPanResponderMove: (_, gesture) => {
+        const centerX = SCREEN_WIDTH / 2;
+        const centerY = DIAL_SIZE / 2;
+        const deltaX = (dragPosition.current.x + gesture.dx) - centerX;
+        const deltaY = (dragPosition.current.y + gesture.dy) - centerY;
+        const currentAngle = Math.atan2(deltaY, deltaX);
+        const angleDelta = currentAngle - lastAngle.current;
+        
+        dialRotation.setValue(dialRotation._value + (angleDelta * 180 / Math.PI) * 1.5);
+        lastAngle.current = currentAngle;
+      },
+      onPanResponderRelease: (_, gesture) => {
+        const velocity = Math.sqrt(gesture.vx * gesture.vx + gesture.vy * gesture.vy);
+        const currentRotation = dialRotation._value;
+        const segmentAngle = 360 / categories.length;
+        
+        let targetIndex = Math.round(-currentRotation / segmentAngle) % categories.length;
+        if (targetIndex < 0) targetIndex += categories.length;
+        
+        setCurrentIndex(targetIndex);
+        setSelectedCategory(categories[targetIndex].key as any);
+      },
+    })
+  ).current;
 
   const handleSwipeComplete = (direction: 'left' | 'right') => {
     if (direction === 'right' && property) {
@@ -229,113 +291,107 @@ export default function DiscoverScreen() {
             <Text style={styles.categoriesTitle}>Categories</Text>
           </View>
 
-          <Animated.ScrollView
-            ref={categoryScrollRef}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesScroll}
-            snapToInterval={CATEGORY_ITEM_WIDTH + CATEGORY_SPACING}
-            decelerationRate="fast"
-            scrollEventThrottle={16}
-            onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-              { useNativeDriver: true }
-            )}
-          >
-            {[
-              { key: 'all', icon: Grid3x3, label: 'All', count: '154 listings' },
-              { key: 'rooms', icon: HomeIcon, label: 'Rooms', count: '124 listings' },
-              { key: 'apartments', icon: LayoutGrid, label: 'Apartments', count: '30 listings' },
-            ].map((category, index) => {
-              const inputRange = [
-                (index - 1) * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
-                index * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
-                (index + 1) * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
-              ];
+          <View style={styles.dialContainer} {...dialPanResponder.panHandlers}>
+            <View style={styles.dialBackground}>
+              <View style={styles.dialRing} />
+              <View style={styles.dialCenter} />
+              <View style={styles.dialMarker} />
+            </View>
 
-              const scale = scrollX.interpolate({
-                inputRange,
-                outputRange: [0.85, 1.15, 0.85],
-                extrapolate: 'clamp',
-              });
+            <Animated.View
+              style={[
+                styles.dialRotator,
+                {
+                  transform: [
+                    { rotate: dialRotation.interpolate({
+                      inputRange: [-360, 0, 360],
+                      outputRange: ['-360deg', '0deg', '360deg'],
+                    }) },
+                  ],
+                },
+              ]}
+            >
+              {categories.map((category, index) => {
+                const angle = (index * 360) / categories.length;
+                const radian = (angle * Math.PI) / 180;
+                const x = Math.cos(radian) * DIAL_RADIUS;
+                const y = Math.sin(radian) * DIAL_RADIUS;
 
-              const opacity = scrollX.interpolate({
-                inputRange,
-                outputRange: [0.5, 1, 0.5],
-                extrapolate: 'clamp',
-              });
+                const rotation = dialRotation.interpolate({
+                  inputRange: [-360, 0, 360],
+                  outputRange: [360, 0, -360],
+                });
 
-              const translateY = scrollX.interpolate({
-                inputRange,
-                outputRange: [15, 0, 15],
-                extrapolate: 'clamp',
-              });
+                const isCenter = currentIndex === index;
+                const distanceFromCenter = Math.abs((currentIndex - index + categories.length) % categories.length);
+                const normalizedDistance = Math.min(distanceFromCenter, categories.length - distanceFromCenter);
 
-              const rotateY = scrollX.interpolate({
-                inputRange,
-                outputRange: ['-25deg', '0deg', '25deg'],
-                extrapolate: 'clamp',
-              });
+                const scale = dialRotation.interpolate({
+                  inputRange: [
+                    -(index + 1) * (360 / categories.length),
+                    -index * (360 / categories.length),
+                    -(index - 1) * (360 / categories.length),
+                  ],
+                  outputRange: [0.7, 1.3, 0.7],
+                  extrapolate: 'clamp',
+                });
 
-              const Icon = category.icon;
-              const isSelected = selectedCategory === category.key;
+                const opacity = dialRotation.interpolate({
+                  inputRange: [
+                    -(index + 1) * (360 / categories.length),
+                    -index * (360 / categories.length),
+                    -(index - 1) * (360 / categories.length),
+                  ],
+                  outputRange: [0.4, 1, 0.4],
+                  extrapolate: 'clamp',
+                });
 
-              return (
-                <TouchableOpacity
-                  key={category.key}
-                  onPress={() => {
-                    setSelectedCategory(category.key as any);
-                    categoryScrollRef.current?.scrollTo({
-                      x: index * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
-                      animated: true,
-                    });
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <Animated.View
+                const Icon = category.icon;
+
+                return (
+                  <TouchableOpacity
+                    key={category.key}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      setCurrentIndex(index);
+                      setSelectedCategory(category.key as any);
+                    }}
                     style={[
-                      styles.categoryCard,
-                      isSelected && styles.categoryCardActive,
+                      styles.dialItem,
                       {
-                        transform: [
-                          { scale },
-                          { translateY },
-                          { perspective: 1000 },
-                          { rotateY },
-                        ],
-                        opacity,
+                        left: DIAL_SIZE / 2 + x - CATEGORY_SIZE / 2,
+                        top: DIAL_SIZE / 2 + y - CATEGORY_SIZE / 2,
                       },
                     ]}
                   >
-                    <View
+                    <Animated.View
                       style={[
-                        styles.categoryIcon,
-                        isSelected && styles.categoryIconActive,
+                        styles.categoryCircle,
+                        isCenter && styles.categoryCircleActive,
+                        {
+                          transform: [
+                            { rotate: rotation },
+                            { scale },
+                          ],
+                          opacity,
+                        },
                       ]}
                     >
-                      <Icon size={24} color={isSelected ? '#fff' : '#0A5C36'} />
-                    </View>
-                    <Text
-                      style={[
-                        styles.categoryTitle,
-                        isSelected && styles.categoryTitleActive,
-                      ]}
-                    >
-                      {category.label}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.categoryCount,
-                        isSelected && styles.categoryCountActive,
-                      ]}
-                    >
-                      {category.count}
-                    </Text>
-                  </Animated.View>
-                </TouchableOpacity>
-              );
-            })}
-          </Animated.ScrollView>
+                      <Icon
+                        size={isCenter ? 32 : 24}
+                        color={isCenter ? '#fff' : '#0A5C36'}
+                      />
+                    </Animated.View>
+                  </TouchableOpacity>
+                );
+              })}
+            </Animated.View>
+
+            <View style={styles.dialInfo}>
+              <Text style={styles.dialLabel}>{categories[currentIndex].label}</Text>
+              <Text style={styles.dialCount}>{categories[currentIndex].count}</Text>
+            </View>
+          </View>
         </View>
       </View>
 
@@ -749,67 +805,111 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 20,
   },
   categoriesTitle: {
     fontSize: 18,
     fontWeight: '700' as const,
     color: '#0A5C36',
   },
-  categoriesScroll: {
-    paddingHorizontal: (SCREEN_WIDTH - CATEGORY_ITEM_WIDTH) / 2,
-    gap: CATEGORY_SPACING,
+  dialContainer: {
+    height: DIAL_SIZE,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
-  categoryCard: {
+  dialBackground: {
+    position: 'absolute',
+    width: DIAL_SIZE,
+    height: DIAL_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dialRing: {
+    position: 'absolute',
+    width: DIAL_RADIUS * 2 + 40,
+    height: DIAL_RADIUS * 2 + 40,
+    borderRadius: (DIAL_RADIUS * 2 + 40) / 2,
+    borderWidth: 2,
+    borderColor: 'rgba(10, 92, 54, 0.15)',
+    borderStyle: 'dashed' as const,
+  },
+  dialCenter: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     backgroundColor: '#fff',
-    borderRadius: 24,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderWidth: 1.5,
-    borderColor: '#e8e8e8',
-    width: CATEGORY_ITEM_WIDTH,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 3,
+    borderColor: '#E8F5F0',
+  },
+  dialMarker: {
+    position: 'absolute',
+    top: 20,
+    width: 0,
+    height: 0,
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderBottomWidth: 12,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#0A5C36',
+  },
+  dialRotator: {
+    position: 'absolute',
+    width: DIAL_SIZE,
+    height: DIAL_SIZE,
+  },
+  dialItem: {
+    position: 'absolute',
+    width: CATEGORY_SIZE,
+    height: CATEGORY_SIZE,
+  },
+  categoryCircle: {
+    width: CATEGORY_SIZE,
+    height: CATEGORY_SIZE,
+    borderRadius: CATEGORY_SIZE / 2,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E8F5F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
   },
-  categoryCardActive: {
+  categoryCircleActive: {
     backgroundColor: '#0A5C36',
     borderColor: '#0A5C36',
     shadowColor: '#0A5C36',
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
     elevation: 8,
+    borderWidth: 4,
   },
-  categoryIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: '#E8F5F0',
-    justifyContent: 'center',
+  dialInfo: {
+    position: 'absolute',
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
   },
-  categoryIconActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  categoryTitle: {
-    fontSize: 16,
+  dialLabel: {
+    fontSize: 20,
     fontWeight: '700' as const,
-    color: '#1a1a1a',
+    color: '#0A5C36',
     marginBottom: 4,
   },
-  categoryTitleActive: {
-    color: '#fff',
-  },
-  categoryCount: {
+  dialCount: {
     fontSize: 13,
-    color: '#999',
+    color: '#666',
     fontWeight: '500' as const,
-  },
-  categoryCountActive: {
-    color: 'rgba(255, 255, 255, 0.7)',
   },
   filterButton: {
     width: 48,
