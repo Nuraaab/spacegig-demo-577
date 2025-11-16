@@ -13,7 +13,7 @@ import {
   Modal,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home, LayoutGrid, Layers, Map } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, LayoutGrid, Layers, Map, Users, Grid3x3 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -27,6 +27,8 @@ export default function DiscoverScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('swipe');
+  const [selectedTab, setSelectedTab] = useState<'explore' | 'social' | 'dating'>('explore');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
   const viewModeButtonScale = useRef(new Animated.Value(1)).current;
 
   const [filters, setFilters] = useState({
@@ -190,7 +192,7 @@ export default function DiscoverScreen() {
                 onPress={() => router.replace('/onboarding')}
                 style={{ marginLeft: 8 }}
               >
-                <Home size={24} color="#1a1a1a" />
+                <HomeIcon size={24} color="#1a1a1a" />
               </TouchableOpacity>
             ),
           }}
@@ -214,7 +216,7 @@ export default function DiscoverScreen() {
                 onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
                 activeOpacity={0.8}
               >
-                <Home size={24} color="#1a1a1a" />
+                <HomeIcon size={24} color="#1a1a1a" />
               </TouchableOpacity>
             </Animated.View>
           ),
@@ -226,51 +228,101 @@ export default function DiscoverScreen() {
           <Search size={20} color="#999" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search properties..."
+            placeholder="Search for anything..."
             placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-        </View>
-        <View style={styles.filterRow}>
-          <Animated.View style={{ transform: [{ scale: homeButtonScale }] }}>
-            <TouchableOpacity
-              style={styles.homeButton}
-              onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
-              activeOpacity={0.8}
-            >
-              <Home size={22} color="#4A90E2" />
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{ transform: [{ scale: viewModeButtonScale }] }}>
-            <TouchableOpacity
-              style={styles.filterButton}
-              onPress={handleToggleViewMode}
-              activeOpacity={0.8}
-            >
-              {viewMode === 'swipe' ? (
-                <LayoutGrid size={20} color="#4A90E2" />
-              ) : (
-                <Layers size={20} color="#4A90E2" />
-              )}
-            </TouchableOpacity>
-          </Animated.View>
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={() => router.push('/(tabs)/(discover)/map' as any)}
-            activeOpacity={0.8}
-          >
-            <Map size={20} color="#4A90E2" />
+          <TouchableOpacity onPress={() => setShowFilters(true)}>
+            <SlidersHorizontal size={20} color="#666" />
           </TouchableOpacity>
-          <Animated.View style={{ transform: [{ scale: filterButtonScale }] }}>
+        </View>
+
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            style={styles.tabButton}
+            onPress={() => setSelectedTab('explore')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.tabIcon, selectedTab === 'explore' && styles.tabIconActive]}>
+              <Search size={20} color={selectedTab === 'explore' ? '#FF6B6B' : '#999'} />
+            </View>
+            <Text style={[styles.tabText, selectedTab === 'explore' && styles.tabTextActive]}>Explore</Text>
+            {selectedTab === 'explore' && <View style={styles.tabIndicator} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.tabButton}
+            onPress={() => setSelectedTab('social')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.tabIcon, selectedTab === 'social' && styles.tabIconActive]}>
+              <Users size={20} color={selectedTab === 'social' ? '#FF6B6B' : '#999'} />
+            </View>
+            <Text style={[styles.tabText, selectedTab === 'social' && styles.tabTextActive]}>Social</Text>
+            {selectedTab === 'social' && <View style={styles.tabIndicator} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.tabButton}
+            onPress={() => setSelectedTab('dating')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.tabIcon, selectedTab === 'dating' && styles.tabIconActive]}>
+              <Heart size={20} color={selectedTab === 'dating' ? '#FF6B6B' : '#999'} />
+            </View>
+            <Text style={[styles.tabText, selectedTab === 'dating' && styles.tabTextActive]}>Dating</Text>
+            {selectedTab === 'dating' && <View style={styles.tabIndicator} />}
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.categoriesSection}>
+          <View style={styles.categoriesHeader}>
+            <Grid3x3 size={18} color="#0A5C36" />
+            <Text style={styles.categoriesTitle}>Categories</Text>
+          </View>
+
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesScroll}
+          >
             <TouchableOpacity
-              style={styles.filterButton}
-              onPress={() => animateButton(filterButtonScale, () => setShowFilters(!showFilters))}
+              style={[styles.categoryCard, selectedCategory === 'all' && styles.categoryCardActive]}
+              onPress={() => setSelectedCategory('all')}
               activeOpacity={0.8}
             >
-              <SlidersHorizontal size={20} color="#4A90E2" />
+              <View style={[styles.categoryIcon, selectedCategory === 'all' && styles.categoryIconActive]}>
+                <Grid3x3 size={24} color={selectedCategory === 'all' ? '#fff' : '#0A5C36'} />
+              </View>
+              <Text style={[styles.categoryTitle, selectedCategory === 'all' && styles.categoryTitleActive]}>All</Text>
+              <Text style={[styles.categoryCount, selectedCategory === 'all' && styles.categoryCountActive]}>154 listings</Text>
             </TouchableOpacity>
-          </Animated.View>
+
+            <TouchableOpacity
+              style={[styles.categoryCard, selectedCategory === 'rooms' && styles.categoryCardActive]}
+              onPress={() => setSelectedCategory('rooms')}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.categoryIcon, selectedCategory === 'rooms' && styles.categoryIconActive]}>
+                <HomeIcon size={24} color={selectedCategory === 'rooms' ? '#fff' : '#0A5C36'} />
+              </View>
+              <Text style={[styles.categoryTitle, selectedCategory === 'rooms' && styles.categoryTitleActive]}>Rooms</Text>
+              <Text style={[styles.categoryCount, selectedCategory === 'rooms' && styles.categoryCountActive]}>124 listings</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.categoryCard, selectedCategory === 'apartments' && styles.categoryCardActive]}
+              onPress={() => setSelectedCategory('apartments')}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.categoryIcon, selectedCategory === 'apartments' && styles.categoryIconActive]}>
+                <LayoutGrid size={24} color={selectedCategory === 'apartments' ? '#fff' : '#0A5C36'} />
+              </View>
+              <Text style={[styles.categoryTitle, selectedCategory === 'apartments' && styles.categoryTitleActive]}>Apartments</Text>
+              <Text style={[styles.categoryCount, selectedCategory === 'apartments' && styles.categoryCountActive]}>30 listings</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
       </View>
 
@@ -644,19 +696,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    gap: 12,
+    paddingBottom: 0,
   },
   searchBarFullWidth: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 16,
+    gap: 10,
+    marginBottom: 16,
   },
   filterRow: {
     flexDirection: 'row',
@@ -675,8 +725,107 @@ const styles = StyleSheet.create({
 
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: '#1a1a1a',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingBottom: 12,
+    marginBottom: 16,
+  },
+  tabButton: {
+    alignItems: 'center',
+    gap: 8,
+    position: 'relative' as const,
+  },
+  tabIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tabIconActive: {
+    backgroundColor: '#FFE8E8',
+  },
+  tabText: {
+    fontSize: 13,
+    color: '#999',
+    fontWeight: '500' as const,
+  },
+  tabTextActive: {
+    color: '#1a1a1a',
+    fontWeight: '600' as const,
+  },
+  tabIndicator: {
+    position: 'absolute' as const,
+    bottom: -12,
+    width: 48,
+    height: 3,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 2,
+  },
+  categoriesSection: {
+    paddingBottom: 16,
+  },
+  categoriesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  categoriesTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#0A5C36',
+  },
+  categoriesScroll: {
+    gap: 12,
+    paddingRight: 20,
+  },
+  categoryCard: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderWidth: 1.5,
+    borderColor: '#e8e8e8',
+    minWidth: 140,
+  },
+  categoryCardActive: {
+    backgroundColor: '#0A5C36',
+    borderColor: '#0A5C36',
+  },
+  categoryIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: '#E8F5F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  categoryIconActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  categoryTitle: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  categoryTitleActive: {
+    color: '#fff',
+  },
+  categoryCount: {
+    fontSize: 13,
+    color: '#999',
+    fontWeight: '500' as const,
+  },
+  categoryCountActive: {
+    color: 'rgba(255, 255, 255, 0.7)',
   },
   filterButton: {
     width: 48,
@@ -688,10 +837,10 @@ const styles = StyleSheet.create({
   },
   card: {
     position: 'absolute',
-    top: 140,
+    top: 280,
     left: 20,
     right: 20,
-    height: SCREEN_HEIGHT * 0.6,
+    height: SCREEN_HEIGHT * 0.55,
     borderRadius: 20,
     backgroundColor: '#fff',
     shadowColor: '#000',
