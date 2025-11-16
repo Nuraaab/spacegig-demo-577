@@ -31,7 +31,7 @@ export default function SplashScreen() {
 
     const timer = setTimeout(() => {
       if (!isLoading) {
-        router.replace('/welcome');
+        router.replace('/(tabs)/(discover)/discover');
       }
     }, 1800);
 
