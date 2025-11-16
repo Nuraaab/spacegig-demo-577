@@ -319,7 +319,7 @@ export default function DiscoverScreen() {
 
                 const rotation = dialRotation.interpolate({
                   inputRange: [-360, 0, 360],
-                  outputRange: [360, 0, -360],
+                  outputRange: ['360deg', '0deg', '-360deg'],
                 });
 
                 const isCenter = currentIndex === index;
