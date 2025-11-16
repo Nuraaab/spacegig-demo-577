@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,11 @@ import {
   Modal,
   TextInput,
   Alert,
+  Animated,
+  Easing,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,6 +26,8 @@ import {
   Zap,
   Lock,
   Unlock,
+  Send,
+  Sparkles,
 } from 'lucide-react-native';
 import { useCommunity } from '@/contexts/CommunityContext';
 import { useApp } from '@/contexts/AppContext';
@@ -38,6 +45,11 @@ export default function GroupDetailScreen() {
   const isAdmin = user ? isGroupAdmin(groupId, user.id) : false;
   
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showChatModal, setShowChatModal] = useState<boolean>(false);
+  const [selectedMember, setSelectedMember] = useState<{ id: string; name: string; avatar: string } | null>(null);
+  const [messageInput, setMessageInput] = useState<string>('');
+  const [messages, setMessages] = useState<Array<{ id: string; text: string; sent: boolean }>>([]);
+  const [confettiAnimations, setConfettiAnimations] = useState<{ [key: string]: boolean }>({});
   const [editData, setEditData] = useState({
     name: '',
     description: '',
@@ -86,26 +98,56 @@ export default function GroupDetailScreen() {
     Alert.alert('Success', 'Group updated successfully!');
   };
 
-  const handleLike = async (memberId: string) => {
+  const handleLike = async (memberId: string, memberName: string) => {
     if (user) {
       await likeUser(user.id, memberId);
-      Alert.alert('Success', 'Like sent!');
+      triggerConfetti(memberId);
     }
   };
 
-  const handleNudge = async (memberId: string) => {
+  const handleNudge = async (memberId: string, memberName: string) => {
     if (user) {
       try {
         await nudgeUser(user.id, memberId);
-        Alert.alert('Success', 'Nudge sent!');
+        triggerConfetti(memberId);
       } catch {
         Alert.alert('Error', 'No nudges remaining this month');
       }
     }
   };
 
-  const handleSayHi = (memberName: string) => {
-    Alert.alert('Say Hi', `Opening chat with ${memberName}...`);
+  const handleSuperLike = async (memberId: string, memberName: string) => {
+    if (user) {
+      await likeUser(user.id, memberId);
+      triggerConfetti(memberId);
+    }
+  };
+
+  const triggerConfetti = (memberId: string) => {
+    setConfettiAnimations((prev) => ({ ...prev, [memberId]: true }));
+    setTimeout(() => {
+      setConfettiAnimations((prev) => ({ ...prev, [memberId]: false }));
+    }, 1000);
+  };
+
+  const handleSayHi = (member: { id: string; name: string; avatar: string }) => {
+    setSelectedMember(member);
+    setMessages([
+      { id: '1', text: 'Hey! How are you?', sent: false },
+      { id: '2', text: 'I\'m good! Thanks for reaching out!', sent: true },
+    ]);
+    setShowChatModal(true);
+  };
+
+  const sendMessage = () => {
+    if (messageInput.trim() === '') return;
+    const newMessage = {
+      id: Date.now().toString(),
+      text: messageInput,
+      sent: true,
+    };
+    setMessages((prev) => [...prev, newMessage]);
+    setMessageInput('');
   };
 
   return (
@@ -186,31 +228,39 @@ export default function GroupDetailScreen() {
 
               <View style={styles.memberActions}>
                 <TouchableOpacity
-                  style={styles.sayHiButton}
-                  onPress={() => handleSayHi(member.name)}
+                  style={styles.actionButton}
+                  onPress={() => handleSayHi({ id: member.id, name: member.name, avatar: member.avatar })}
                   activeOpacity={0.7}
                 >
-                  <MessageCircle size={16} color="#fff" />
-                  <Text style={styles.sayHiText}>Say Hi</Text>
+                  <MessageCircle size={16} color="#4A90E2" />
                 </TouchableOpacity>
 
-                <View style={styles.iconActions}>
-                  <TouchableOpacity
-                    style={styles.iconButton}
-                    onPress={() => handleLike(member.id)}
-                    activeOpacity={0.7}
-                  >
-                    <Heart size={18} color="#f43f5e" />
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={styles.iconButton}
-                    onPress={() => handleNudge(member.id)}
-                    activeOpacity={0.7}
-                  >
-                    <Zap size={18} color="#f59e0b" />
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => handleNudge(member.id, member.name)}
+                  activeOpacity={0.7}
+                >
+                  <Zap size={16} color="#f59e0b" />
+                  {confettiAnimations[member.id] && <ConfettiAnimation />}
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => handleLike(member.id, member.name)}
+                  activeOpacity={0.7}
+                >
+                  <Heart size={16} color="#f43f5e" />
+                  {confettiAnimations[member.id] && <ConfettiAnimation />}
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => handleSuperLike(member.id, member.name)}
+                  activeOpacity={0.7}
+                >
+                  <Sparkles size={16} color="#8b5cf6" />
+                  {confettiAnimations[member.id] && <ConfettiAnimation />}
+                </TouchableOpacity>
               </View>
             </View>
           ))}
@@ -335,6 +385,146 @@ export default function GroupDetailScreen() {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        visible={showChatModal}
+        animationType="slide"
+        onRequestClose={() => setShowChatModal(false)}
+      >
+        <View style={styles.chatContainer}>
+          <View style={[styles.chatHeader, { paddingTop: insets.top + 12 }]}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setShowChatModal(false)}
+              activeOpacity={0.7}
+            >
+              <ArrowLeft size={24} color="#1a1a1a" />
+            </TouchableOpacity>
+            {selectedMember && (
+              <View style={styles.chatHeaderInfo}>
+                <Image source={{ uri: selectedMember.avatar }} style={styles.chatAvatar} />
+                <Text style={styles.chatMemberName}>{selectedMember.name}</Text>
+              </View>
+            )}
+          </View>
+
+          <FlatList
+            data={messages}
+            keyExtractor={(item) => item.id}
+            style={styles.messagesList}
+            contentContainerStyle={styles.messagesContent}
+            renderItem={({ item }) => (
+              <View
+                style={[
+                  styles.messageBubble,
+                  item.sent ? styles.messageSent : styles.messageReceived,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.messageText,
+                    item.sent ? styles.messageTextSent : styles.messageTextReceived,
+                  ]}
+                >
+                  {item.text}
+                </Text>
+              </View>
+            )}
+          />
+
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={[styles.chatInputContainer, { paddingBottom: insets.bottom + 8 }]}
+          >
+            <TextInput
+              style={styles.chatInput}
+              placeholder="Type a message..."
+              placeholderTextColor="#999"
+              value={messageInput}
+              onChangeText={setMessageInput}
+            />
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={sendMessage}
+              activeOpacity={0.7}
+            >
+              <Send size={20} color="#fff" />
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+function ConfettiAnimation() {
+  const animations = useRef(
+    Array.from({ length: 8 }, () => ({
+      translateY: new Animated.Value(0),
+      translateX: new Animated.Value(0),
+      opacity: new Animated.Value(1),
+      rotate: new Animated.Value(0),
+    }))
+  ).current;
+
+  useEffect(() => {
+    animations.forEach((anim, index) => {
+      const angle = (index / 8) * 2 * Math.PI;
+      const distance = 40;
+
+      Animated.parallel([
+        Animated.timing(anim.translateX, {
+          toValue: Math.cos(angle) * distance,
+          duration: 600,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim.translateY, {
+          toValue: Math.sin(angle) * distance,
+          duration: 600,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim.opacity, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim.rotate, {
+          toValue: 360,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
+  }, [animations]);
+
+  const colors = ['#f43f5e', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
+
+  return (
+    <View style={styles.confettiContainer}>
+      {animations.map((anim, index) => (
+        <Animated.View
+          key={index}
+          style={[
+            styles.confettiPiece,
+            {
+              backgroundColor: colors[index % colors.length],
+              transform: [
+                { translateX: anim.translateX },
+                { translateY: anim.translateY },
+                {
+                  rotate: anim.rotate.interpolate({
+                    inputRange: [0, 360],
+                    outputRange: ['0deg', '360deg'],
+                  }),
+                },
+              ],
+              opacity: anim.opacity,
+            },
+          ]}
+        />
+      ))}
     </View>
   );
 }
@@ -499,35 +689,18 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   memberActions: {
-    flexDirection: 'column',
-    gap: 8,
-    alignItems: 'flex-end',
-  },
-  sayHiButton: {
     flexDirection: 'row',
+    gap: 8,
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#4A90E2',
   },
-  sayHiText: {
-    fontSize: 13,
-    fontWeight: '600' as const,
-    color: '#fff',
-  },
-  iconActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  iconButton: {
+  actionButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative' as const,
   },
   errorContainer: {
     flex: 1,
@@ -646,5 +819,111 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700' as const,
     color: '#fff',
+  },
+  chatContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  chatHeader: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  chatHeaderInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  chatAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  chatMemberName: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+  },
+  messagesList: {
+    flex: 1,
+  },
+  messagesContent: {
+    padding: 16,
+    gap: 12,
+  },
+  messageBubble: {
+    maxWidth: '75%',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 18,
+  },
+  messageSent: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#4A90E2',
+    borderBottomRightRadius: 4,
+  },
+  messageReceived: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#fff',
+    borderBottomLeftRadius: 4,
+  },
+  messageText: {
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  messageTextSent: {
+    color: '#fff',
+  },
+  messageTextReceived: {
+    color: '#1a1a1a',
+  },
+  chatInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    gap: 12,
+  },
+  chatInput: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 24,
+    fontSize: 15,
+    color: '#1a1a1a',
+  },
+  sendButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#4A90E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  confettiContainer: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    pointerEvents: 'none' as const,
+  },
+  confettiPiece: {
+    position: 'absolute' as const,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
 });
