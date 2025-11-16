@@ -59,7 +59,7 @@ export default function CommunityScreen() {
   );
 
   const handleCreateGroupPress = () => {
-    setShowCreateGroup(true);
+    router.push('/create-group');
   };
 
   const handlePlusIconHover = (isHovering: boolean) => {
