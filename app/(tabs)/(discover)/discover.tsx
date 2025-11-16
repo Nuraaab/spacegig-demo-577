@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
+const CATEGORY_ITEM_WIDTH = 160;
+const CATEGORY_SPACING = 20;
 
 export default function DiscoverScreen() {
   const router = useRouter();
@@ -29,6 +31,8 @@ export default function DiscoverScreen() {
   const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('stack');
 
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const categoryScrollRef = useRef<ScrollView>(null);
 
   const [filters, setFilters] = useState({
     propertyTypes: [] as PropertyType[],
@@ -225,47 +229,113 @@ export default function DiscoverScreen() {
             <Text style={styles.categoriesTitle}>Categories</Text>
           </View>
 
-          <ScrollView 
-            horizontal 
+          <Animated.ScrollView
+            ref={categoryScrollRef}
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoriesScroll}
+            snapToInterval={CATEGORY_ITEM_WIDTH + CATEGORY_SPACING}
+            decelerationRate="fast"
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: true }
+            )}
           >
-            <TouchableOpacity
-              style={[styles.categoryCard, selectedCategory === 'all' && styles.categoryCardActive]}
-              onPress={() => setSelectedCategory('all')}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.categoryIcon, selectedCategory === 'all' && styles.categoryIconActive]}>
-                <Grid3x3 size={24} color={selectedCategory === 'all' ? '#fff' : '#0A5C36'} />
-              </View>
-              <Text style={[styles.categoryTitle, selectedCategory === 'all' && styles.categoryTitleActive]}>All</Text>
-              <Text style={[styles.categoryCount, selectedCategory === 'all' && styles.categoryCountActive]}>154 listings</Text>
-            </TouchableOpacity>
+            {[
+              { key: 'all', icon: Grid3x3, label: 'All', count: '154 listings' },
+              { key: 'rooms', icon: HomeIcon, label: 'Rooms', count: '124 listings' },
+              { key: 'apartments', icon: LayoutGrid, label: 'Apartments', count: '30 listings' },
+            ].map((category, index) => {
+              const inputRange = [
+                (index - 1) * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
+                index * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
+                (index + 1) * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
+              ];
 
-            <TouchableOpacity
-              style={[styles.categoryCard, selectedCategory === 'rooms' && styles.categoryCardActive]}
-              onPress={() => setSelectedCategory('rooms')}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.categoryIcon, selectedCategory === 'rooms' && styles.categoryIconActive]}>
-                <HomeIcon size={24} color={selectedCategory === 'rooms' ? '#fff' : '#0A5C36'} />
-              </View>
-              <Text style={[styles.categoryTitle, selectedCategory === 'rooms' && styles.categoryTitleActive]}>Rooms</Text>
-              <Text style={[styles.categoryCount, selectedCategory === 'rooms' && styles.categoryCountActive]}>124 listings</Text>
-            </TouchableOpacity>
+              const scale = scrollX.interpolate({
+                inputRange,
+                outputRange: [0.85, 1.15, 0.85],
+                extrapolate: 'clamp',
+              });
 
-            <TouchableOpacity
-              style={[styles.categoryCard, selectedCategory === 'apartments' && styles.categoryCardActive]}
-              onPress={() => setSelectedCategory('apartments')}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.categoryIcon, selectedCategory === 'apartments' && styles.categoryIconActive]}>
-                <LayoutGrid size={24} color={selectedCategory === 'apartments' ? '#fff' : '#0A5C36'} />
-              </View>
-              <Text style={[styles.categoryTitle, selectedCategory === 'apartments' && styles.categoryTitleActive]}>Apartments</Text>
-              <Text style={[styles.categoryCount, selectedCategory === 'apartments' && styles.categoryCountActive]}>30 listings</Text>
-            </TouchableOpacity>
-          </ScrollView>
+              const opacity = scrollX.interpolate({
+                inputRange,
+                outputRange: [0.5, 1, 0.5],
+                extrapolate: 'clamp',
+              });
+
+              const translateY = scrollX.interpolate({
+                inputRange,
+                outputRange: [15, 0, 15],
+                extrapolate: 'clamp',
+              });
+
+              const rotateY = scrollX.interpolate({
+                inputRange,
+                outputRange: ['-25deg', '0deg', '25deg'],
+                extrapolate: 'clamp',
+              });
+
+              const Icon = category.icon;
+              const isSelected = selectedCategory === category.key;
+
+              return (
+                <TouchableOpacity
+                  key={category.key}
+                  onPress={() => {
+                    setSelectedCategory(category.key as any);
+                    categoryScrollRef.current?.scrollTo({
+                      x: index * (CATEGORY_ITEM_WIDTH + CATEGORY_SPACING),
+                      animated: true,
+                    });
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Animated.View
+                    style={[
+                      styles.categoryCard,
+                      isSelected && styles.categoryCardActive,
+                      {
+                        transform: [
+                          { scale },
+                          { translateY },
+                          { perspective: 1000 },
+                          { rotateY },
+                        ],
+                        opacity,
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.categoryIcon,
+                        isSelected && styles.categoryIconActive,
+                      ]}
+                    >
+                      <Icon size={24} color={isSelected ? '#fff' : '#0A5C36'} />
+                    </View>
+                    <Text
+                      style={[
+                        styles.categoryTitle,
+                        isSelected && styles.categoryTitleActive,
+                      ]}
+                    >
+                      {category.label}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.categoryCount,
+                        isSelected && styles.categoryCountActive,
+                      ]}
+                    >
+                      {category.count}
+                    </Text>
+                  </Animated.View>
+                </TouchableOpacity>
+              );
+            })}
+          </Animated.ScrollView>
         </View>
       </View>
 
@@ -687,8 +757,8 @@ const styles = StyleSheet.create({
     color: '#0A5C36',
   },
   categoriesScroll: {
-    gap: 12,
-    paddingRight: 20,
+    paddingHorizontal: (SCREEN_WIDTH - CATEGORY_ITEM_WIDTH) / 2,
+    gap: CATEGORY_SPACING,
   },
   categoryCard: {
     backgroundColor: '#fff',
@@ -697,11 +767,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 1.5,
     borderColor: '#e8e8e8',
-    minWidth: 140,
+    width: CATEGORY_ITEM_WIDTH,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   categoryCardActive: {
     backgroundColor: '#0A5C36',
     borderColor: '#0A5C36',
+    shadowColor: '#0A5C36',
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   categoryIcon: {
     width: 48,
