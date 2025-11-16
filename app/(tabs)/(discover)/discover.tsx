@@ -66,6 +66,14 @@ export default function DiscoverScreen() {
         return false;
       }
 
+      if (selectedCategory === 'rooms' && prop.propertyType !== 'room') {
+        return false;
+      }
+
+      if (selectedCategory === 'apartments' && prop.propertyType !== 'apartment') {
+        return false;
+      }
+
       if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(prop.propertyType)) {
         return false;
       }
@@ -93,7 +101,7 @@ export default function DiscoverScreen() {
 
       return true;
     });
-  }, [properties, searchQuery, filters]);
+  }, [properties, searchQuery, filters, selectedCategory]);
 
   const property = getCurrentProperty();
 
