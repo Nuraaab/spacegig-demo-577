@@ -13,7 +13,7 @@ import {
   Modal,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, LayoutGrid, Layers, Map, Users, Grid3x3 } from 'lucide-react-native';
+import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, LayoutGrid, Grid3x3 } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -29,7 +29,6 @@ export default function DiscoverScreen() {
   const [viewMode, setViewMode] = useState<'swipe' | 'stack'>('swipe');
 
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
-  const viewModeButtonScale = useRef(new Animated.Value(1)).current;
 
   const [filters, setFilters] = useState({
     propertyTypes: [] as PropertyType[],
@@ -145,14 +144,6 @@ export default function DiscoverScreen() {
 
   const likeButtonScale = useRef(new Animated.Value(1)).current;
   const passButtonScale = useRef(new Animated.Value(1)).current;
-  const homeButtonScale = useRef(new Animated.Value(1)).current;
-  const filterButtonScale = useRef(new Animated.Value(1)).current;
-
-  const handleToggleViewMode = () => {
-    animateButton(viewModeButtonScale, () => {
-      setViewMode(prev => prev === 'swipe' ? 'stack' : 'swipe');
-    });
-  };
 
   const animateButton = (scale: Animated.Value, callback: () => void) => {
     Animated.sequence([
@@ -195,14 +186,6 @@ export default function DiscoverScreen() {
         <Stack.Screen
           options={{
             title: 'Discover Properties',
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() => router.replace('/onboarding')}
-                style={{ marginLeft: 8 }}
-              >
-                <HomeIcon size={24} color="#1a1a1a" />
-              </TouchableOpacity>
-            ),
           }}
         />
         <View style={styles.emptyContainer}>
@@ -218,16 +201,6 @@ export default function DiscoverScreen() {
       <Stack.Screen
         options={{
           title: 'Discover Properties',
-          headerLeft: () => (
-            <Animated.View style={{ transform: [{ scale: homeButtonScale }], marginLeft: 8 }}>
-              <TouchableOpacity
-                onPress={() => animateButton(homeButtonScale, () => router.replace('/onboarding'))}
-                activeOpacity={0.8}
-              >
-                <HomeIcon size={24} color="#1a1a1a" />
-              </TouchableOpacity>
-            </Animated.View>
-          ),
         }}
       />
 
