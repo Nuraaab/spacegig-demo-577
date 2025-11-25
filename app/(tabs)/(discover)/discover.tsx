@@ -1,106 +1,92 @@
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   Image,
-  PanResponder,
-  Animated,
   TouchableOpacity,
   TextInput,
   ScrollView,
   Modal,
+  FlatList,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, X, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, LayoutGrid, Grid3x3, Users } from 'lucide-react-native';
+import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Building2, Store, TreePine, DoorOpen, Users, ChevronRight, X } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const SWIPE_THRESHOLD = 120;
 
-interface CategoryItemProps {
-  category: { key: string; icon: any; label: string; count: string };
-  isSelected: boolean;
-  onPress: () => void;
+
+interface Category {
+  id: string;
+  label: string;
+  icon: any;
+  count: number;
+  subcategories: Subcategory[];
 }
 
-function CategoryItem({ category, isSelected, onPress }: CategoryItemProps) {
-  const Icon = category.icon;
-  const slideAnim = useRef(new Animated.Value(isSelected ? 1 : 0)).current;
-
-  useEffect(() => {
-    Animated.spring(slideAnim, {
-      toValue: isSelected ? 1 : 0,
-      useNativeDriver: true,
-      tension: 50,
-      friction: 7,
-    }).start();
-  }, [isSelected, slideAnim]);
-
-  const scale = slideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.95, 1],
-  });
-
-  const translateY = slideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -4],
-  });
-
-  return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onPress}
-      style={styles.categoryItem}
-    >
-      <Animated.View
-        style={[
-          styles.categoryCard,
-          isSelected && styles.categoryCardActive,
-          {
-            transform: [{ scale }, { translateY }],
-          },
-        ]}
-      >
-        <View style={[
-          styles.categoryIconContainer,
-          isSelected && styles.categoryIconContainerActive,
-        ]}>
-          <Icon
-            size={24}
-            color={isSelected ? '#fff' : '#2f95dc'}
-          />
-        </View>
-        <View style={styles.categoryTextContainer}>
-          <Text style={[
-            styles.categoryLabel,
-            isSelected && styles.categoryLabelActive,
-          ]}>
-            {category.label}
-          </Text>
-          <Text style={[
-            styles.categoryCount,
-            isSelected && styles.categoryCountActive,
-          ]}>
-            {category.count}
-          </Text>
-        </View>
-      </Animated.View>
-    </TouchableOpacity>
-  );
+interface Subcategory {
+  id: string;
+  label: string;
+  count: number;
+  propertyTypes?: PropertyType[];
 }
 
 export default function DiscoverScreen() {
   const router = useRouter();
-  const { getCurrentProperty, nextProperty, addToFavorites, properties } = useApp();
+  const { addToFavorites, properties } = useApp();
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const viewMode = 'stack';
+  const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
+  const [showSubcategoryModal, setShowSubcategoryModal] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'rooms' | 'apartments'>('all');
+  const categories: Category[] = [
+    {
+      id: 'residential',
+      label: 'Residential',
+      icon: HomeIcon,
+      count: 342,
+      subcategories: [
+        { id: 'houses', label: 'Houses', count: 128, propertyTypes: ['house'] },
+        { id: 'apartments', label: 'Apartments', count: 156, propertyTypes: ['apartment'] },
+        { id: 'condos', label: 'Condos', count: 58, propertyTypes: ['condo'] },
+      ],
+    },
+    {
+      id: 'commercial',
+      label: 'Commercial',
+      icon: Building2,
+      count: 89,
+      subcategories: [
+        { id: 'offices', label: 'Offices', count: 45, propertyTypes: ['commercial'] },
+        { id: 'retail', label: 'Retail Spaces', count: 34, propertyTypes: ['commercial'] },
+        { id: 'warehouses', label: 'Warehouses', count: 10, propertyTypes: ['commercial'] },
+      ],
+    },
+    {
+      id: 'shared',
+      label: 'Shared Spaces',
+      icon: DoorOpen,
+      count: 213,
+      subcategories: [
+        { id: 'rooms', label: 'Rooms', count: 167, propertyTypes: ['room'] },
+        { id: 'basements', label: 'Basements', count: 46, propertyTypes: ['basement'] },
+      ],
+    },
+    {
+      id: 'land',
+      label: 'Land & Lots',
+      icon: TreePine,
+      count: 67,
+      subcategories: [
+        { id: 'residential-land', label: 'Residential Land', count: 42, propertyTypes: ['land'] },
+        { id: 'commercial-land', label: 'Commercial Land', count: 25, propertyTypes: ['land'] },
+      ],
+    },
+  ];
 
   const [filters, setFilters] = useState({
     propertyTypes: [] as PropertyType[],
@@ -111,25 +97,6 @@ export default function DiscoverScreen() {
     amenities: [] as string[],
   });
 
-  const position = useRef(new Animated.ValueXY()).current;
-  const rotate = position.x.interpolate({
-    inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-    outputRange: ['-10deg', '0deg', '10deg'],
-    extrapolate: 'clamp',
-  });
-
-  const likeOpacity = position.x.interpolate({
-    inputRange: [0, SWIPE_THRESHOLD],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
-
-  const nopeOpacity = position.x.interpolate({
-    inputRange: [-SWIPE_THRESHOLD, 0],
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
-
   const filteredProperties = useMemo(() => {
     return properties.filter((prop) => {
       if (searchQuery && !prop.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -137,12 +104,10 @@ export default function DiscoverScreen() {
         return false;
       }
 
-      if (selectedCategory === 'rooms' && prop.propertyType !== 'room') {
-        return false;
-      }
-
-      if (selectedCategory === 'apartments' && prop.propertyType !== 'apartment') {
-        return false;
+      if (selectedSubcategory?.propertyTypes && selectedSubcategory.propertyTypes.length > 0) {
+        if (!selectedSubcategory.propertyTypes.includes(prop.propertyType)) {
+          return false;
+        }
       }
 
       if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(prop.propertyType)) {
@@ -172,300 +137,276 @@ export default function DiscoverScreen() {
 
       return true;
     });
-  }, [properties, searchQuery, filters, selectedCategory]);
+  }, [properties, searchQuery, filters, selectedSubcategory]);
 
-  const property = getCurrentProperty();
-
-  const categories = [
-    { key: 'all', icon: Grid3x3, label: 'All', count: '154 listings' },
-    { key: 'rooms', icon: HomeIcon, label: 'Rooms', count: '124 listings' },
-    { key: 'apartments', icon: LayoutGrid, label: 'Apartments', count: '30 listings' },
-    { key: 'roommates', icon: Users, label: 'Roommates', count: 'Find matches' },
-  ];
-
-  const handleSwipeComplete = (direction: 'left' | 'right') => {
-    if (direction === 'right' && property) {
-      addToFavorites(property.id);
-      setShowConfirmation(true);
-      setTimeout(() => setShowConfirmation(false), 2000);
-    }
-    nextProperty();
-    position.setValue({ x: 0, y: 0 });
+  const handleCategorySelect = (category: Category) => {
+    setSelectedCategory(category);
+    setShowCategoryModal(false);
+    setShowSubcategoryModal(true);
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (_, gesture) => {
-        position.setValue({ x: gesture.dx, y: gesture.dy });
-      },
-      onPanResponderRelease: (_, gesture) => {
-        if (gesture.dx > SWIPE_THRESHOLD) {
-          Animated.spring(position, {
-            toValue: { x: SCREEN_WIDTH + 100, y: gesture.dy },
-            useNativeDriver: false,
-          }).start(() => handleSwipeComplete('right'));
-        } else if (gesture.dx < -SWIPE_THRESHOLD) {
-          Animated.spring(position, {
-            toValue: { x: -SCREEN_WIDTH - 100, y: gesture.dy },
-            useNativeDriver: false,
-          }).start(() => handleSwipeComplete('left'));
-        } else {
-          Animated.spring(position, {
-            toValue: { x: 0, y: 0 },
-            friction: 4,
-            useNativeDriver: false,
-          }).start();
-        }
-      },
-    })
-  ).current;
-
-  const likeButtonScale = useRef(new Animated.Value(1)).current;
-  const passButtonScale = useRef(new Animated.Value(1)).current;
-
-  const animateButton = (scale: Animated.Value, callback: () => void) => {
-    Animated.sequence([
-      Animated.timing(scale, {
-        toValue: 0.85,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scale, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start(callback);
+  const handleSubcategorySelect = (subcategory: Subcategory) => {
+    setSelectedSubcategory(subcategory);
+    setShowSubcategoryModal(false);
   };
 
-  const handleLike = () => {
-    animateButton(likeButtonScale, () => {
-      Animated.spring(position, {
-        toValue: { x: SCREEN_WIDTH + 100, y: 0 },
-        useNativeDriver: false,
-      }).start(() => handleSwipeComplete('right'));
-    });
-  };
-
-  const handlePass = () => {
-    animateButton(passButtonScale, () => {
-      Animated.spring(position, {
-        toValue: { x: -SCREEN_WIDTH - 100, y: 0 },
-        useNativeDriver: false,
-      }).start(() => handleSwipeComplete('left'));
-    });
+  const resetCategorySelection = () => {
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
   };
 
 
-
-  if (!property) {
-    return (
-      <View style={styles.container}>
-        <Stack.Screen
-          options={{
-            title: 'Discover Properties',
-          }}
-        />
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No more properties to show</Text>
-          <Text style={styles.emptySubtext}>Check back later for new listings</Text>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: 'Discover Properties',
+          headerShown: false,
         }}
       />
 
-      <View style={styles.topContainer}>
-        <View style={styles.searchBarFullWidth}>
-          <Search size={20} color="#999" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search for anything..."
-            placeholderTextColor="#999"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <TouchableOpacity onPress={() => setShowFilters(true)}>
-            <SlidersHorizontal size={20} color="#666" />
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.greeting}>Discover</Text>
+            <Text style={styles.subGreeting}>Find your perfect space</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.roommatesButton}
+            onPress={() => router.push('/(tabs)/(discover)/roommates' as any)}
+          >
+            <Users size={20} color="#2f95dc" />
+            <Text style={styles.roommatesButtonText}>Find Roommates</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.categoriesSection}>
-          <View style={styles.categoriesHeader}>
-            <Grid3x3 size={18} color="#2f95dc" />
-            <Text style={styles.categoriesTitle}>Categories</Text>
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchBar}>
+            <Search size={18} color="#999" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search location, property..."
+              placeholderTextColor="#999"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
           </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesScrollContent}
+          <TouchableOpacity 
+            style={styles.filterButton}
+            onPress={() => setShowFilters(true)}
           >
-            {categories.map((category) => (
-              <CategoryItem
-                key={category.key}
-                category={category}
-                isSelected={selectedCategory === category.key}
-                onPress={() => {
-                  if (category.key === 'roommates') {
-                    router.push('/roommates' as any);
-                  } else {
-                    setSelectedCategory(category.key as any);
-                  }
-                }}
-              />
-            ))}
-          </ScrollView>
+            <SlidersHorizontal size={20} color="#1a1a1a" />
+          </TouchableOpacity>
         </View>
       </View>
 
-      {viewMode === 'swipe' ? (
-        <>
-          <Animated.View
-            style={[
-              styles.card,
-              {
-                transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }],
-              },
-            ]}
-            {...panResponder.panHandlers}
+      <View style={styles.categorySelectionContainer}>
+        <TouchableOpacity 
+          style={styles.categorySelector}
+          onPress={() => setShowCategoryModal(true)}
+        >
+          <View style={styles.categorySelectorLeft}>
+            <Text style={styles.categorySelectorLabel}>Category</Text>
+            {selectedCategory ? (
+              <View style={styles.selectedCategoryDisplay}>
+                {(() => {
+                  const Icon = selectedCategory.icon;
+                  return <Icon size={18} color="#2f95dc" />;
+                })()}
+                <Text style={styles.categorySelectorValue}>{selectedCategory.label}</Text>
+              </View>
+            ) : (
+              <Text style={styles.categorySelectorPlaceholder}>Choose category</Text>
+            )}
+          </View>
+          <ChevronRight size={20} color="#999" />
+        </TouchableOpacity>
+
+        {selectedCategory && (
+          <TouchableOpacity 
+            style={styles.categorySelector}
+            onPress={() => setShowSubcategoryModal(true)}
           >
+            <View style={styles.categorySelectorLeft}>
+              <Text style={styles.categorySelectorLabel}>Subcategory</Text>
+              {selectedSubcategory ? (
+                <Text style={styles.categorySelectorValue}>{selectedSubcategory.label}</Text>
+              ) : (
+                <Text style={styles.categorySelectorPlaceholder}>Choose subcategory</Text>
+              )}
+            </View>
+            <ChevronRight size={20} color="#999" />
+          </TouchableOpacity>
+        )}
+
+        {selectedCategory && (
+          <TouchableOpacity 
+            style={styles.resetButton}
+            onPress={resetCategorySelection}
+          >
+            <X size={16} color="#666" />
+            <Text style={styles.resetButtonText}>Clear selection</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={styles.resultsHeader}>
+        <Text style={styles.resultsCount}>{filteredProperties.length} properties</Text>
+        {selectedSubcategory && (
+          <View style={styles.activeFilterBadge}>
+            <Text style={styles.activeFilterText}>{selectedSubcategory.label}</Text>
+          </View>
+        )}
+      </View>
+
+      <FlatList
+        data={filteredProperties}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            activeOpacity={0.95}
+            onPress={() => router.push(`/property/${item.id}` as any)}
+            style={styles.propertyCard}
+          >
+            <Image source={{ uri: item.images[0] }} style={styles.propertyImage} />
             <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => router.push(`/property/${property.id}` as any)}
-              style={styles.cardTouchable}
+              onPress={(e) => {
+                e.stopPropagation();
+                addToFavorites(item.id);
+                setShowConfirmation(true);
+                setTimeout(() => setShowConfirmation(false), 2000);
+              }}
+              style={styles.likeButtonOverlay}
+              activeOpacity={0.7}
             >
-              <Image source={{ uri: property.images[0] }} style={styles.image} />
-
-              <Animated.View style={[styles.likeLabel, { opacity: likeOpacity }]}>
-                <Text style={styles.likeLabelText}>LIKE</Text>
-              </Animated.View>
-
-              <Animated.View style={[styles.nopeLabel, { opacity: nopeOpacity }]}>
-                <Text style={styles.nopeLabelText}>PASS</Text>
-              </Animated.View>
-
-              <View style={styles.cardContent}>
-                <View style={styles.priceTag}>
-                  <Text style={styles.price}>
-                    ${property.price.toLocaleString()}/{property.listingType === 'rent' ? 'mo' : 'sale'}
-                  </Text>
-                </View>
-
-                <Text style={styles.title}>{property.title}</Text>
-
-                <View style={styles.locationRow}>
-                  <MapPin size={16} color="#666" />
-                  <Text style={styles.location}>
-                    {property.location.city}, {property.location.state}
-                  </Text>
-                </View>
-
-                <View style={styles.specs}>
-                  <View style={styles.specItem}>
-                    <Bed size={18} color="#4A90E2" />
-                    <Text style={styles.specText}>{property.specs.beds} beds</Text>
-                  </View>
-                  <View style={styles.specItem}>
-                    <Bath size={18} color="#4A90E2" />
-                    <Text style={styles.specText}>{property.specs.baths} baths</Text>
-                  </View>
-                  <View style={styles.specItem}>
-                    <Maximize size={18} color="#4A90E2" />
-                    <Text style={styles.specText}>{property.specs.sqft} sqft</Text>
-                  </View>
+              <Heart size={20} color="#fff" strokeWidth={2.5} />
+            </TouchableOpacity>
+            <View style={styles.propertyInfo}>
+              <View style={styles.propertyHeader}>
+                <Text style={styles.propertyPrice}>
+                  ${item.price.toLocaleString()}<Text style={styles.pricePeriod}>/{item.listingType === 'rent' ? 'mo' : 'sale'}</Text>
+                </Text>
+                <View style={styles.propertyTypeBadge}>
+                  <Text style={styles.propertyTypeText}>{PROPERTY_TYPES.find(t => t.value === item.propertyType)?.label}</Text>
                 </View>
               </View>
-            </TouchableOpacity>
-          </Animated.View>
-
-          <View style={styles.buttonsContainer}>
-            <Animated.View style={{ transform: [{ scale: passButtonScale }] }}>
-              <TouchableOpacity style={[styles.actionButton, styles.passButton]} onPress={handlePass} activeOpacity={0.8}>
-                <X size={32} color="#FF6B6B" strokeWidth={3} />
-              </TouchableOpacity>
-            </Animated.View>
-
-            <Animated.View style={{ transform: [{ scale: likeButtonScale }] }}>
-              <TouchableOpacity style={[styles.actionButton, styles.likeButton]} onPress={handleLike} activeOpacity={0.8}>
-                <Heart size={32} color="#4A90E2" strokeWidth={3} />
-              </TouchableOpacity>
-            </Animated.View>
+              <Text style={styles.propertyTitle} numberOfLines={1}>{item.title}</Text>
+              <View style={styles.propertyLocation}>
+                <MapPin size={14} color="#666" />
+                <Text style={styles.propertyLocationText} numberOfLines={1}>
+                  {item.location.city}, {item.location.state}
+                </Text>
+              </View>
+              <View style={styles.propertySpecs}>
+                <View style={styles.propertySpec}>
+                  <Bed size={16} color="#2f95dc" />
+                  <Text style={styles.propertySpecText}>{item.specs.beds}</Text>
+                </View>
+                <View style={styles.propertySep} />
+                <View style={styles.propertySpec}>
+                  <Bath size={16} color="#2f95dc" />
+                  <Text style={styles.propertySpecText}>{item.specs.baths}</Text>
+                </View>
+                <View style={styles.propertySep} />
+                <View style={styles.propertySpec}>
+                  <Maximize size={16} color="#2f95dc" />
+                  <Text style={styles.propertySpecText}>{item.specs.sqft}</Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Store size={48} color="#ccc" />
+            <Text style={styles.emptyText}>No properties found</Text>
+            <Text style={styles.emptySubtext}>Try adjusting your filters or search</Text>
           </View>
-        </>
-      ) : (
-        <ScrollView
-          style={styles.stackContainer}
-          contentContainerStyle={styles.stackContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {filteredProperties.map((prop) => (
-            <TouchableOpacity
-              key={prop.id}
-              activeOpacity={0.95}
-              onPress={() => router.push(`/property/${prop.id}` as any)}
-              style={styles.stackCard}
-            >
-              <Image source={{ uri: prop.images[0] }} style={styles.stackImage} />
-              <View style={styles.stackCardContent}>
-                <View style={styles.stackHeader}>
-                  <View style={styles.stackPriceTag}>
-                    <Text style={styles.stackPrice}>
-                      ${prop.price.toLocaleString()}/{prop.listingType === 'rent' ? 'mo' : 'sale'}
-                    </Text>
-                  </View>
+        }
+      />
+
+      <Modal
+        visible={showCategoryModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowCategoryModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Choose Category</Text>
+              <TouchableOpacity onPress={() => setShowCategoryModal(false)}>
+                <X size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
                   <TouchableOpacity
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      addToFavorites(prop.id);
-                      setShowConfirmation(true);
-                      setTimeout(() => setShowConfirmation(false), 2000);
-                    }}
-                    style={styles.stackLikeButton}
+                    key={category.id}
+                    style={styles.categoryOption}
+                    onPress={() => handleCategorySelect(category)}
                     activeOpacity={0.7}
                   >
-                    <Heart size={20} color="#4A90E2" strokeWidth={2.5} />
+                    <View style={styles.categoryOptionLeft}>
+                      <View style={styles.categoryIconBox}>
+                        <Icon size={24} color="#2f95dc" />
+                      </View>
+                      <View>
+                        <Text style={styles.categoryOptionLabel}>{category.label}</Text>
+                        <Text style={styles.categoryOptionCount}>{category.count} listings</Text>
+                      </View>
+                    </View>
+                    <ChevronRight size={20} color="#ccc" />
                   </TouchableOpacity>
-                </View>
-                <Text style={styles.stackTitle}>{prop.title}</Text>
-                <View style={styles.locationRow}>
-                  <MapPin size={14} color="#666" />
-                  <Text style={styles.stackLocation}>
-                    {prop.location.city}, {prop.location.state}
-                  </Text>
-                </View>
-                <View style={styles.stackSpecs}>
-                  <View style={styles.stackSpecItem}>
-                    <Bed size={16} color="#4A90E2" />
-                    <Text style={styles.stackSpecText}>{prop.specs.beds}</Text>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showSubcategoryModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowSubcategoryModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Choose Subcategory</Text>
+              <TouchableOpacity onPress={() => setShowSubcategoryModal(false)}>
+                <X size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+              {selectedCategory?.subcategories.map((subcategory) => (
+                <TouchableOpacity
+                  key={subcategory.id}
+                  style={styles.subcategoryOption}
+                  onPress={() => handleSubcategorySelect(subcategory)}
+                  activeOpacity={0.7}
+                >
+                  <View>
+                    <Text style={styles.subcategoryOptionLabel}>{subcategory.label}</Text>
+                    <Text style={styles.subcategoryOptionCount}>{subcategory.count} listings</Text>
                   </View>
-                  <View style={styles.stackSpecItem}>
-                    <Bath size={16} color="#4A90E2" />
-                    <Text style={styles.stackSpecText}>{prop.specs.baths}</Text>
-                  </View>
-                  <View style={styles.stackSpecItem}>
-                    <Maximize size={16} color="#4A90E2" />
-                    <Text style={styles.stackSpecText}>{prop.specs.sqft} sqft</Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
+                  <ChevronRight size={20} color="#ccc" />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {showConfirmation && (
         <View style={styles.confirmation}>
-          <Heart size={24} color="#fff" fill="#fff" />
-          <Text style={styles.confirmationText}>Added to favorites!</Text>
+          <Heart size={20} color="#fff" fill="#fff" />
+          <Text style={styles.confirmationText}>Saved to favorites</Text>
         </View>
       )}
 
@@ -693,36 +634,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  topContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 0,
-  },
-  searchBarFullWidth: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 16,
-    gap: 10,
-    marginBottom: 16,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  homeButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#F0F8FF',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
 
   searchInput: {
     flex: 1,
@@ -730,82 +642,7 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
 
-  categoriesSection: {
-    paddingBottom: 16,
-  },
-  categoriesHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-  },
-  categoriesTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#2f95dc',
-  },
-  categoriesScrollContent: {
-    paddingRight: 20,
-    gap: 12,
-  },
-  categoryItem: {
-    marginRight: 12,
-  },
-  categoryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    gap: 12,
-    borderWidth: 2,
-    borderColor: '#E8F4FF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  categoryCardActive: {
-    backgroundColor: '#2f95dc',
-    borderColor: '#2f95dc',
-    shadowColor: '#2f95dc',
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  categoryIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: '#E8F4FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  categoryIconContainerActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  categoryTextContainer: {
-    justifyContent: 'center',
-  },
-  categoryLabel: {
-    fontSize: 16,
-    fontWeight: '700' as const,
-    color: '#2f95dc',
-    marginBottom: 2,
-  },
-  categoryLabelActive: {
-    color: '#fff',
-  },
-  categoryCount: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: '500' as const,
-  },
-  categoryCountActive: {
-    color: 'rgba(255, 255, 255, 0.8)',
-  },
+
   filterButton: {
     width: 48,
     height: 48,
@@ -814,262 +651,52 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  card: {
-    position: 'absolute',
-    top: 220,
-    left: 20,
-    right: 20,
-    height: SCREEN_HEIGHT * 0.55,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  cardTouchable: {
-    flex: 1,
-  },
-  image: {
-    width: '100%',
-    height: '70%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  likeLabel: {
-    position: 'absolute',
-    top: 50,
-    right: 40,
-    borderWidth: 4,
-    borderColor: '#4A90E2',
-    borderRadius: 8,
-    padding: 8,
-    transform: [{ rotate: '20deg' }],
-  },
-  likeLabelText: {
-    fontSize: 32,
-    fontWeight: '700' as const,
-    color: '#4A90E2',
-  },
-  nopeLabel: {
-    position: 'absolute',
-    top: 50,
-    left: 40,
-    borderWidth: 4,
-    borderColor: '#FF6B6B',
-    borderRadius: 8,
-    padding: 8,
-    transform: [{ rotate: '-20deg' }],
-  },
-  nopeLabelText: {
-    fontSize: 32,
-    fontWeight: '700' as const,
-    color: '#FF6B6B',
-  },
-  cardContent: {
-    flex: 1,
-    padding: 20,
-  },
-  priceTag: {
-    position: 'absolute',
-    top: -30,
-    right: 20,
-    backgroundColor: '#4A90E2',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  price: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: '#1a1a1a',
-    marginBottom: 8,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 16,
-  },
-  location: {
-    fontSize: 14,
-    color: '#666',
-  },
-  specs: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  specItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  specText: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '500' as const,
-  },
-  buttonsContainer: {
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 40,
-  },
-  actionButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  passButton: {
-    borderWidth: 2,
-    borderColor: '#FF6B6B',
-  },
-  likeButton: {
-    borderWidth: 2,
-    borderColor: '#4A90E2',
-  },
+
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: 60,
+    marginTop: 80,
   },
   emptyText: {
-    fontSize: 24,
-    fontWeight: '700' as const,
+    fontSize: 18,
+    fontWeight: '600' as const,
     color: '#1a1a1a',
+    marginTop: 16,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 14,
+    color: '#999',
     textAlign: 'center',
   },
   confirmation: {
     position: 'absolute',
-    top: 100,
-    left: '50%',
-    transform: [{ translateX: -100 }],
-    width: 200,
-    backgroundColor: '#4A90E2',
+    top: 80,
+    alignSelf: 'center',
+    backgroundColor: '#2f95dc',
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 25,
+    paddingHorizontal: 24,
+    borderRadius: 24,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    shadowColor: '#000',
+    shadowColor: '#2f95dc',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
     elevation: 8,
   },
   confirmationText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600' as const,
   },
 
-  stackContainer: {
-    flex: 1,
-    marginTop: 8,
-  },
-  stackContent: {
-    padding: 16,
-    paddingBottom: 100,
-  },
-  stackCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    overflow: 'hidden',
-  },
-  stackImage: {
-    width: '100%',
-    height: 220,
-  },
-  stackCardContent: {
-    padding: 16,
-  },
-  stackHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  stackPriceTag: {
-    backgroundColor: '#4A90E2',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  stackPrice: {
-    fontSize: 16,
-    fontWeight: '700' as const,
-    color: '#fff',
-  },
-  stackLikeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0F8FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  stackTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: '#1a1a1a',
-    marginBottom: 6,
-  },
-  stackLocation: {
-    fontSize: 13,
-    color: '#666',
-  },
-  stackSpecs: {
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 12,
-  },
-  stackSpecItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  stackSpecText: {
-    fontSize: 13,
-    color: '#333',
-    fontWeight: '500' as const,
-  },
+
 
   modalOverlay: {
     flex: 1,
@@ -1249,5 +876,296 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700' as const,
     color: '#fff',
+  },
+
+  header: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  greeting: {
+    fontSize: 28,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  subGreeting: {
+    fontSize: 15,
+    color: '#666',
+    fontWeight: '400' as const,
+  },
+  roommatesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#E8F4FF',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  roommatesButtonText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#2f95dc',
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+  },
+  searchBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+  },
+
+  categorySelectionContainer: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  categorySelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
+  },
+  categorySelectorLeft: {
+    flex: 1,
+  },
+  categorySelectorLabel: {
+    fontSize: 12,
+    color: '#999',
+    fontWeight: '500' as const,
+    marginBottom: 4,
+  },
+  categorySelectorValue: {
+    fontSize: 16,
+    color: '#1a1a1a',
+    fontWeight: '600' as const,
+  },
+  categorySelectorPlaceholder: {
+    fontSize: 16,
+    color: '#ccc',
+    fontWeight: '500' as const,
+  },
+  selectedCategoryDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  resetButtonText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500' as const,
+  },
+
+  resultsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    backgroundColor: '#fff',
+  },
+  resultsCount: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+  },
+  activeFilterBadge: {
+    backgroundColor: '#E8F4FF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  activeFilterText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#2f95dc',
+  },
+
+  listContent: {
+    padding: 16,
+    paddingBottom: 100,
+  },
+  propertyCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    overflow: 'hidden',
+  },
+  propertyImage: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#f5f5f5',
+  },
+  likeButtonOverlay: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backdropFilter: 'blur(10px)',
+  },
+  propertyInfo: {
+    padding: 16,
+  },
+  propertyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  propertyPrice: {
+    fontSize: 22,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+  },
+  pricePeriod: {
+    fontSize: 15,
+    fontWeight: '500' as const,
+    color: '#666',
+  },
+  propertyTypeBadge: {
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  propertyTypeText: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  propertyTitle: {
+    fontSize: 17,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 8,
+  },
+  propertyLocation: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 12,
+  },
+  propertyLocationText: {
+    fontSize: 14,
+    color: '#666',
+    flex: 1,
+  },
+  propertySpecs: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  propertySpec: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  propertySpecText: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+    color: '#333',
+  },
+  propertySep: {
+    width: 1,
+    height: 16,
+    backgroundColor: '#e0e0e0',
+  },
+
+  categoryOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f5f5f5',
+  },
+  categoryOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  categoryIconBox: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    backgroundColor: '#E8F4FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  categoryOptionLabel: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 2,
+  },
+  categoryOptionCount: {
+    fontSize: 13,
+    color: '#999',
+    fontWeight: '400' as const,
+  },
+
+  subcategoryOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f5f5f5',
+  },
+  subcategoryOptionLabel: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
+    marginBottom: 2,
+  },
+  subcategoryOptionCount: {
+    fontSize: 13,
+    color: '#999',
+    fontWeight: '400' as const,
   },
 });
