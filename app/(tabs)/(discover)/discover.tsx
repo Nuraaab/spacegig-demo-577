@@ -343,16 +343,13 @@ export default function DiscoverScreen() {
         transparent={true}
         onRequestClose={() => setShowCategoryModal(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowCategoryModal(false)}
-        >
+        <View style={styles.modalOverlay}>
           <TouchableOpacity 
-            style={styles.modalContent}
+            style={{ flex: 1 }}
             activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
-          >
+            onPress={() => setShowCategoryModal(false)}
+          />
+          <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Choose Category</Text>
               <TouchableOpacity onPress={() => setShowCategoryModal(false)}>
@@ -387,8 +384,8 @@ export default function DiscoverScreen() {
                 );
               })}
             </ScrollView>
-          </TouchableOpacity>
-        </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
 
       <Modal
