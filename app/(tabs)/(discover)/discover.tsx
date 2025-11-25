@@ -11,7 +11,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Building2, Store, TreePine, DoorOpen, Users, ChevronRight, X } from 'lucide-react-native';
+import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -45,45 +45,51 @@ export default function DiscoverScreen() {
 
   const categories: Category[] = [
     {
-      id: 'residential',
-      label: 'Residential',
+      id: 'properties',
+      label: 'Properties',
       icon: HomeIcon,
       count: 342,
       subcategories: [
         { id: 'houses', label: 'Houses', count: 128, propertyTypes: ['house'] },
         { id: 'apartments', label: 'Apartments', count: 156, propertyTypes: ['apartment'] },
         { id: 'condos', label: 'Condos', count: 58, propertyTypes: ['condo'] },
-      ],
-    },
-    {
-      id: 'commercial',
-      label: 'Commercial',
-      icon: Building2,
-      count: 89,
-      subcategories: [
-        { id: 'offices', label: 'Offices', count: 45, propertyTypes: ['commercial'] },
-        { id: 'retail', label: 'Retail Spaces', count: 34, propertyTypes: ['commercial'] },
-        { id: 'warehouses', label: 'Warehouses', count: 10, propertyTypes: ['commercial'] },
-      ],
-    },
-    {
-      id: 'shared',
-      label: 'Shared Spaces',
-      icon: DoorOpen,
-      count: 213,
-      subcategories: [
+        { id: 'commercial', label: 'Commercial', count: 89, propertyTypes: ['commercial'] },
         { id: 'rooms', label: 'Rooms', count: 167, propertyTypes: ['room'] },
-        { id: 'basements', label: 'Basements', count: 46, propertyTypes: ['basement'] },
+        { id: 'land', label: 'Land', count: 67, propertyTypes: ['land'] },
       ],
     },
     {
-      id: 'land',
-      label: 'Land & Lots',
-      icon: TreePine,
-      count: 67,
+      id: 'jobs',
+      label: 'Jobs',
+      icon: Briefcase,
+      count: 145,
       subcategories: [
-        { id: 'residential-land', label: 'Residential Land', count: 42, propertyTypes: ['land'] },
-        { id: 'commercial-land', label: 'Commercial Land', count: 25, propertyTypes: ['land'] },
+        { id: 'full-time', label: 'Full Time', count: 78 },
+        { id: 'part-time', label: 'Part Time', count: 45 },
+        { id: 'contract', label: 'Contract', count: 22 },
+      ],
+    },
+    {
+      id: 'services',
+      label: 'Services',
+      icon: Wrench,
+      count: 203,
+      subcategories: [
+        { id: 'home-services', label: 'Home Services', count: 89 },
+        { id: 'professional', label: 'Professional Services', count: 67 },
+        { id: 'personal', label: 'Personal Services', count: 47 },
+      ],
+    },
+    {
+      id: 'items',
+      label: 'Items',
+      icon: Package,
+      count: 521,
+      subcategories: [
+        { id: 'furniture', label: 'Furniture', count: 156 },
+        { id: 'electronics', label: 'Electronics', count: 198 },
+        { id: 'clothing', label: 'Clothing', count: 89 },
+        { id: 'other', label: 'Other', count: 78 },
       ],
     },
   ];
