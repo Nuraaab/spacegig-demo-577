@@ -209,7 +209,11 @@ export default function DiscoverScreen() {
       <View style={styles.categorySelectionContainer}>
         <TouchableOpacity 
           style={styles.categorySelector}
-          onPress={() => setShowCategoryModal(true)}
+          onPress={() => {
+            console.log('Category selector pressed');
+            setShowCategoryModal(true);
+          }}
+          activeOpacity={0.7}
         >
           <View style={styles.categorySelectorLeft}>
             <Text style={styles.categorySelectorLabel}>Category</Text>
@@ -339,8 +343,16 @@ export default function DiscoverScreen() {
         transparent={true}
         onRequestClose={() => setShowCategoryModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowCategoryModal(false)}
+        >
+          <TouchableOpacity 
+            style={styles.modalContent}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Choose Category</Text>
               <TouchableOpacity onPress={() => setShowCategoryModal(false)}>
@@ -350,11 +362,15 @@ export default function DiscoverScreen() {
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               {categories.map((category) => {
                 const Icon = category.icon;
+                console.log('Rendering category:', category.label);
                 return (
                   <TouchableOpacity
                     key={category.id}
                     style={styles.categoryOption}
-                    onPress={() => handleCategorySelect(category)}
+                    onPress={() => {
+                      console.log('Category selected:', category.label);
+                      handleCategorySelect(category);
+                    }}
                     activeOpacity={0.7}
                   >
                     <View style={styles.categoryOptionLeft}>
@@ -371,8 +387,8 @@ export default function DiscoverScreen() {
                 );
               })}
             </ScrollView>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
 
       <Modal
