@@ -46,7 +46,7 @@ export default function DiscoverScreen() {
   const categories: Category[] = [
     {
       id: 'properties',
-      label: 'Properties',
+      label: '🏠 Properties',
       icon: HomeIcon,
       count: 342,
       subcategories: [
@@ -60,7 +60,7 @@ export default function DiscoverScreen() {
     },
     {
       id: 'jobs',
-      label: 'Jobs',
+      label: '💼 Jobs',
       icon: Briefcase,
       count: 145,
       subcategories: [
@@ -71,7 +71,7 @@ export default function DiscoverScreen() {
     },
     {
       id: 'services',
-      label: 'Services',
+      label: '🔧 Services',
       icon: Wrench,
       count: 203,
       subcategories: [
@@ -82,7 +82,7 @@ export default function DiscoverScreen() {
     },
     {
       id: 'items',
-      label: 'Items',
+      label: '📦 Items',
       icon: Package,
       count: 521,
       subcategories: [
