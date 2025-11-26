@@ -11,7 +11,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store } from 'lucide-react-native';
+import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store, LayoutGrid, List } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -43,6 +43,7 @@ export default function DiscoverScreen() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
   const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'rent' | 'sale'>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'map'>('list');
 
   const categories: Category[] = [
     {
@@ -204,12 +205,7 @@ export default function DiscoverScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesScroll}
-          style={styles.categoriesContainer}
-        >
+        <View style={styles.categoriesContainer}>
           {categories.map((category) => {
             const isActive = selectedCategory?.id === category.id;
             return (
@@ -237,7 +233,7 @@ export default function DiscoverScreen() {
               </TouchableOpacity>
             );
           })}
-        </ScrollView>
+        </View>
 
         {selectedCategory?.id === 'properties' && (
           <>
@@ -279,40 +275,57 @@ export default function DiscoverScreen() {
                 </TouchableOpacity>
               )}
             </ScrollView>
-            <View style={styles.listingTypeToggle}>
+            <View style={styles.listingTypeRow}>
+              <View style={styles.listingTypeToggle}>
+                <TouchableOpacity
+                  style={[
+                    styles.listingTypeButton,
+                    listingTypeFilter === 'sale' && styles.listingTypeButtonActive,
+                  ]}
+                  onPress={() => setListingTypeFilter('sale')}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.listingTypeButtonText,
+                      listingTypeFilter === 'sale' && styles.listingTypeButtonTextActive,
+                    ]}
+                  >
+                    For Sale
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.listingTypeButton,
+                    listingTypeFilter === 'rent' && styles.listingTypeButtonActive,
+                  ]}
+                  onPress={() => setListingTypeFilter('rent')}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.listingTypeButtonText,
+                      listingTypeFilter === 'rent' && styles.listingTypeButtonTextActive,
+                    ]}
+                  >
+                    For Rent
+                  </Text>
+                </TouchableOpacity>
+              </View>
               <TouchableOpacity
-                style={[
-                  styles.listingTypeButton,
-                  listingTypeFilter === 'sale' && styles.listingTypeButtonActive,
-                ]}
-                onPress={() => setListingTypeFilter('sale')}
+                style={styles.viewSwitcher}
+                onPress={() => {
+                  setViewMode(current => {
+                    if (current === 'list') return 'grid';
+                    if (current === 'grid') return 'map';
+                    return 'list';
+                  });
+                }}
                 activeOpacity={0.7}
               >
-                <Text
-                  style={[
-                    styles.listingTypeButtonText,
-                    listingTypeFilter === 'sale' && styles.listingTypeButtonTextActive,
-                  ]}
-                >
-                  For Sale
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.listingTypeButton,
-                  listingTypeFilter === 'rent' && styles.listingTypeButtonActive,
-                ]}
-                onPress={() => setListingTypeFilter('rent')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.listingTypeButtonText,
-                    listingTypeFilter === 'rent' && styles.listingTypeButtonTextActive,
-                  ]}
-                >
-                  For Rent
-                </Text>
+                {viewMode === 'list' && <List size={20} color="#2f95dc" />}
+                {viewMode === 'grid' && <LayoutGrid size={20} color="#2f95dc" />}
+                {viewMode === 'map' && <MapPin size={20} color="#2f95dc" />}
               </TouchableOpacity>
             </View>
           </>
@@ -1012,14 +1025,15 @@ const styles = StyleSheet.create({
   categoriesContainer: {
     marginTop: 16,
     marginBottom: 4,
-  },
-  categoriesScroll: {
-    paddingRight: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    paddingHorizontal: 8,
   },
   categoryCard: {
     alignItems: 'center',
-    marginRight: 20,
     paddingVertical: 8,
+    flex: 1,
   },
   categoryCardActive: {
     borderBottomWidth: 2,
@@ -1099,13 +1113,27 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 
-  listingTypeToggle: {
+  listingTypeRow: {
     flexDirection: 'row',
     marginTop: 12,
+    gap: 10,
+    alignItems: 'center',
+  },
+  listingTypeToggle: {
+    flexDirection: 'row',
+    flex: 1,
     backgroundColor: '#f5f5f5',
     borderRadius: 12,
     padding: 4,
     gap: 4,
+  },
+  viewSwitcher: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#E8F4FF',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listingTypeButton: {
     flex: 1,
