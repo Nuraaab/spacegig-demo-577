@@ -11,7 +11,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store, ChevronDown } from 'lucide-react-native';
+import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -42,7 +42,6 @@ export default function DiscoverScreen() {
   const [showSubcategoryModal, setShowSubcategoryModal] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState<boolean>(false);
   const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'rent' | 'sale'>('all');
 
   const categories: Category[] = [
@@ -162,11 +161,6 @@ export default function DiscoverScreen() {
     setShowSubcategoryModal(false);
   };
 
-  const resetCategorySelection = () => {
-    setSelectedCategory(null);
-    setSelectedSubcategory(null);
-  };
-
 
 
   return (
@@ -211,49 +205,40 @@ export default function DiscoverScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.categoryDropdownContainer}>
-          <TouchableOpacity
-            style={styles.categoryDropdownButton}
-            onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.categoryDropdownButtonText}>
-              {selectedCategory ? selectedCategory.label : 'Categories'}
-            </Text>
-            <ChevronDown 
-              size={18} 
-              color="#666" 
-              style={{
-                transform: [{ rotate: showCategoryDropdown ? '180deg' : '0deg' }]
-              }}
-            />
-          </TouchableOpacity>
-
-          {showCategoryDropdown && (
-            <View style={styles.categoryDropdownMenu}>
-              {categories.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <TouchableOpacity
-                    key={category.id}
-                    style={styles.categoryDropdownItem}
-                    onPress={() => {
-                      handleCategorySelect(category);
-                      setShowCategoryDropdown(false);
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.categoryDropdownItemLeft}>
-                      <Icon size={20} color="#2f95dc" />
-                      <Text style={styles.categoryDropdownItemText}>{category.label}</Text>
-                    </View>
-                    <Text style={styles.categoryDropdownItemCount}>{category.count}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
-        </View>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoriesScroll}
+          style={styles.categoriesContainer}
+        >
+          {categories.map((category) => {
+            const isActive = selectedCategory?.id === category.id;
+            return (
+              <TouchableOpacity
+                key={category.id}
+                style={[
+                  styles.categoryCard,
+                  isActive && styles.categoryCardActive,
+                ]}
+                onPress={() => handleCategorySelect(category)}
+                activeOpacity={0.7}
+              >
+                <View style={[
+                  styles.categoryIconContainer,
+                  isActive && styles.categoryIconContainerActive,
+                ]}>
+                  <Text style={styles.categoryEmoji}>{category.label.split(' ')[0]}</Text>
+                </View>
+                <Text style={[
+                  styles.categoryLabel,
+                  isActive && styles.categoryLabelActive,
+                ]}>
+                  {category.label.split(' ').slice(1).join(' ')}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
 
         {selectedCategory?.id === 'properties' && (
           <View style={styles.listingTypeToggle}>
@@ -985,66 +970,47 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  categoryDropdownContainer: {
-    marginTop: 12,
-    position: 'relative',
-    zIndex: 1000,
+  categoriesContainer: {
+    marginTop: 16,
+    marginBottom: 4,
   },
-  categoryDropdownButton: {
-    flexDirection: 'row',
+  categoriesScroll: {
+    paddingRight: 20,
+  },
+  categoryCard: {
     alignItems: 'center',
-    justifyContent: 'space-between',
+    marginRight: 20,
+    paddingVertical: 8,
+  },
+  categoryCardActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#1a1a1a',
+  },
+  categoryIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#f5f5f5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  categoryDropdownButtonText: {
-    fontSize: 15,
-    fontWeight: '500' as const,
-    color: '#1a1a1a',
-  },
-  categoryDropdownMenu: {
-    position: 'absolute',
-    top: 52,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-    zIndex: 1001,
-  },
-  categoryDropdownItem: {
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    marginBottom: 8,
   },
-  categoryDropdownItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  categoryIconContainerActive: {
+    backgroundColor: '#E8F4FF',
+    borderWidth: 2,
+    borderColor: '#2f95dc',
   },
-  categoryDropdownItemText: {
-    fontSize: 15,
-    fontWeight: '500' as const,
-    color: '#1a1a1a',
+  categoryEmoji: {
+    fontSize: 28,
   },
-  categoryDropdownItemCount: {
+  categoryLabel: {
     fontSize: 13,
     fontWeight: '500' as const,
-    color: '#999',
+    color: '#666',
+  },
+  categoryLabelActive: {
+    color: '#1a1a1a',
+    fontWeight: '600' as const,
   },
 
   listingTypeToggle: {
