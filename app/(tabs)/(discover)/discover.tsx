@@ -209,10 +209,7 @@ export default function DiscoverScreen() {
       <View style={styles.categorySelectionContainer}>
         <TouchableOpacity 
           style={styles.categorySelector}
-          onPress={() => {
-            console.log('Category selector pressed');
-            setShowCategoryModal(true);
-          }}
+          onPress={() => setShowCategoryModal(true)}
           activeOpacity={0.7}
         >
           <View style={styles.categorySelectorLeft}>
@@ -359,15 +356,11 @@ export default function DiscoverScreen() {
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               {categories.map((category) => {
                 const Icon = category.icon;
-                console.log('Rendering category:', category.label);
                 return (
                   <TouchableOpacity
                     key={category.id}
                     style={styles.categoryOption}
-                    onPress={() => {
-                      console.log('Category selected:', category.label);
-                      handleCategorySelect(category);
-                    }}
+                    onPress={() => handleCategorySelect(category)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.categoryOptionLeft}>
