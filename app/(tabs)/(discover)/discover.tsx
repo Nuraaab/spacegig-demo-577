@@ -51,12 +51,11 @@ export default function DiscoverScreen() {
       icon: HomeIcon,
       count: 342,
       subcategories: [
-        { id: 'houses', label: 'Houses', count: 128, propertyTypes: ['house'] },
-        { id: 'apartments', label: 'Apartments', count: 156, propertyTypes: ['apartment'] },
-        { id: 'condos', label: 'Condos', count: 58, propertyTypes: ['condo'] },
-        { id: 'commercial', label: 'Commercial', count: 89, propertyTypes: ['commercial'] },
-        { id: 'rooms', label: 'Rooms', count: 167, propertyTypes: ['room'] },
-        { id: 'land', label: 'Land', count: 67, propertyTypes: ['land'] },
+        { id: 'houses', label: '🏠 House', count: 128, propertyTypes: ['house'] },
+        { id: 'apartments', label: '🏢 Apartment', count: 156, propertyTypes: ['apartment'] },
+        { id: 'land', label: '🌳 Land', count: 67, propertyTypes: ['land'] },
+        { id: 'basement', label: '🏚️ Basement', count: 45, propertyTypes: ['basement'] },
+        { id: 'rooms', label: '🚪 Room', count: 167, propertyTypes: ['room'] },
       ],
     },
     {
@@ -152,8 +151,8 @@ export default function DiscoverScreen() {
 
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
+    setSelectedSubcategory(null);
     setShowCategoryModal(false);
-    setShowSubcategoryModal(true);
   };
 
   const handleSubcategorySelect = (subcategory: Subcategory) => {
@@ -241,42 +240,82 @@ export default function DiscoverScreen() {
         </ScrollView>
 
         {selectedCategory?.id === 'properties' && (
-          <View style={styles.listingTypeToggle}>
-            <TouchableOpacity
-              style={[
-                styles.listingTypeButton,
-                listingTypeFilter === 'sale' && styles.listingTypeButtonActive,
-              ]}
-              onPress={() => setListingTypeFilter('sale')}
-              activeOpacity={0.7}
+          <>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.subcategoriesScroll}
+              style={styles.subcategoriesContainer}
             >
-              <Text
+              {selectedCategory.subcategories.map((subcategory) => {
+                const isActive = selectedSubcategory?.id === subcategory.id;
+                return (
+                  <TouchableOpacity
+                    key={subcategory.id}
+                    style={[
+                      styles.subcategoryChip,
+                      isActive && styles.subcategoryChipActive,
+                    ]}
+                    onPress={() => handleSubcategorySelect(subcategory)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[
+                      styles.subcategoryChipText,
+                      isActive && styles.subcategoryChipTextActive,
+                    ]}>
+                      {subcategory.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+              {selectedSubcategory && (
+                <TouchableOpacity
+                  style={styles.clearSubcategoryButton}
+                  onPress={() => setSelectedSubcategory(null)}
+                  activeOpacity={0.7}
+                >
+                  <X size={14} color="#666" />
+                  <Text style={styles.clearSubcategoryText}>Clear</Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+            <View style={styles.listingTypeToggle}>
+              <TouchableOpacity
                 style={[
-                  styles.listingTypeButtonText,
-                  listingTypeFilter === 'sale' && styles.listingTypeButtonTextActive,
+                  styles.listingTypeButton,
+                  listingTypeFilter === 'sale' && styles.listingTypeButtonActive,
                 ]}
+                onPress={() => setListingTypeFilter('sale')}
+                activeOpacity={0.7}
               >
-                For Sale
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.listingTypeButton,
-                listingTypeFilter === 'rent' && styles.listingTypeButtonActive,
-              ]}
-              onPress={() => setListingTypeFilter('rent')}
-              activeOpacity={0.7}
-            >
-              <Text
+                <Text
+                  style={[
+                    styles.listingTypeButtonText,
+                    listingTypeFilter === 'sale' && styles.listingTypeButtonTextActive,
+                  ]}
+                >
+                  For Sale
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={[
-                  styles.listingTypeButtonText,
-                  listingTypeFilter === 'rent' && styles.listingTypeButtonTextActive,
+                  styles.listingTypeButton,
+                  listingTypeFilter === 'rent' && styles.listingTypeButtonActive,
                 ]}
+                onPress={() => setListingTypeFilter('rent')}
+                activeOpacity={0.7}
               >
-                For Rent
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Text
+                  style={[
+                    styles.listingTypeButtonText,
+                    listingTypeFilter === 'rent' && styles.listingTypeButtonTextActive,
+                  ]}
+                >
+                  For Rent
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
         )}
       </View>
 
@@ -1011,6 +1050,53 @@ const styles = StyleSheet.create({
   categoryLabelActive: {
     color: '#1a1a1a',
     fontWeight: '600' as const,
+  },
+
+  subcategoriesContainer: {
+    marginTop: 14,
+    marginBottom: 8,
+  },
+  subcategoriesScroll: {
+    paddingRight: 20,
+  },
+  subcategoryChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    marginRight: 10,
+    borderWidth: 1.5,
+    borderColor: '#f5f5f5',
+  },
+  subcategoryChipActive: {
+    backgroundColor: '#E8F4FF',
+    borderColor: '#2f95dc',
+  },
+  subcategoryChipText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  subcategoryChipTextActive: {
+    color: '#2f95dc',
+    fontWeight: '700' as const,
+  },
+  clearSubcategoryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#e0e0e0',
+    marginRight: 10,
+  },
+  clearSubcategoryText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#666',
   },
 
   listingTypeToggle: {
