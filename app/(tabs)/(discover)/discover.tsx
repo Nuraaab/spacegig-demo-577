@@ -43,6 +43,7 @@ export default function DiscoverScreen() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState<boolean>(false);
+  const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'rent' | 'sale'>('all');
 
   const categories: Category[] = [
     {
@@ -121,6 +122,10 @@ export default function DiscoverScreen() {
         return false;
       }
 
+      if (listingTypeFilter !== 'all' && prop.listingType !== listingTypeFilter) {
+        return false;
+      }
+
       if (filters.listingType !== 'all' && prop.listingType !== filters.listingType) {
         return false;
       }
@@ -144,7 +149,7 @@ export default function DiscoverScreen() {
 
       return true;
     });
-  }, [properties, searchQuery, filters, selectedSubcategory]);
+  }, [properties, searchQuery, filters, selectedSubcategory, listingTypeFilter]);
 
   const handleCategorySelect = (category: Category) => {
     setSelectedCategory(category);
@@ -249,6 +254,45 @@ export default function DiscoverScreen() {
             </View>
           )}
         </View>
+
+        {selectedCategory?.id === 'properties' && (
+          <View style={styles.listingTypeToggle}>
+            <TouchableOpacity
+              style={[
+                styles.listingTypeButton,
+                listingTypeFilter === 'sale' && styles.listingTypeButtonActive,
+              ]}
+              onPress={() => setListingTypeFilter('sale')}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.listingTypeButtonText,
+                  listingTypeFilter === 'sale' && styles.listingTypeButtonTextActive,
+                ]}
+              >
+                For Sale
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.listingTypeButton,
+                listingTypeFilter === 'rent' && styles.listingTypeButtonActive,
+              ]}
+              onPress={() => setListingTypeFilter('rent')}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.listingTypeButtonText,
+                  listingTypeFilter === 'rent' && styles.listingTypeButtonTextActive,
+                ]}
+              >
+                For Rent
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
 
@@ -1001,6 +1045,40 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500' as const,
     color: '#999',
+  },
+
+  listingTypeToggle: {
+    flexDirection: 'row',
+    marginTop: 12,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 4,
+    gap: 4,
+  },
+  listingTypeButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  listingTypeButtonActive: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  listingTypeButtonText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  listingTypeButtonTextActive: {
+    color: '#2f95dc',
+    fontWeight: '700' as const,
   },
 
 
