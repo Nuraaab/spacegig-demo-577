@@ -11,7 +11,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store, LayoutGrid, List } from 'lucide-react-native';
+import { Heart, MapPin, Bed, Bath, Maximize, Search, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store, LayoutGrid, List } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -36,8 +36,9 @@ export default function DiscoverScreen() {
   const router = useRouter();
   const { addToFavorites, properties } = useApp();
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+
+  const [showSearchModal, setShowSearchModal] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
   const [showSubcategoryModal, setShowSubcategoryModal] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -186,24 +187,7 @@ export default function DiscoverScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.searchBarContainer}>
-          <View style={styles.searchBar}>
-            <Search size={18} color="#999" />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search location, property..."
-              placeholderTextColor="#999"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-          <TouchableOpacity 
-            style={styles.filterButton}
-            onPress={() => setShowFilters(true)}
-          >
-            <SlidersHorizontal size={20} color="#1a1a1a" />
-          </TouchableOpacity>
-        </View>
+
 
         <View style={styles.categoriesContainer}>
           {categories.map((category) => {
@@ -233,6 +217,16 @@ export default function DiscoverScreen() {
               </TouchableOpacity>
             );
           })}
+          <TouchableOpacity
+            style={styles.searchIconButton}
+            onPress={() => setShowSearchModal(true)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.searchIconContainer}>
+              <Search size={24} color="#2f95dc" />
+            </View>
+            <Text style={styles.searchIconLabel}>Search</Text>
+          </TouchableOpacity>
         </View>
 
         {selectedCategory?.id === 'properties' && (
@@ -500,33 +494,58 @@ export default function DiscoverScreen() {
       )}
 
       <Modal
-        visible={showFilters}
+        visible={showSearchModal}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowFilters(false)}
+        onRequestClose={() => setShowSearchModal(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Filters</Text>
-              <TouchableOpacity 
-                onPress={() => {
-                  setFilters({
-                    propertyTypes: [],
-                    listingType: 'all',
-                    priceRange: { min: 0, max: 10000 },
-                    beds: 0,
-                    baths: 0,
-                    amenities: [],
-                  });
-                }}
-              >
-                <Text style={styles.resetText}>Reset</Text>
+              <Text style={styles.modalTitle}>Search & Filters</Text>
+              <TouchableOpacity onPress={() => setShowSearchModal(false)}>
+                <X size={24} color="#666" />
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
-              <View style={styles.filterSection}>
+            <View style={styles.modalBody}>
+              <View style={styles.searchModalSection}>
+                <View style={styles.searchModalBar}>
+                  <Search size={20} color="#999" />
+                  <TextInput
+                    style={styles.searchModalInput}
+                    placeholder="Search location, property..."
+                    placeholderTextColor="#999"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    autoFocus
+                  />
+                </View>
+              </View>
+
+              <View style={styles.filterDivider} />
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.resetButtonContainer}>
+                  <TouchableOpacity 
+                    style={styles.resetButton}
+                    onPress={() => {
+                      setFilters({
+                        propertyTypes: [],
+                        listingType: 'all',
+                        priceRange: { min: 0, max: 10000 },
+                        beds: 0,
+                        baths: 0,
+                        amenities: [],
+                      });
+                      setSearchQuery('');
+                    }}
+                  >
+                    <Text style={styles.resetText}>Reset All</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.filterSection}>
                 <Text style={styles.filterLabel}>Listing Type</Text>
                 <View style={styles.segmentedControl}>
                   {['all', 'rent', 'sale'].map((type) => (
@@ -701,14 +720,15 @@ export default function DiscoverScreen() {
                   ))}
                 </View>
               </View>
-            </ScrollView>
+              </ScrollView>
+            </View>
 
             <View style={styles.modalFooter}>
               <TouchableOpacity
                 style={styles.applyButton}
-                onPress={() => setShowFilters(false)}
+                onPress={() => setShowSearchModal(false)}
               >
-                <Text style={styles.applyButtonText}>Show Results</Text>
+                <Text style={styles.applyButtonText}>Show {filteredProperties.length} Results</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -732,13 +752,23 @@ const styles = StyleSheet.create({
   },
 
 
-  filterButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#F0F8FF',
-    borderRadius: 12,
+  searchIconButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  searchIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#E8F4FF',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
+  },
+  searchIconLabel: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    color: '#666',
   },
 
   emptyContainer: {
@@ -812,9 +842,39 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   resetText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600' as const,
     color: '#4A90E2',
+  },
+  searchModalSection: {
+    marginBottom: 16,
+  },
+  searchModalBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    gap: 10,
+  },
+  searchModalInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1a1a1a',
+  },
+  filterDivider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 16,
+  },
+  resetButtonContainer: {
+    marginBottom: 16,
+  },
+  resetButton: {
+    alignSelf: 'flex-end',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   modalBody: {
     flex: 1,
@@ -1006,29 +1066,15 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: '#2f95dc',
   },
-  searchBarContainer: {
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'center',
-  },
-  searchBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 12,
-    gap: 8,
-  },
+
 
   categoriesContainer: {
-    marginTop: 16,
+    marginTop: 20,
     marginBottom: 4,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
   },
   categoryCard: {
     alignItems: 'center',
