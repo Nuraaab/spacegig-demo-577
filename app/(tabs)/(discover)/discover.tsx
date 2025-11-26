@@ -208,22 +208,19 @@ export default function DiscoverScreen() {
 
       <View style={styles.categorySelectionContainer}>
         <TouchableOpacity 
-          style={styles.categorySelector}
-          onPress={() => setShowCategoryModal(true)}
+          style={styles.categoryDropdown}
+          onPress={() => {
+            console.log('Category button pressed');
+            setShowCategoryModal(true);
+          }}
           activeOpacity={0.7}
         >
-          <View style={styles.categorySelectorLeft}>
-            <Text style={styles.categorySelectorLabel}>Category</Text>
+          <View style={styles.dropdownLeft}>
+            <Text style={styles.dropdownLabel}>Category</Text>
             {selectedCategory ? (
-              <View style={styles.selectedCategoryDisplay}>
-                {(() => {
-                  const Icon = selectedCategory.icon;
-                  return <Icon size={18} color="#2f95dc" />;
-                })()}
-                <Text style={styles.categorySelectorValue}>{selectedCategory.label}</Text>
-              </View>
+              <Text style={styles.dropdownValue}>{selectedCategory.label}</Text>
             ) : (
-              <Text style={styles.categorySelectorPlaceholder}>Choose category</Text>
+              <Text style={styles.dropdownPlaceholder}>Choose category</Text>
             )}
           </View>
           <ChevronRight size={20} color="#999" />
@@ -231,15 +228,19 @@ export default function DiscoverScreen() {
 
         {selectedCategory && (
           <TouchableOpacity 
-            style={styles.categorySelector}
-            onPress={() => setShowSubcategoryModal(true)}
+            style={styles.categoryDropdown}
+            onPress={() => {
+              console.log('Subcategory button pressed');
+              setShowSubcategoryModal(true);
+            }}
+            activeOpacity={0.7}
           >
-            <View style={styles.categorySelectorLeft}>
-              <Text style={styles.categorySelectorLabel}>Subcategory</Text>
+            <View style={styles.dropdownLeft}>
+              <Text style={styles.dropdownLabel}>Subcategory</Text>
               {selectedSubcategory ? (
-                <Text style={styles.categorySelectorValue}>{selectedSubcategory.label}</Text>
+                <Text style={styles.dropdownValue}>{selectedSubcategory.label}</Text>
               ) : (
-                <Text style={styles.categorySelectorPlaceholder}>Choose subcategory</Text>
+                <Text style={styles.dropdownPlaceholder}>Choose subcategory</Text>
               )}
             </View>
             <ChevronRight size={20} color="#999" />
@@ -248,11 +249,15 @@ export default function DiscoverScreen() {
 
         {selectedCategory && (
           <TouchableOpacity 
-            style={styles.resetButton}
-            onPress={resetCategorySelection}
+            style={styles.clearButton}
+            onPress={() => {
+              console.log('Clearing selection');
+              resetCategorySelection();
+            }}
+            activeOpacity={0.7}
           >
             <X size={16} color="#666" />
-            <Text style={styles.resetButtonText}>Clear selection</Text>
+            <Text style={styles.clearButtonText}>Clear selection</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -953,7 +958,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
-  categorySelector: {
+  categoryDropdown: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -964,39 +969,36 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e8e8e8',
   },
-  categorySelectorLeft: {
+  dropdownLeft: {
     flex: 1,
   },
-  categorySelectorLabel: {
+  dropdownLabel: {
     fontSize: 12,
     color: '#999',
     fontWeight: '500' as const,
     marginBottom: 4,
   },
-  categorySelectorValue: {
+  dropdownValue: {
     fontSize: 16,
     color: '#1a1a1a',
     fontWeight: '600' as const,
   },
-  categorySelectorPlaceholder: {
+  dropdownPlaceholder: {
     fontSize: 16,
     color: '#ccc',
     fontWeight: '500' as const,
   },
-  selectedCategoryDisplay: {
+  clearButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  resetButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
-    alignSelf: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
   },
-  resetButtonText: {
+  clearButtonText: {
     fontSize: 14,
     color: '#666',
     fontWeight: '500' as const,
