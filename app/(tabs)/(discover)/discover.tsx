@@ -206,61 +206,7 @@ export default function DiscoverScreen() {
         </View>
       </View>
 
-      <View style={styles.categorySelectionContainer}>
-        <TouchableOpacity 
-          style={styles.categoryDropdown}
-          onPress={() => {
-            console.log('Category button pressed');
-            setShowCategoryModal(true);
-          }}
-          activeOpacity={0.7}
-        >
-          <View style={styles.dropdownLeft}>
-            <Text style={styles.dropdownLabel}>Category</Text>
-            {selectedCategory ? (
-              <Text style={styles.dropdownValue}>{selectedCategory.label}</Text>
-            ) : (
-              <Text style={styles.dropdownPlaceholder}>Choose category</Text>
-            )}
-          </View>
-          <ChevronRight size={20} color="#999" />
-        </TouchableOpacity>
 
-        {selectedCategory && (
-          <TouchableOpacity 
-            style={styles.categoryDropdown}
-            onPress={() => {
-              console.log('Subcategory button pressed');
-              setShowSubcategoryModal(true);
-            }}
-            activeOpacity={0.7}
-          >
-            <View style={styles.dropdownLeft}>
-              <Text style={styles.dropdownLabel}>Subcategory</Text>
-              {selectedSubcategory ? (
-                <Text style={styles.dropdownValue}>{selectedSubcategory.label}</Text>
-              ) : (
-                <Text style={styles.dropdownPlaceholder}>Choose subcategory</Text>
-              )}
-            </View>
-            <ChevronRight size={20} color="#999" />
-          </TouchableOpacity>
-        )}
-
-        {selectedCategory && (
-          <TouchableOpacity 
-            style={styles.clearButton}
-            onPress={() => {
-              console.log('Clearing selection');
-              resetCategorySelection();
-            }}
-            activeOpacity={0.7}
-          >
-            <X size={16} color="#666" />
-            <Text style={styles.clearButtonText}>Clear selection</Text>
-          </TouchableOpacity>
-        )}
-      </View>
 
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>{filteredProperties.length} properties</Text>
@@ -950,59 +896,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  categorySelectionContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    gap: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  categoryDropdown: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e8e8e8',
-  },
-  dropdownLeft: {
-    flex: 1,
-  },
-  dropdownLabel: {
-    fontSize: 12,
-    color: '#999',
-    fontWeight: '500' as const,
-    marginBottom: 4,
-  },
-  dropdownValue: {
-    fontSize: 16,
-    color: '#1a1a1a',
-    fontWeight: '600' as const,
-  },
-  dropdownPlaceholder: {
-    fontSize: 16,
-    color: '#ccc',
-    fontWeight: '500' as const,
-  },
-  clearButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 10,
-  },
-  clearButtonText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500' as const,
-  },
+
 
   resultsHeader: {
     flexDirection: 'row',
