@@ -11,7 +11,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store } from 'lucide-react-native';
+import { Heart, MapPin, Bed, Bath, Maximize, Search, SlidersHorizontal, Home as HomeIcon, Briefcase, Package, Wrench, Users, ChevronRight, X, Store, ChevronDown } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 import { PROPERTY_TYPES, AMENITIES, PropertyType } from '@/mocks/properties';
 
@@ -42,6 +42,7 @@ export default function DiscoverScreen() {
   const [showSubcategoryModal, setShowSubcategoryModal] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState<boolean>(false);
 
   const categories: Category[] = [
     {
@@ -203,6 +204,50 @@ export default function DiscoverScreen() {
           >
             <SlidersHorizontal size={20} color="#1a1a1a" />
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.categoryDropdownContainer}>
+          <TouchableOpacity
+            style={styles.categoryDropdownButton}
+            onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.categoryDropdownButtonText}>
+              {selectedCategory ? selectedCategory.label : 'Categories'}
+            </Text>
+            <ChevronDown 
+              size={18} 
+              color="#666" 
+              style={{
+                transform: [{ rotate: showCategoryDropdown ? '180deg' : '0deg' }]
+              }}
+            />
+          </TouchableOpacity>
+
+          {showCategoryDropdown && (
+            <View style={styles.categoryDropdownMenu}>
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <TouchableOpacity
+                    key={category.id}
+                    style={styles.categoryDropdownItem}
+                    onPress={() => {
+                      handleCategorySelect(category);
+                      setShowCategoryDropdown(false);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.categoryDropdownItemLeft}>
+                      <Icon size={20} color="#2f95dc" />
+                      <Text style={styles.categoryDropdownItemText}>{category.label}</Text>
+                    </View>
+                    <Text style={styles.categoryDropdownItemCount}>{category.count}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </View>
       </View>
 
@@ -894,6 +939,68 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     gap: 8,
+  },
+
+  categoryDropdownContainer: {
+    marginTop: 12,
+    position: 'relative',
+    zIndex: 1000,
+  },
+  categoryDropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  categoryDropdownButtonText: {
+    fontSize: 15,
+    fontWeight: '500' as const,
+    color: '#1a1a1a',
+  },
+  categoryDropdownMenu: {
+    position: 'absolute',
+    top: 52,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+    zIndex: 1001,
+  },
+  categoryDropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  categoryDropdownItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  categoryDropdownItemText: {
+    fontSize: 15,
+    fontWeight: '500' as const,
+    color: '#1a1a1a',
+  },
+  categoryDropdownItemCount: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    color: '#999',
   },
 
 
